@@ -1,0 +1,10 @@
+server:
+  id: "main"
+
+api:
+  socket:
+    url: 'ws.warz.one'
+    secret: 'fun!'
+  http:
+    url: 'api.warz.one'
+    secret: 'epic123'

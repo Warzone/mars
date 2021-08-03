@@ -1,0 +1,5 @@
+name: WarzonePGM
+version: ${project.version}
+main: network.warzone.pgm.WarzonePGM
+depend: [ PGM ]
+website: https://github.com/Warzone
