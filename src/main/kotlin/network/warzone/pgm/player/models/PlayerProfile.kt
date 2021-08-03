@@ -1,12 +1,12 @@
 @file:UseSerializers(UUIDSerializer::class, DateAsLongSerializer::class)
+
 package network.warzone.pgm.player.models
 
-import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.UseSerializers
 import network.warzone.pgm.feature.named.NamedResource
 import network.warzone.pgm.feature.relations.Relation
-import network.warzone.pgm.feature.resource.Resource
 import network.warzone.pgm.feature.resource.ResourceType
 import network.warzone.pgm.ranks.models.Rank
 import network.warzone.pgm.utils.DateAsLongSerializer
@@ -32,7 +32,7 @@ data class PlayerProfile(
 
     val tagIds: MutableList<UUID>,
     @Transient var tags: List<Any> = emptyList()
-    ) : NamedResource {
+) : NamedResource {
 
     override fun generate(): PlayerProfile {
         ranks = rankIds.map {

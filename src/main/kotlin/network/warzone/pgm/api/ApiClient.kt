@@ -21,7 +21,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import network.warzone.pgm.WarzonePGM
 import network.warzone.pgm.api.events.ApiConnectedEvent
-import network.warzone.pgm.api.http.Response
 import network.warzone.pgm.api.socket.InboundEvent
 import network.warzone.pgm.api.socket.OutboundEvent
 import network.warzone.pgm.exceptions.MissingConfigPathException
@@ -65,13 +64,13 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
     }
 
     suspend inline fun <reified T> get(url: String): T {
-        return client.get(url)
+        return client.get(httpUrl + url)
     }
 
     suspend inline fun <reified T, K> post(url: String, body: K): T {
-         return client.post(httpUrl + url) {
-             this.body = body!!
-         }
+        return client.post(httpUrl + url) {
+            this.body = body!!
+        }
     }
 
     suspend inline fun <reified T> delete(url: String): T {

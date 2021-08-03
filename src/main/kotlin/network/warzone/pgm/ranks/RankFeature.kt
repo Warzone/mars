@@ -5,9 +5,7 @@ import network.warzone.pgm.feature.named.NamedCacheFeature
 import network.warzone.pgm.player.feature.PlayerFeature
 import network.warzone.pgm.ranks.commands.RankCommands
 import network.warzone.pgm.ranks.models.Rank
-import org.bukkit.permissions.PermissionAttachment
 import java.util.*
-import kotlin.collections.HashMap
 
 object RankFeature : NamedCacheFeature<Rank, RankService>() {
     override val service = RankService
@@ -28,11 +26,11 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
             .create(
                 name = name,
                 displayName = displayName ?: name,
-                priority = priority?: 0,
+                priority = priority ?: 0,
                 prefix = prefix,
                 permissions = emptyList(),
-                staff = staff?: false,
-                applyOnJoin = applyOnJoin?: false
+                staff = staff ?: false,
+                applyOnJoin = applyOnJoin ?: false
             )
             .also { it?.let { add(it) } }
     }
@@ -63,7 +61,9 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
             }
 
             invalidate(uuid)
-        } catch (e: ApiException) { throw e }
+        } catch (e: ApiException) {
+            throw e
+        }
     }
 
     override fun getCommands(): List<Any> {

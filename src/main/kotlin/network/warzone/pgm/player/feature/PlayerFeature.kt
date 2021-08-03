@@ -11,9 +11,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.permissions.PermissionAttachment
 import java.util.*
-import java.util.function.Predicate
 
 object PlayerFeature : NamedCacheFeature<PlayerProfile, PlayerService>(), Listener {
     override val service = PlayerService

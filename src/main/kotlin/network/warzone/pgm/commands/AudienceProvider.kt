@@ -9,11 +9,11 @@ import org.bukkit.command.CommandSender
 class AudienceProvider : BukkitProvider<Audience> {
 
     override fun get(sender: CommandSender, args: CommandArgs?, list: MutableList<out Annotation>?): Audience {
-        return AUDIENCE_PROVIDER.sender(sender!!)
+        return AUDIENCE_PROVIDER.sender(sender)
     }
 
     override fun isProvided(): Boolean {
-        return true;
+        return true
     }
 
 

@@ -18,7 +18,7 @@ inline fun literalText(
     builder: LiteralTextBuilder.() -> Unit = { }
 ) = LiteralTextBuilder(baseText).apply(builder).build()
 
-class LiteralTextBuilder(val internalText: TextComponent, ) {
+class LiteralTextBuilder(val internalText: TextComponent) {
     constructor(text: String) : this(Component.text(text))
 
     var bold: Boolean? = null
@@ -106,7 +106,10 @@ class LiteralTextBuilder(val internalText: TextComponent, ) {
      * instead it will be suggested in the command prompt
      */
     fun onClickCommand(command: String, onlySuggest: Boolean = false) {
-        clickEvent = ClickEvent.clickEvent(if (onlySuggest) ClickEvent.Action.SUGGEST_COMMAND else ClickEvent.Action.RUN_COMMAND, command)
+        clickEvent = ClickEvent.clickEvent(
+            if (onlySuggest) ClickEvent.Action.SUGGEST_COMMAND else ClickEvent.Action.RUN_COMMAND,
+            command
+        )
     }
 
     /**

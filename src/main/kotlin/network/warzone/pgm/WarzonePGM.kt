@@ -1,8 +1,7 @@
 package network.warzone.pgm
 
+import app.ashcon.intake.bukkit.BukkitIntake
 import app.ashcon.intake.bukkit.graph.BasicBukkitCommandGraph
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import network.warzone.pgm.api.ApiClient
 import network.warzone.pgm.commands.CommandModule
@@ -37,7 +36,9 @@ class WarzonePGM : JavaPlugin() {
         val commandGraph = BasicBukkitCommandGraph(CommandModule)
 
         FeatureManager.init()
-
+        FeatureManager.registerCommands(commandGraph)
+        
+        BukkitIntake(this, commandGraph).register()
     }
 
     override fun onDisable() {
