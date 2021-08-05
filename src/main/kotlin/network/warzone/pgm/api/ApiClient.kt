@@ -67,14 +67,16 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
         return client.get(httpUrl + url)
     }
 
-    suspend inline fun <reified T, K> post(url: String, body: K): T {
+    suspend inline fun <reified T, K : Any> post(url: String, body: K): T {
         return client.post(httpUrl + url) {
-            this.body = body!!
+            this.body = body
         }
     }
 
-    suspend inline fun <reified T, K> put(url: String, body: K): T {
-        return client.put(httpUrl + url)
+    suspend inline fun <reified T, K : Any> put(url: String, body: K): T {
+        return client.put(httpUrl + url) {
+            this.body = body
+        }
     }
 
     suspend inline fun <reified T> delete(url: String): T {
