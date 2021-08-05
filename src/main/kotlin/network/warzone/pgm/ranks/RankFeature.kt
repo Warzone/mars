@@ -2,6 +2,7 @@ package network.warzone.pgm.ranks
 
 import network.warzone.pgm.api.exceptions.ApiException
 import network.warzone.pgm.feature.named.NamedCacheFeature
+import network.warzone.pgm.player.PlayerManager
 import network.warzone.pgm.player.feature.PlayerFeature
 import network.warzone.pgm.ranks.commands.RankCommands
 import network.warzone.pgm.ranks.models.Rank
@@ -58,12 +59,28 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
 
                 // Regenerate relation
                 it.generate()
+
+                // Refresh permissions
+                RankAttachments.refresh(PlayerManager.getPlayer(it._id)!!)
             }
 
             invalidate(uuid)
         } catch (e: ApiException) {
             throw e
         }
+    }
+
+    suspend fun updateRank(rank: Rank) {
+        service.update(
+            id = rank._id,
+            name = rank.name,
+            displayName = rank.displayName,
+            priority = rank.priority,
+            prefix = rank.prefix,
+            permissions = rank.permissions,
+            staff = rank.staff,
+            applyOnJoin = rank.applyOnJoin
+        )
     }
 
     override fun getCommands(): List<Any> {

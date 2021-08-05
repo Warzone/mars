@@ -73,6 +73,10 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
         }
     }
 
+    suspend inline fun <reified T, K> put(url: String, body: K): T {
+        return client.put(httpUrl + url)
+    }
+
     suspend inline fun <reified T> delete(url: String): T {
         return client.delete(httpUrl + url)
     }

@@ -38,6 +38,27 @@ object RankService : Service<Rank>() {
         return apiClient.get<RankListResponse>("/mc/ranks").ranks
     }
 
+    suspend fun update(
+        id: UUID,
+        name: String,
+        displayName: String?,
+        priority: Int?,
+        prefix: String?,
+        permissions: List<String>?,
+        staff: Boolean?,
+        applyOnJoin: Boolean?
+    ) {
+       return apiClient.put("/mc/ranks/$id", RankUpdateRequest(
+           name,
+           displayName,
+           priority,
+           prefix,
+           permissions,
+           staff,
+           applyOnJoin
+       ))
+    }
+
     override suspend fun get(target: String): Rank {
         return apiClient.get("/mc/ranks/$target")
     }
@@ -69,5 +90,16 @@ object RankService : Service<Rank>() {
         override val message: String? = null,
         override val error: Boolean   = false
     ) : Response()
+
+    @Serializable
+    data class RankUpdateRequest(
+        val name: String,
+        val displayName: String?,
+        val priority: Int?,
+        val prefix: String?,
+        val permissions: List<String>?,
+        val staff: Boolean?,
+        val applyOnJoin: Boolean?
+    )
 
 }

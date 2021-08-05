@@ -4,6 +4,7 @@ import app.ashcon.intake.argument.CommandArgs
 import app.ashcon.intake.parametric.AbstractModule
 import app.ashcon.intake.parametric.Provider
 import net.kyori.adventure.audience.Audience
+import network.warzone.pgm.ranks.models.Rank
 import java.util.function.Supplier
 import kotlin.reflect.KClass
 
@@ -11,6 +12,7 @@ object CommandModule : AbstractModule() {
 
     override fun configure() {
         bind(Audience::class, AudienceProvider())
+        bind(Rank::class, RankProvider())
     }
 
     private fun <T : Any> bind(type: KClass<T>, provider: Provider<T>) {

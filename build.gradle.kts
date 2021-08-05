@@ -1,5 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.31"
@@ -50,7 +50,7 @@ dependencies {
 
 tasks.withType<ShadowJar> {
     minimize()
-    archiveClassifier.set("")
+    archiveClassifier.set("swag")
 }
 
 tasks.withType<KotlinCompile> {

@@ -12,7 +12,7 @@ import java.util.*
 @Serializable
 class Rank (
     override val _id: UUID,
-    override val name: String,
+    override var name: String,
     var nameLower: String,
     var displayName: String?,
     var prefix: String?,
