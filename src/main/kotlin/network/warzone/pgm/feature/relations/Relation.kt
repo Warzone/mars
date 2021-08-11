@@ -10,11 +10,11 @@ import java.util.*
 class Relation<T : Resource>(private val type: ResourceType<Feature<T, *>>, val id: UUID) {
 
     fun blockAndGet(): T = runBlocking {
-        return@runBlocking FeatureManager.getFeature(type).get(id)
+        return@runBlocking FeatureManager.getFeature(type).getKnown(id)
     }
 
     suspend fun get(): T {
-        return FeatureManager.getFeature(type).get(id)
+        return FeatureManager.getFeature(type).getKnown(id)
     }
 
 }
