@@ -1,6 +1,9 @@
 package network.warzone.pgm.feature
 
+import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.map
 import network.warzone.pgm.feature.resource.Resource
+import network.warzone.pgm.utils.FeatureException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Predicate
@@ -27,6 +30,20 @@ abstract class CachedFeature<T : Resource, U : Service<T>> : Feature<T, U>() {
         return resource
     }
 
+    /**
+     * Sets a [UUID] to a resource [T].
+     *
+     * @param id The [UUID] to set.
+     * @param resource The [T] resource to set it to.
+     *
+     * @return The resource [T]
+     */
+    fun set(id: UUID, resource: T): T {
+        cache[id] = resource
+
+        return resource
+    }
+
     fun has(id: UUID): Boolean {
         return cache.containsKey(id)
     }
@@ -39,12 +56,12 @@ abstract class CachedFeature<T : Resource, U : Service<T>> : Feature<T, U>() {
         cache.remove(id)
     }
 
-    override suspend fun get(uuid: UUID): T {
-        if (has(uuid)) return cache.getValue(uuid)
+    override suspend fun get(uuid: UUID): Result<T, FeatureException> {
+        if (has(uuid)) return Result.success(cache.getValue(uuid))
 
         return service
             .get(target = uuid.toString())
-            .also { add(it) }
+            .map { add(it) }
     }
 
 }

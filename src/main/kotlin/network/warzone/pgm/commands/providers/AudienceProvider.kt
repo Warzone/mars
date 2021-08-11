@@ -1,4 +1,4 @@
-package network.warzone.pgm.commands
+package network.warzone.pgm.commands.providers
 
 import app.ashcon.intake.argument.CommandArgs
 import app.ashcon.intake.bukkit.parametric.provider.BukkitProvider

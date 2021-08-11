@@ -1,11 +1,14 @@
 package network.warzone.pgm.ranks
 
-import kotlinx.serialization.Serializable
-import network.warzone.pgm.api.ErrorCode
-import network.warzone.pgm.api.http.Response
+import com.github.kittinunf.result.Result
+import network.warzone.pgm.api.http.ApiExceptionType
 import network.warzone.pgm.feature.Service
+import network.warzone.pgm.ranks.exceptions.RankConflictException
+import network.warzone.pgm.ranks.exceptions.RankMissingException
 import network.warzone.pgm.ranks.models.Rank
-import network.warzone.pgm.utils.except
+import network.warzone.pgm.utils.FeatureException
+import network.warzone.pgm.utils.mapErrorSmart
+import network.warzone.pgm.utils.parseHttpException
 import java.util.*
 
 object RankService : Service<Rank>() {
@@ -18,24 +21,23 @@ object RankService : Service<Rank>() {
         permissions: List<String>?,
         staff: Boolean?,
         applyOnJoin: Boolean?
-    ): Rank? {
-        return apiClient.post<RankCreateResponse, RankCreateRequest>("/mc/ranks", RankCreateRequest(
-            name,
-            displayName,
-            priority,
-            prefix,
-            permissions,
-            staff,
-            applyOnJoin
-        )).except().rank
-    }
-
-    suspend fun delete(uuid: UUID) {
-        apiClient.delete<Response>("/mc/ranks/$uuid").except()
-    }
-
-    suspend fun list(): List<Rank> {
-        return apiClient.get<RankListResponse>("/mc/ranks").ranks
+    ): Result<Rank, RankConflictException> {
+        return parseHttpException {
+            apiClient.post<Rank, RankDataRequest>("/mc/ranks", RankDataRequest(
+                name,
+                displayName,
+                priority,
+                prefix,
+                permissions,
+                staff,
+                applyOnJoin
+            ))
+        }.mapErrorSmart {
+            when (it.code) {
+                ApiExceptionType.RANK_CONFLICT -> RankConflictException(name)
+                else -> TODO()
+            }
+        }
     }
 
     suspend fun update(
@@ -47,52 +49,53 @@ object RankService : Service<Rank>() {
         permissions: List<String>?,
         staff: Boolean?,
         applyOnJoin: Boolean?
-    ) {
-       return apiClient.put("/mc/ranks/$id", RankUpdateRequest(
-           name,
-           displayName,
-           priority,
-           prefix,
-           permissions,
-           staff,
-           applyOnJoin
-       ))
+    ): Result<Unit, FeatureException> {
+        return parseHttpException {
+            apiClient.put<Unit, RankDataRequest>("/mc/ranks/$id", RankDataRequest(
+                name,
+                displayName,
+                priority,
+                prefix,
+                permissions,
+                staff,
+                applyOnJoin
+            ))
+        }.mapErrorSmart {
+            when (it.code) {
+                ApiExceptionType.RANK_CONFLICT -> RankConflictException(name)
+                ApiExceptionType.RANK_MISSING -> RankMissingException(name)
+                else -> TODO()
+            }
+        }
     }
 
-    override suspend fun get(target: String): Rank {
-        return apiClient.get("/mc/ranks/$target")
+    suspend fun delete(uuid: UUID): Result<Unit, RankMissingException> {
+        return parseHttpException {
+            apiClient.delete<Unit>("/mc/ranks/$uuid")
+        }.mapErrorSmart {
+            when (it.code) {
+                ApiExceptionType.RANK_MISSING -> RankMissingException(uuid.toString())
+                else -> TODO()
+            }
+        }
     }
 
-    @Serializable
-    data class RankCreateRequest(
-        val name: String,
-        val displayName: String?,
-        val priority: Int?,
-        val prefix: String?,
-        val permissions: List<String>?,
-        val staff: Boolean?,
-        val applyOnJoin: Boolean?
-    )
-    @Serializable
-    data class RankCreateResponse(
-        val rank: Rank? = null,
+    suspend fun list(): List<Rank> {
+        return apiClient.get("/mc/ranks")
+    }
 
-        override val code: ErrorCode? = null,
-        override val message: String? = null,
-        override val error: Boolean   = false
-    ) : Response()
+    override suspend fun get(target: String): Result<Rank, RankMissingException> {
+        return parseHttpException {
+            apiClient.get<Rank>("/mc/ranks/$target")
+        }.mapErrorSmart {
+            when (it.code) {
+                ApiExceptionType.RANK_MISSING -> RankMissingException(target)
+                else -> TODO()
+            }
+        }
+    }
 
-    @Serializable
-    data class RankListResponse(
-        val ranks: List<Rank>,
-
-        override val code: ErrorCode? = null,
-        override val message: String? = null,
-        override val error: Boolean   = false
-    ) : Response()
-
-    @Serializable
-    data class RankUpdateRequest(
+    data class RankDataRequest(
         val name: String,
         val displayName: String?,
         val priority: Int?,

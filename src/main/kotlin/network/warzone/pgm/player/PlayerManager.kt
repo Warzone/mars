@@ -1,5 +1,7 @@
 package network.warzone.pgm.player
 
+import network.warzone.pgm.WarzonePGM
+import network.warzone.pgm.player.listeners.ChatListener
 import network.warzone.pgm.player.models.Session
 import org.bukkit.entity.Player
 import java.util.*
@@ -8,16 +10,20 @@ object PlayerManager {
 
     private val players: MutableMap<UUID, PlayerContext> = HashMap()
 
-    fun addPlayer(context: PlayerContext) {
-        players[context.uuid] = context
+    init {
+        WarzonePGM.registerEvents(ChatListener())
     }
 
-    fun addPlayer(player: Player, session: Session): PlayerContext {
+    fun createPlayer(player: Player, session: Session): PlayerContext {
         return PlayerContext(
             uuid = player.uniqueId,
             player = player,
             activeSession = session
         ).also { players[it.uuid] = it }
+    }
+
+    fun addPlayer(context: PlayerContext) {
+        players[context.uuid] = context
     }
 
     fun getPlayer(username: String): PlayerContext? {

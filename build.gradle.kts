@@ -40,17 +40,19 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-websockets:$ktorVersion")
-    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+    implementation("io.ktor:ktor-client-gson:$ktorVersion")
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.21")
+
+    implementation("com.github.kittinunf.result:result-jvm:5.1.0")
 }
 
 tasks.withType<ShadowJar> {
     minimize()
-    archiveClassifier.set("swag")
+    archiveClassifier.set("")
 }
 
 tasks.withType<KotlinCompile> {

@@ -1,10 +1,13 @@
 package network.warzone.pgm.api
 
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializer
+import com.google.gson.annotations.SerializedName
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -13,29 +16,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import network.warzone.pgm.WarzonePGM
 import network.warzone.pgm.api.events.ApiConnectedEvent
 import network.warzone.pgm.api.socket.InboundEvent
 import network.warzone.pgm.api.socket.OutboundEvent
-import network.warzone.pgm.exceptions.MissingConfigPathException
+import network.warzone.pgm.utils.GSON
+import network.warzone.pgm.utils.MissingConfigPathException
 import network.warzone.pgm.utils.zlibCompress
 import network.warzone.pgm.utils.zlibDecompress
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
+import java.util.*
 
-@Serializable
 data class Packet<T>(
-    @SerialName("e") val event: String,
-    @SerialName("d") val data: T,
+    @SerializedName("e") val event: String,
+    @SerializedName("d") val data: T,
 )
 
-@Serializable
 data class AuthData(val id: String, val secret: String)
 
 class ApiClient(serverId: String, config: ConfigurationSection) {
@@ -46,7 +43,14 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
 
     val client: HttpClient = HttpClient(CIO) {
         install(JsonFeature) {
-            serializer = KotlinxSerializer()
+            serializer = GsonSerializer {
+                registerTypeAdapter(Date::class.java, JsonDeserializer {
+                    json, _, _ -> Date(json.asJsonPrimitive.asLong)
+                })
+                registerTypeAdapter(Date::class.java, JsonSerializer<Date> {
+                        date, _, _ -> JsonPrimitive(date.time)
+                })
+            }
         }
         install(WebSockets)
 
@@ -67,6 +71,10 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
         return client.get(httpUrl + url)
     }
 
+    suspend inline fun <reified T> post(url: String): T {
+        return client.post(httpUrl + url)
+    }
+
     suspend inline fun <reified T, K : Any> post(url: String, body: K): T {
         return client.post(httpUrl + url) {
             this.body = body
@@ -84,7 +92,7 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
     }
 
     fun <T> emit(type: OutboundEvent<T>, data: T) {
-        val jsonString = Json.encodeToString(Packet(type.eventName, data))
+        val jsonString = GSON.toJson(Packet(type.eventName, data))
 
         API_SCOPE.launch {
             websocketSession.send(Frame.Binary(true, jsonString.zlibCompress()))
@@ -129,12 +137,12 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
                     val jsonPacket = frame.data.zlibDecompress()
                     println("Received $jsonPacket")
 
-                    val jsonElement = Json.parseToJsonElement(jsonPacket).jsonObject
-                    val eventName = jsonElement["e"]?.jsonPrimitive?.content
+                    val jsonElement = GSON.toJsonTree(jsonPacket).asJsonObject
+                    val eventName = jsonElement.get("e").asString
 
                     val event = InboundEvent.valueOf<Any>(eventName!!)
 
-                    jsonElement["d"]?.let { event.call(it) }
+                    jsonElement.asJsonObject.get("d")?. let { event.call(it) }
                 }
             }
         }

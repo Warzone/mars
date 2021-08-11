@@ -7,7 +7,7 @@ import network.warzone.pgm.feature.resource.Resource
 import network.warzone.pgm.feature.resource.ResourceType
 import java.util.*
 
-class Relation<T : Resource>(private val type: ResourceType<Feature<T, *>>, private val id: UUID) {
+class Relation<T : Resource>(private val type: ResourceType<Feature<T, *>>, val id: UUID) {
 
     fun blockAndGet(): T = runBlocking {
         return@runBlocking FeatureManager.getFeature(type).get(id)

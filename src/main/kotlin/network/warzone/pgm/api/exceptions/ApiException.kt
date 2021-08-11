@@ -1,5 +1,5 @@
 package network.warzone.pgm.api.exceptions
 
-import network.warzone.pgm.api.ErrorCode
+import network.warzone.pgm.api.http.ApiExceptionType
 
-class ApiException(val code: ErrorCode, override val message: String) : RuntimeException()
+data class ApiException(val code: ApiExceptionType, override val message: String) : RuntimeException()

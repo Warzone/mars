@@ -1,17 +1,16 @@
 package network.warzone.pgm.api.socket
 
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.decodeFromJsonElement
+import com.google.gson.Gson
+import com.google.gson.JsonElement
 import org.bukkit.event.Event
 import kotlin.reflect.full.isSubclassOf
 
-@Serializable
 data class ComplexType(val test: String)
 
 sealed class InboundEvent<T>(val eventName: String, val toBukkit: (T) -> Event, val parse: (JsonElement) -> T) {
-    object PING : InboundEvent<ComplexType>("PING", ::PingEvent, Json::decodeFromJsonElement)
+    object PING : InboundEvent<ComplexType>("PING", ::PingEvent, {
+        Gson().fromJson(it, ComplexType::class.java)
+    })
 
     fun call(d: JsonElement) {
         toBukkit(parse(d)).callEvent()
