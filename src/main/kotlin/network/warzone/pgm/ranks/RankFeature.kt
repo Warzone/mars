@@ -67,7 +67,7 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
      */
     suspend fun updateRank(id: UUID, newRank: Rank): Result<Rank, FeatureException> {
         // Checks if a rank exists by the name of the new rank, if so returns an exception.
-        if (has(newRank.name)) return Result.failure(RankConflictException(newRank.name))
+        if (has(newRank.name) && getKnown(newRank.name)._id != id) return Result.failure(RankConflictException(newRank.name))
         // Checks if the target rank exists, if not returns an exception.
         if (!has(id)) return Result.failure(RankMissingException(id.toString()))
 
@@ -132,7 +132,9 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
         }
     }
 
-    override fun getCommands(): List<Any> {
-        return listOf(RankCommands())
+    override fun getSubcommands(): Map<List<String>, Any> {
+        return mapOf(
+            listOf("rank", "ranks") to RankCommands()
+        )
     }
 }

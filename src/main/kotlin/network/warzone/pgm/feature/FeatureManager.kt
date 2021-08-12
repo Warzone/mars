@@ -15,7 +15,8 @@ object FeatureManager : Listener {
 
     private val features: MutableMap<ResourceType<*>, Feature<*, *>> = mutableMapOf(
         ResourceType.Player to PlayerFeature,
-        ResourceType.Rank to RankFeature
+        ResourceType.Rank to RankFeature,
+        ResourceType.Tag to TagFeature
     )
 
     fun init() {
@@ -27,11 +28,16 @@ object FeatureManager : Listener {
     }
 
     fun registerCommands(graph: BasicBukkitCommandGraph) {
-        val rankCommandNode = graph.rootDispatcherNode.registerNode("rank")
-        RankFeature.getCommands().forEach(rankCommandNode::registerCommands)
+        features.values.forEach {
+            it.getSubcommands().forEach { entry ->
+                val node = graph.rootDispatcherNode.registerNode(*entry.key.toTypedArray())
+                node.registerCommands(entry.value)
+            }
 
-        val tagCommandNode = graph.rootDispatcherNode.registerNode("tags")
-        TagFeature.getCommands().forEach(tagCommandNode::registerCommands)
+            it.getCommands().forEach { command ->
+                graph.rootDispatcherNode.registerCommands(command)
+            }
+        }
     }
 
     @EventHandler

@@ -7,6 +7,7 @@ import network.warzone.pgm.WarzonePGM
 import network.warzone.pgm.feature.named.NamedCacheFeature
 import network.warzone.pgm.player.PlayerContext
 import network.warzone.pgm.player.PlayerManager
+import network.warzone.pgm.player.feature.exceptions.PlayerMissingException
 import network.warzone.pgm.player.models.PlayerProfile
 import network.warzone.pgm.ranks.RankAttachments
 import network.warzone.pgm.ranks.exceptions.RankAlreadyPresentException
@@ -15,6 +16,7 @@ import network.warzone.pgm.ranks.models.Rank
 import network.warzone.pgm.tags.exceptions.TagAlreadyPresentException
 import network.warzone.pgm.tags.exceptions.TagNotPresentException
 import network.warzone.pgm.tags.models.Tag
+import network.warzone.pgm.utils.FeatureException
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
@@ -120,7 +122,29 @@ object PlayerFeature : NamedCacheFeature<PlayerProfile, PlayerService>(), Listen
 
         val profile = player.getPlayerProfile()
 
+        if (profile.activeTagId == tag._id) profile.activeTagId = null
+
         profile.tagIds.remove(tag._id)
+        profile.generate()
+
+        return Result.success(player)
+    }
+
+    suspend fun setActiveTag(player: PlayerContext, tag: Tag): Result<PlayerContext, FeatureException> {
+        service.setActiveTag(player.uuid, tag._id)
+
+        val profile = player.getPlayerProfile()
+        profile.activeTagId = tag._id
+        profile.generate()
+
+        return Result.success(player)
+    }
+
+    suspend fun removeActiveTag(player: PlayerContext): Result<PlayerContext, PlayerMissingException> {
+        service.setActiveTag(player.uuid, null)
+
+        val profile = player.getPlayerProfile()
+        profile.activeTagId = null
         profile.generate()
 
         return Result.success(player)

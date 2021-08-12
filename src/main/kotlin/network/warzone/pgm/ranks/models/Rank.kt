@@ -7,7 +7,6 @@ import java.util.*
 data class Rank (
     override val _id: UUID,
     override var name: String,
-    var nameLower: String,
     var displayName: String?,
     var prefix: String?,
     var priority: Int,
@@ -16,6 +15,8 @@ data class Rank (
     var applyOnJoin: Boolean,
     var permissions: MutableList<String>
 ) : NamedResource {
+
+    val nameLower: String get() = name.toLowerCase(Locale.ROOT)
 
     override fun generate(): Resource {
         // no relations?

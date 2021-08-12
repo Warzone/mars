@@ -1,6 +1,5 @@
 package network.warzone.pgm.utils
 
-import app.ashcon.intake.parametric.ProvisionException
 import com.github.kittinunf.result.Result
 import com.google.gson.JsonSyntaxException
 import io.ktor.client.features.*
@@ -25,6 +24,8 @@ suspend fun <T> parseHttpException(block: suspend() -> T?): Result<T, ApiExcepti
         // Read the lines of the exception.
         val lines = e.response.readText(Charset.defaultCharset())
 
+        println("lines $lines")
+
         // Try parsing the lines to an ApiExceptionResponse, throwing a RuntimeException if that fails.
         val res = try {
             GSON.fromJson(lines, ApiExceptionResponse::class.java)
@@ -32,16 +33,10 @@ suspend fun <T> parseHttpException(block: suspend() -> T?): Result<T, ApiExcepti
             throw RuntimeException("oh no jellz's api is shit and not giving us a valid errorful response!")
         }
 
+        println("res $res")
+
         // Throws
         return Result.failure(ApiException(res.code, res.message))
-    }
-}
-
-suspend fun <T> provide(block: suspend () -> T?): T {
-    try {
-        return block()!!
-    } catch (e: ApiException) {
-        throw ProvisionException("[${e.code}] ${e.message}")
     }
 }
 

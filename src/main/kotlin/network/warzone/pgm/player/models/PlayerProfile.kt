@@ -23,12 +23,16 @@ data class PlayerProfile(
     val rankIds: MutableList<UUID>,
     @Transient var ranks: List<Relation<Rank>> = emptyList(),
 
+    var activeTagId: UUID?,
+    @Transient var activeTag: Relation<Tag>? = null,
+
     val tagIds: MutableList<UUID>,
     @Transient var tags: List<Relation<Tag>> = emptyList()
 ) : NamedResource {
 
     suspend fun tags(): List<Tag> = tags.map { it.get() }
     suspend fun ranks(): List<Rank> = ranks.map { it.get() }
+    suspend fun activeTag(): Tag? = activeTag?.get()
 
     override fun generate(): PlayerProfile {
         ranks = rankIds.map {
@@ -37,6 +41,11 @@ data class PlayerProfile(
 
         tags = tagIds.map {
             Relation(ResourceType.Tag, it)
+        }
+
+        activeTag = null
+        activeTagId?.let {
+            activeTag = Relation(ResourceType.Tag, it)
         }
 
         return this

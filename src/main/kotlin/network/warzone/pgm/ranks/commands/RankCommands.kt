@@ -7,6 +7,8 @@ import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.pgm.player.PlayerManager
 import network.warzone.pgm.player.feature.PlayerFeature
 import network.warzone.pgm.ranks.RankFeature
@@ -62,6 +64,7 @@ class RankCommands {
         sender.sendMessage("${GREEN}Ranks:")
         ranks
             .map(Rank::asTextComponent)
+            .map { Component.text("- ", NamedTextColor.GRAY).append(it) }
             .forEach(audience::sendMessage)
     }
 
@@ -86,17 +89,23 @@ class RankCommands {
                 "clear" -> mutableRank.permissions.clear()
                 else -> throw CommandException("Invalid action for permissions.")
             }
+            val afterWithDuplicates = mutableRank.permissions.count()
+            mutableRank.permissions = mutableRank.permissions.distinct().toMutableList()
 
             val after = mutableRank.permissions.count()
             val change = after - before
-            val changeDisplay = if (change > 0) "$GREEN+$change" else "$RED-$change"
-            val cleared = before == -change
+            val changeDisplay = if (change > 0) "$GREEN+$change" else if (change == 0) "${YELLOW}0" else "$RED$change"
+            val cleared = after == 0
+            val duplicates = afterWithDuplicates - after
 
             RankFeature.updatePermissions(rank)
             RankFeature.updateRank(rank._id, mutableRank).fold(
                 {
                     if (cleared) sender.sendMessage("${GREEN}Cleared permissions.")
-                    else sender.sendMessage("${GREEN}Updated permissions. $WHITE$BOLD$before $RESET$GRAY-> $WHITE$BOLD$after $GRAY($changeDisplay$GRAY)")
+                    else sender
+                            .sendMessage("${GREEN}Updated permissions." +
+                                    "\n$WHITE$BOLD$before $RESET$GRAY-> $WHITE$BOLD$after $GRAY($changeDisplay$GRAY) " +
+                                    "[$duplicates duplicate${if (duplicates == 1) "" else "s"} ignored]")
                 },
                 {
                     audience.sendMessage(it.asTextComponent())
@@ -110,13 +119,18 @@ class RankCommands {
                 "prefix" -> mutableRank.prefix = if (value == "clear") null else value
                 "staff" -> mutableRank.staff = value.toBoolean()
                 "default" -> mutableRank.applyOnJoin = value.toBoolean()
-                else -> throw CommandException("Invalid property.")
+                else -> throw CommandException("Invalid property $targetProperty.")
             }
+
+            //val difference = rank.diff(mutableRank, Rank::class)
 
             RankFeature
                 .updateRank(rank._id, mutableRank)
                 .fold(
-                    { sender.sendMessage("${GREEN}Updated permissions.") },
+                    {
+                        sender.sendMessage("${GREEN}Updated rank.")
+                        //difference.map { it.asTextComponent() }.forEach(audience::sendMessage)
+                    },
                     { audience.sendMessage(it.asTextComponent()) }
                 )
         }
@@ -124,7 +138,7 @@ class RankCommands {
 
     @Command( aliases = ["player", "p"], desc = "Operations on a players ranks." )
     fun onRankPlayer(sender: CommandSender, audience: Audience, playerName: String, operation: String, @Nullable rank: Rank?) = runBlocking {
-        val player = PlayerManager.getPlayer(playerName) ?: throw CommandException("Invalid player.")
+        val player = PlayerManager.getPlayer(playerName) ?: throw CommandException("Invalid player.") //TODO: support offline players.
 
         when (operation) {
             "add" -> {
@@ -144,15 +158,15 @@ class RankCommands {
                 )
             }
             "list" -> {
-                val ranks = player.getPlayerProfile().ranks
+                val ranks = player.getPlayerProfile().ranks()
 
                 sender.sendMessage("${GREEN}Ranks:")
                 ranks
-                    .map { it.get() }
                     .map { it.asTextComponent() }
+                    .map { Component.text("- ", NamedTextColor.GRAY).append(it) }
                     .forEach { audience.sendMessage(it) }
             }
-            else -> throw CommandException("Invalid property.")
+            else -> throw CommandException("Invalid operation $operation.")
         }
     }
 

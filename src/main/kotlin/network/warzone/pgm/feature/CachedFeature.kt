@@ -56,6 +56,10 @@ abstract class CachedFeature<T : Resource, U : Service<T>> : Feature<T, U>() {
         cache.remove(id)
     }
 
+    override fun getCached(uuid: UUID): T? {
+        return cache[uuid]
+    }
+
     override suspend fun get(uuid: UUID): Result<T, FeatureException> {
         if (has(uuid)) return Result.success(cache.getValue(uuid))
 

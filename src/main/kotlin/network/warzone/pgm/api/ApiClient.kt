@@ -81,6 +81,10 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
         }
     }
 
+    suspend inline fun <reified T> put(url: String): T {
+        return client.put(httpUrl + url)
+    }
+
     suspend inline fun <reified T, K : Any> put(url: String, body: K): T {
         return client.put(httpUrl + url) {
             this.body = body

@@ -1,8 +1,13 @@
 package network.warzone.pgm.player.listeners
 
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
 import network.warzone.pgm.player.PlayerContext
 import network.warzone.pgm.player.PlayerManager
+import network.warzone.pgm.utils.AUDIENCE_PROVIDER
+import network.warzone.pgm.utils.color
 import org.bukkit.ChatColor.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -32,18 +37,30 @@ class ChatListener : Listener {
     }
 
     private suspend fun sendGlobalChat(match: Match, context: PlayerContext, message: String) {
-
-        //TODO: tags, levels
-
+        //TODO: levels
         val prefix = context.getPrefix()
-        val teamColor = context.matchPlayer.party.color
+        val teamColor = context.matchPlayer.party.fullColor
         val username = context.player.name
 
-        val magicSpace = if (prefix == "") "" else " "
+        val profile = context.getPlayerProfile()
+        val tag = profile.activeTag()
+
+        val messageBuilder = text()
+
+        if (prefix != null) messageBuilder.append { text("$prefix ") }
+
+        messageBuilder.append { text(username, TextColor.color(teamColor.red, teamColor.green, teamColor.blue))  }
+
+        if (tag != null) messageBuilder.append { text(" $GRAY[${tag.display.color()}$GRAY]") }
+
+        messageBuilder.append { text(": ", NamedTextColor.WHITE) }
+        messageBuilder.append { text(message, NamedTextColor.WHITE) }
+
+        val messageComponent = messageBuilder.build()
 
         match.players
-            .map { it.bukkit }
-            .forEach { it.sendMessage("$prefix$magicSpace$teamColor$username$WHITE: $message") }
+            .map { AUDIENCE_PROVIDER.player(it.id) }
+            .forEach { it.sendMessage(messageComponent) }
     }
 
     private fun sendTeamChat(team: Party, context: PlayerContext, message: String) {

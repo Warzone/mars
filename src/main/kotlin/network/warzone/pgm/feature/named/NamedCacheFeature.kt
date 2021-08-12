@@ -13,6 +13,8 @@ abstract class NamedCacheFeature<T : NamedResource, U : Service<T>> : CachedFeat
         return cache.values.any { it.name.equals(name, ignoreCase = true) }
     }
 
+    fun getCached(name: String): T? = cache.values.firstOrNull { it.name.equals(name, ignoreCase = true) }
+
     suspend fun getKnown(name: String): T = getOrNull(name)!!
     suspend fun getOrNull(name: String): T? = get(name).getOrNull()
     suspend fun getOrThrow(name: String): T? = get(name).get()
