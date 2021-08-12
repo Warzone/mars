@@ -40,6 +40,8 @@ suspend fun <T> parseHttpException(block: suspend() -> T?): Result<T, ApiExcepti
     }
 }
 
+
+
 /**
  * Really surprised this method doesn't exist already. They have [Result.mapError] but it randomly drops [T] and uses star projection instead.
  */

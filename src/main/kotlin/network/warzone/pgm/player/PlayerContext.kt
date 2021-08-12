@@ -25,6 +25,10 @@ class PlayerContext(val uuid: UUID, val player: Player, val activeSession: Sessi
         return rank.prefix?.color()
     }
 
+    suspend fun isStaff(): Boolean {
+        return getPlayerProfile().ranks().any { it.staff }
+    }
+
     suspend fun getPlayerProfile(): PlayerProfile {
         // The player is online so we know they exist.
         return PlayerFeature.getKnown(uuid)

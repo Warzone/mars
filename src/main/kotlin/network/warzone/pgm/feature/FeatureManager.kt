@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import network.warzone.pgm.WarzonePGM
 import network.warzone.pgm.api.events.ApiConnectedEvent
 import network.warzone.pgm.feature.resource.ResourceType
+import network.warzone.pgm.map.MapFeature
 import network.warzone.pgm.player.feature.PlayerFeature
 import network.warzone.pgm.ranks.RankFeature
 import network.warzone.pgm.tags.TagFeature
@@ -16,7 +17,8 @@ object FeatureManager : Listener {
     private val features: MutableMap<ResourceType<*>, Feature<*, *>> = mutableMapOf(
         ResourceType.Player to PlayerFeature,
         ResourceType.Rank to RankFeature,
-        ResourceType.Tag to TagFeature
+        ResourceType.Tag to TagFeature,
+        ResourceType.Map to MapFeature
     )
 
     fun init() {

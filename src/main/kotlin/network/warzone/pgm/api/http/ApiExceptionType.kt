@@ -1,6 +1,7 @@
 package network.warzone.pgm.api.http
 
 enum class ApiExceptionType(val code: String) {
+    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR"),
     VALIDATION_ERROR("VALIDATION_ERROR"),
     SESSION_INACTIVE("SESSION_INACTIVE"),
     PLAYER_MISSING("PLAYER_MISSING"),
@@ -11,5 +12,6 @@ enum class ApiExceptionType(val code: String) {
     TAG_CONFLICT("TAG_CONFLICT"),
     TAG_MISSING("TAG_MISSING"),
     TAG_ALREADY_PRESENT("TAG_ALREADY_PRESENT"),
-    TAG_NOT_PRESENT("TAG_NOT_PRESENT");
+    TAG_NOT_PRESENT("TAG_NOT_PRESENT"),
+    MAP_MISSING("MAP_MISSING");
 }
