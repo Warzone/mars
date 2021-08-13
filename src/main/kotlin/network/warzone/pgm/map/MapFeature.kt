@@ -56,9 +56,14 @@ object MapFeature : NamedCacheFeature<GameMap, MapService>() {
             // If it is currently loaded, check its version.
             if (existingMap != null) {
                 // Get the current maps version components.
-                val (major, minor, patch) = existingMap.version.split(".").map { it.toInt() }
-                // Construct a map Version from the components.
-                val existingVersion = Version(major, minor, patch)
+                val components = existingMap.version.split(".").map { it.toInt() }
+                val existingVersion: Version = if (components.size == 3) {
+                    val (major, minor, patch) = components
+                    Version(major, minor, patch)
+                } else {
+                    val (major, minor) = components
+                    Version(major, minor, 0)
+                }
 
                 // Indicate we should load the map if the existing version is older than the new version.
                 load = existingVersion.isOlderThan(map.version)

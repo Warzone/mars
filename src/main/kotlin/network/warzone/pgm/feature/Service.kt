@@ -8,7 +8,7 @@ import network.warzone.pgm.utils.FeatureException
 
 abstract class Service<T : Resource> {
 
-    val apiClient: ApiClient = WarzonePGM.instance.apiClient
+    val apiClient: ApiClient get() = WarzonePGM.get().apiClient
 
     abstract suspend fun get(target: String): Result<T, FeatureException>
 

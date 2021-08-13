@@ -22,6 +22,9 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    //implementation("com.google.code.gson:gson:2.8.2")
+
     implementation("app.ashcon:sportpaper:1.8.8-R0.1-SNAPSHOT")
     implementation("app.ashcon.intake:intake-bukkit:1.2-SNAPSHOT")
 
@@ -36,12 +39,18 @@ dependencies {
         exclude(group = "org.spigotmc", module = "spigot-api")
     }
 
-    val ktorVersion = "1.6.1"
+    val ktorVersion = "1.6.2"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
-    implementation("io.ktor:ktor-client-websockets:$ktorVersion")
     implementation("io.ktor:ktor-client-gson:$ktorVersion")
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
+
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
+    implementation("com.tinder.scarlet:scarlet:0.1.12")
+    implementation("com.tinder.scarlet:websocket-okhttp:0.1.12")
+    implementation("com.tinder.scarlet:message-adapter-gson:0.1.12")
+    implementation("com.tinder.scarlet:stream-adapter-coroutines:0.1.12")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")

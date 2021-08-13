@@ -44,6 +44,7 @@ object FeatureManager : Listener {
 
     @EventHandler
     fun onApiConnected(event: ApiConnectedEvent) = runBlocking {
+        println("API connected event called.")
         features.values.forEach {
             it.init()
         }

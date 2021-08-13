@@ -1,10 +1,11 @@
 package network.warzone.pgm.match
 
-import org.bukkit.event.Listener
+import network.warzone.pgm.WarzonePGM
 
-class MatchManager : Listener {
+object MatchManager {
 
-//    @EventHandler
-//    fun onTeamChange(e: MapLoad)
+    fun init() {
+        WarzonePGM.registerEvents(MatchListener())
+    }
 
 }

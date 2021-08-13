@@ -1,7 +1,10 @@
 package network.warzone.pgm.api.socket
 
-import network.warzone.pgm.api.AuthData
+import java.util.*
+
+data class MatchLoadData(val mapId: UUID)
 
 sealed class OutboundEvent<T>(val eventName: String) {
-    object IDENTIFY : OutboundEvent<AuthData>("IDENTIFY")
+    object MatchLoad : OutboundEvent<MatchLoadData>("MATCH_LOAD")
+    object MatchStart : OutboundEvent<Unit>("MATCH_START")
 }

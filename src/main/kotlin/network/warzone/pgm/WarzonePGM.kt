@@ -5,6 +5,7 @@ import app.ashcon.intake.bukkit.graph.BasicBukkitCommandGraph
 import network.warzone.pgm.api.ApiClient
 import network.warzone.pgm.commands.CommandModule
 import network.warzone.pgm.feature.FeatureManager
+import network.warzone.pgm.match.MatchManager
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -26,12 +27,17 @@ class WarzonePGM : JavaPlugin() {
         instance = this
 
         serverId = config.getString("server.id")
-        apiClient = ApiClient(serverId, config.getConfigurationSection("api"))
 
         val commandGraph = BasicBukkitCommandGraph(CommandModule)
 
         FeatureManager.init()
         FeatureManager.registerCommands(commandGraph)
+
+        apiClient = ApiClient(serverId, config.getConfigurationSection("api"))
+        apiClient.loadHttp()
+        apiClient.loadSocket()
+
+        MatchManager.init()
         
         BukkitIntake(this, commandGraph).register()
     }

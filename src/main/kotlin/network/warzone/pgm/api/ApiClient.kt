@@ -4,26 +4,26 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
+import com.tinder.scarlet.Scarlet
+import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
+import com.tinder.streamadapter.coroutines.CoroutinesStreamAdapterFactory
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
-import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import network.warzone.pgm.WarzonePGM
 import network.warzone.pgm.api.events.ApiConnectedEvent
-import network.warzone.pgm.api.socket.InboundEvent
 import network.warzone.pgm.api.socket.OutboundEvent
+import network.warzone.pgm.api.socket.WarzoneService
 import network.warzone.pgm.utils.GSON
+import network.warzone.pgm.utils.GsonMessageAdapter
 import network.warzone.pgm.utils.MissingConfigPathException
 import network.warzone.pgm.utils.zlibCompress
-import network.warzone.pgm.utils.zlibDecompress
+import okhttp3.OkHttpClient
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import java.util.*
@@ -33,9 +33,7 @@ data class Packet<T>(
     @SerializedName("d") val data: T,
 )
 
-data class AuthData(val id: String, val secret: String)
-
-class ApiClient(serverId: String, config: ConfigurationSection) {
+class ApiClient(val serverId: String, val config: ConfigurationSection) {
 
     companion object {
         val API_SCOPE = CoroutineScope(SupervisorJob())
@@ -52,20 +50,15 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
                 })
             }
         }
-        install(WebSockets)
 
         defaultRequest {
             contentType(ContentType.Application.Json)
         }
     }
+    lateinit var socket: WarzoneService
 
     lateinit var httpUrl: String
     private lateinit var websocketSession: WebSocketSession
-
-    init {
-        loadHttp(config)
-        loadSocket(serverId, config)
-    }
 
     suspend inline fun <reified T> get(url: String): T {
         return client.get(httpUrl + url)
@@ -95,61 +88,44 @@ class ApiClient(serverId: String, config: ConfigurationSection) {
         return client.delete(httpUrl + url)
     }
 
-    fun <T> emit(type: OutboundEvent<T>, data: T) {
-        val jsonString = GSON.toJson(Packet(type.eventName, data))
+    fun <T> emit(event: OutboundEvent<T>, data: T) {
+        val packet = Packet(event.eventName, data)
 
-        API_SCOPE.launch {
-            websocketSession.send(Frame.Binary(true, jsonString.zlibCompress()))
-        }
+        socket.send(GSON.toJson(packet).zlibCompress().asList())
     }
 
-    private fun loadHttp(config: ConfigurationSection) {
+    fun loadHttp() {
         val httpConfig = config.getConfigurationSection("http") ?: throw MissingConfigPathException("api.http")
 
         httpUrl = httpConfig.getString("url") ?: throw MissingConfigPathException("api.http.url")
         //TODO: auth -> set default header.
     }
 
-    private fun loadSocket(serverId: String, config: ConfigurationSection) {
+    fun loadSocket() {
         val socketConfig = config.getConfigurationSection("socket") ?: throw MissingConfigPathException("api.socket")
 
         val socketUrl = socketConfig.getString("url") ?: throw MissingConfigPathException("api.socket.url")
         val socketSecret = socketConfig.getString("secret") ?: throw MissingConfigPathException("api.socket.secret")
 
-        API_SCOPE.launch {
-            createSocket(socketUrl, serverId, socketSecret)
-        }
+        createSocket(socketUrl, serverId, socketSecret)
     }
 
-    private fun createSocket(url: String, serverId: String, secret: String) = runBlocking {
-        client.ws(urlString = "$url/minecraft") {
-            websocketSession = this
+    private fun createSocket(url: String, serverId: String, secret: String) {
+        println("Connecting to socket...")
 
-            emit(OutboundEvent.IDENTIFY, AuthData(serverId, secret))
+        val okHttp = OkHttpClient()
 
-            Bukkit.getPluginManager().callEvent(ApiConnectedEvent(WarzonePGM.get().apiClient))
+        val scarlet = Scarlet.Builder()
+            .webSocketFactory(okHttp.newWebSocketFactory("$url/minecraft?id=$serverId&token=$secret"))
+            .addMessageAdapterFactory(GsonMessageAdapter.Factory())
+            .addStreamAdapterFactory(CoroutinesStreamAdapterFactory())
+            .build()
 
-            while (true) {
-                val optionalFrame = incoming.tryReceive()
+        socket = scarlet.create()
 
-                if (optionalFrame.isSuccess) {
-                    val frame = optionalFrame.getOrNull()
+        Bukkit.getPluginManager().callEvent(ApiConnectedEvent(this))
 
-                    println("Got frame: $frame")
-                    frame as? Frame.Binary ?: continue
-
-                    val jsonPacket = frame.data.zlibDecompress()
-                    println("Received $jsonPacket")
-
-                    val jsonElement = GSON.toJsonTree(jsonPacket).asJsonObject
-                    val eventName = jsonElement.get("e").asString
-
-                    val event = InboundEvent.valueOf<Any>(eventName!!)
-
-                    jsonElement.asJsonObject.get("d")?. let { event.call(it) }
-                }
-            }
-        }
+        println("Connected.")
     }
 
 }
