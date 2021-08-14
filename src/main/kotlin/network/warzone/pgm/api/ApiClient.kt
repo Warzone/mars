@@ -13,32 +13,24 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.http.cio.websocket.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import network.warzone.pgm.api.events.ApiConnectedEvent
 import network.warzone.pgm.api.socket.OutboundEvent
 import network.warzone.pgm.api.socket.WarzoneService
-import network.warzone.pgm.utils.GSON
-import network.warzone.pgm.utils.GsonMessageAdapter
-import network.warzone.pgm.utils.MissingConfigPathException
-import network.warzone.pgm.utils.zlibCompress
+import network.warzone.pgm.utils.*
 import okhttp3.OkHttpClient
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import java.util.*
+import java.util.logging.Level
 
 data class Packet<T>(
     @SerializedName("e") val event: String,
     @SerializedName("d") val data: T,
 )
 
-class ApiClient(val serverId: String, val config: ConfigurationSection) {
+class ApiClient(private val serverId: String, private val config: ConfigurationSection) {
 
-    companion object {
-        val API_SCOPE = CoroutineScope(SupervisorJob())
-    }
-
+    private val logger = createLogger(this::class)
     val client: HttpClient = HttpClient(CIO) {
         install(JsonFeature) {
             serializer = GsonSerializer {
@@ -55,10 +47,13 @@ class ApiClient(val serverId: String, val config: ConfigurationSection) {
             contentType(ContentType.Application.Json)
         }
     }
-    lateinit var socket: WarzoneService
 
+    lateinit var socket: WarzoneService
     lateinit var httpUrl: String
-    private lateinit var websocketSession: WebSocketSession
+
+    init {
+        logger.level = Level.ALL
+    }
 
     suspend inline fun <reified T> get(url: String): T {
         return client.get(httpUrl + url)
@@ -90,8 +85,10 @@ class ApiClient(val serverId: String, val config: ConfigurationSection) {
 
     fun <T> emit(event: OutboundEvent<T>, data: T) {
         val packet = Packet(event.eventName, data)
+        val jsonString = GSON.toJson(packet)
+        logger.finer("Emitting outbound packet. Type ${event.eventName}, Data: $jsonString")
 
-        socket.send(GSON.toJson(packet).zlibCompress().asList())
+        socket.send(jsonString.zlibCompress().asList())
     }
 
     fun loadHttp() {
@@ -111,7 +108,7 @@ class ApiClient(val serverId: String, val config: ConfigurationSection) {
     }
 
     private fun createSocket(url: String, serverId: String, secret: String) {
-        println("Connecting to socket...")
+        logger.info("Connecting to socket...")
 
         val okHttp = OkHttpClient()
 
@@ -125,7 +122,7 @@ class ApiClient(val serverId: String, val config: ConfigurationSection) {
 
         Bukkit.getPluginManager().callEvent(ApiConnectedEvent(this))
 
-        println("Connected.")
+        logger.info("Connected.")
     }
 
 }
