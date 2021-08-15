@@ -1,4 +1,4 @@
-package network.warzone.pgm.api.socket
+package network.warzone.pgm.match.models
 
 import java.util.*
 

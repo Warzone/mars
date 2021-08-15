@@ -9,6 +9,10 @@ val BASE_LOGGER: Logger by lazy {
     Bukkit.getLogger()
 }
 
-fun <T : Any> createLogger(clazz: KClass<T>): ClassLogger {
+fun <T : Any> createLogger(clazz: KClass<out T>): ClassLogger {
     return ClassLogger.get(BASE_LOGGER, clazz.java)
+}
+
+fun createLogger(id: String): Logger {
+    return Logger.getLogger(id)
 }

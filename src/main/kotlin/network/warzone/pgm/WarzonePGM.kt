@@ -9,11 +9,6 @@ import network.warzone.pgm.match.MatchManager
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.logging.Logger
-
-val Logger: Logger by lazy {
-    Bukkit.getLogger()
-}
 
 class WarzonePGM : JavaPlugin() {
 
