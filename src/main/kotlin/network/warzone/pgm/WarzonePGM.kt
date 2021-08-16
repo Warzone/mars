@@ -21,7 +21,6 @@ class WarzonePGM : JavaPlugin() {
     }
 
     private lateinit var serverId: String
-    lateinit var apiClient: ApiClient
 
     override fun onEnable() {
         instance = this
@@ -33,9 +32,9 @@ class WarzonePGM : JavaPlugin() {
         FeatureManager.init()
         FeatureManager.registerCommands(commandGraph)
 
-        apiClient = ApiClient(serverId, config.getConfigurationSection("api"))
-        apiClient.loadHttp()
-        apiClient.loadSocket()
+        val apiConfigurationSection = config.getConfigurationSection("api")
+        ApiClient.loadHttp(apiConfigurationSection)
+        ApiClient.loadSocket(serverId, apiConfigurationSection)
 
         MatchManager.init()
 

@@ -28,7 +28,7 @@ data class Packet<T>(
     @SerializedName("d") val data: T,
 )
 
-class ApiClient(private val serverId: String, private val config: ConfigurationSection) {
+object ApiClient {
 
     private val logger = createLogger(this::class)
     val client: HttpClient = HttpClient(CIO) {
@@ -49,38 +49,54 @@ class ApiClient(private val serverId: String, private val config: ConfigurationS
     }
 
     lateinit var socket: WarzoneService
-    lateinit var httpUrl: String
+    lateinit var baseUrl: String
 
     init {
         logger.level = Level.ALL
     }
 
+    fun loadHttp(config: ConfigurationSection) {
+        val httpConfig = config.getConfigurationSection("http") ?: throw MissingConfigPathException("api.http")
+
+        baseUrl = httpConfig.getString("url") ?: throw MissingConfigPathException("api.http.url")
+        //TODO: auth -> set default header.
+    }
+
+    fun loadSocket(serverId: String, config: ConfigurationSection) {
+        val socketConfig = config.getConfigurationSection("socket") ?: throw MissingConfigPathException("api.socket")
+
+        val socketUrl = socketConfig.getString("url") ?: throw MissingConfigPathException("api.socket.url")
+        val socketSecret = socketConfig.getString("secret") ?: throw MissingConfigPathException("api.socket.secret")
+
+        createSocket(socketUrl, serverId, socketSecret)
+    }
+
     suspend inline fun <reified T> get(url: String): T {
-        return client.get(httpUrl + url)
+        return client.get(baseUrl + url)
     }
 
     suspend inline fun <reified T> post(url: String): T {
-        return client.post(httpUrl + url)
+        return client.post(baseUrl + url)
     }
 
     suspend inline fun <reified T, K : Any> post(url: String, body: K): T {
-        return client.post(httpUrl + url) {
+        return client.post(baseUrl + url) {
             this.body = body
         }
     }
 
     suspend inline fun <reified T> put(url: String): T {
-        return client.put(httpUrl + url)
+        return client.put(baseUrl + url)
     }
 
     suspend inline fun <reified T, K : Any> put(url: String, body: K): T {
-        return client.put(httpUrl + url) {
+        return client.put(baseUrl + url) {
             this.body = body
         }
     }
 
     suspend inline fun <reified T> delete(url: String): T {
-        return client.delete(httpUrl + url)
+        return client.delete(baseUrl + url)
     }
 
     fun <T> emit(event: OutboundEvent<T>, data: T) {
@@ -89,22 +105,6 @@ class ApiClient(private val serverId: String, private val config: ConfigurationS
         logger.finer("Emitting outbound packet. Type ${event.eventName}, Data: $jsonString")
 
         socket.send(jsonString.zlibCompress().asList())
-    }
-
-    fun loadHttp() {
-        val httpConfig = config.getConfigurationSection("http") ?: throw MissingConfigPathException("api.http")
-
-        httpUrl = httpConfig.getString("url") ?: throw MissingConfigPathException("api.http.url")
-        //TODO: auth -> set default header.
-    }
-
-    fun loadSocket() {
-        val socketConfig = config.getConfigurationSection("socket") ?: throw MissingConfigPathException("api.socket")
-
-        val socketUrl = socketConfig.getString("url") ?: throw MissingConfigPathException("api.socket.url")
-        val socketSecret = socketConfig.getString("secret") ?: throw MissingConfigPathException("api.socket.secret")
-
-        createSocket(socketUrl, serverId, socketSecret)
     }
 
     private fun createSocket(url: String, serverId: String, secret: String) {
