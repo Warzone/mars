@@ -3,6 +3,7 @@ package network.warzone.pgm.match.tracker
 import kotlinx.coroutines.runBlocking
 import network.warzone.pgm.api.ApiClient
 import network.warzone.pgm.api.socket.OutboundEvent
+import network.warzone.pgm.api.socket.models.*
 import network.warzone.pgm.map.MapFeature
 import network.warzone.pgm.map.models.GameMap
 import network.warzone.pgm.match.MatchManager
@@ -22,29 +23,8 @@ import tc.oc.pgm.goals.GoalMatchModule
 import tc.oc.pgm.teams.Team
 import tc.oc.pgm.util.bukkit.BukkitUtils
 import tc.oc.pgm.wool.WoolMatchModule
-import java.util.*
 
 class MatchTracker : Listener {
-
-    data class MatchLoadGoals(
-        val flags: List<FlagTracker.FlagPartial>,
-        val wools: List<WoolTracker.WoolPartial>,
-        val cores: List<CoreTracker.CorePartial>,
-        val controlPoints: List<ControlPointTracker.ControlPointPartial>,
-        val destroyables: List<DestroyableTracker.DestroyablePartial>
-    )
-
-    data class MatchLoadData(
-        val mapId: UUID,
-        val parties: List<PartyData>,
-        val goals: MatchLoadGoals
-        )
-    data class MatchStartData(val participants: Set<LiveMatchPlayer>)
-    data class MatchEndData(val winningTeam: String)
-
-    object MatchLoad : OutboundEvent<MatchLoadData>("MATCH_LOAD")
-    object MatchStart : OutboundEvent<MatchStartData>("MATCH_START")
-    object MatchEnd : OutboundEvent<Unit>("MATCH_END")
 
     @EventHandler
     fun onMatchLoad(event: MatchLoadEvent) = runBlocking {
@@ -56,7 +36,7 @@ class MatchTracker : Listener {
 
         val match = event.match
 
-        ApiClient.emit(MatchLoad, MatchLoadData(
+        ApiClient.emit(OutboundEvent.MatchLoad, MatchLoadData(
             gameMap._id,
             parties,
             MatchLoadGoals(
@@ -74,7 +54,7 @@ class MatchTracker : Listener {
     @EventHandler
     fun onMatchStart(event: MatchStartEvent) {
         ApiClient.emit(
-            MatchStart,
+            OutboundEvent.MatchStart,
             MatchStartData(
                 participants = event.match
                     .participants
@@ -87,41 +67,42 @@ class MatchTracker : Listener {
     @EventHandler
     fun onMatchEnd(event: MatchFinishEvent) {
         ApiClient.emit(
-            MatchEnd,
-            Unit
+            OutboundEvent.MatchEnd,
+            MatchEndData(event.match.winners.toMutableList()[0]?.nameLegacy)
         )
     }
 
-    private fun getFlagPartials(match: Match):  List<FlagTracker.FlagPartial> {
+    private fun getFlagPartials(match: Match):  List<FlagPartial> {
         return match.getModule(FlagMatchModule::class.java)
             ?.flags
-            ?.map { FlagTracker.FlagPartial(it.id, it.name, it.bukkitColor, it.owner?.nameLegacy) } ?: listOf()
+            ?.map { FlagPartial(it.id, it.name, it.bukkitColor, it.owner?.nameLegacy) } ?: listOf()
     }
 
-    private fun getWoolPartials(match: Match): List<WoolTracker.WoolPartial> {
+    private fun getWoolPartials(match: Match): List<WoolPartial> {
         return match.getModule(WoolMatchModule::class.java)
             ?.wools
             ?.values()
-            ?.map { WoolTracker.WoolPartial(
-                it.id,
-                it.name,
-                it.owner!!.nameLegacy,
-                BukkitUtils.dyeColorToChatColor(it.dyeColor
+            ?.map {
+                WoolPartial(
+                    it.id,
+                    it.name,
+                    it.owner?.nameLegacy,
+                    BukkitUtils.dyeColorToChatColor(it.dyeColor)
                 )
-            ) } ?: listOf()
+            } ?: listOf()
     }
 
-    private fun getCorePartials(match: Match): List<CoreTracker.CorePartial> {
+    private fun getCorePartials(match: Match): List<CorePartial> {
         return match.getModule(GoalMatchModule::class.java)
             ?.getGoals(Core::class.java)
             ?.values()
-            ?.map { CoreTracker.CorePartial(it.id, it.name, it.owner.nameLegacy, it.material.itemType) } ?: listOf()
+            ?.map { CorePartial(it.id, it.name, it.owner.nameLegacy, it.material.itemType) } ?: listOf()
     }
 
-    private fun getDestroyablePartial(match: Match): List<DestroyableTracker.DestroyablePartial> {
+    private fun getDestroyablePartial(match: Match): List<DestroyablePartial> {
         return match.getModule(DestroyableMatchModule::class.java)
             ?.destroyables
-            ?.map { DestroyableTracker.DestroyablePartial(
+            ?.map { DestroyablePartial(
                 it.id,
                 it.name,
                 it.owner.nameLegacy,
@@ -135,10 +116,10 @@ class MatchTracker : Listener {
             ) } ?: listOf()
     }
 
-    private fun getControlPointPartial(match: Match): List<ControlPointTracker.ControlPointPartial> {
+    private fun getControlPointPartial(match: Match): List<ControlPointPartial> {
         return match.getModule(GoalMatchModule::class.java)
             ?.getGoals(ControlPoint::class.java)
             ?.values()
-            ?.map { ControlPointTracker.ControlPointPartial(it.id, it.name) } ?: listOf()
+            ?.map { ControlPointPartial(it.id, it.name) } ?: listOf()
     }
 }

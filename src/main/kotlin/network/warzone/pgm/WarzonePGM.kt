@@ -20,7 +20,7 @@ class WarzonePGM : JavaPlugin() {
         fun registerEvents(listener: Listener) = Bukkit.getPluginManager().registerEvents(listener, instance)
     }
 
-    private lateinit var serverId: String
+    lateinit var serverId: String
 
     override fun onEnable() {
         instance = this

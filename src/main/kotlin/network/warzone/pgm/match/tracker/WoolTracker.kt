@@ -2,8 +2,8 @@ package network.warzone.pgm.match.tracker
 
 import network.warzone.pgm.api.ApiClient
 import network.warzone.pgm.api.socket.OutboundEvent
+import network.warzone.pgm.api.socket.models.WoolData
 import network.warzone.pgm.utils.hasMode
-import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.map.Gamemode
@@ -17,14 +17,6 @@ import tc.oc.pgm.wool.WoolMatchModule
 import java.util.*
 
 class WoolTracker : Listener {
-
-    data class WoolPartial( val id: String, val name: String, val ownerName: String, val colour: ChatColor )
-    data class WoolData( val woolId: String, val playerId: UUID )
-
-    object WoolPickup : OutboundEvent<WoolData>("WOOL_PICKUP")
-    object WoolCapture : OutboundEvent<WoolData>("WOOL_CAPTURE")
-    object WoolDrop : OutboundEvent<WoolData>("WOOL_DROP")
-    object WoolDefend : OutboundEvent<WoolData>("WOOL_DEFEND")
 
     private val holdingCache = mutableMapOf<MonumentWool, MutableList<UUID>>()
 
@@ -47,7 +39,10 @@ class WoolTracker : Listener {
 
         val wools = holdingCache.filterValues { it.contains(event.player.id) }.keys
 
-        for (wool in wools) holdingCache[wool]?.remove(event.player.id)
+        for (wool in wools) {
+            ApiClient.emit(OutboundEvent.WoolDrop, WoolData(wool.id, event.player.id))
+            holdingCache[wool]?.remove(event.player.id)
+        }
     }
 
     @EventHandler
@@ -55,7 +50,7 @@ class WoolTracker : Listener {
         val wool = event.goal as? MonumentWool ?: return
         val player = event.player ?: return
 
-        ApiClient.emit(WoolPickup, WoolData(wool.id, player.id))
+        ApiClient.emit(OutboundEvent.WoolPickup, WoolData(wool.id, player.id))
 
         holdingCache[wool]!!.add(player.id)
     }
@@ -67,20 +62,20 @@ class WoolTracker : Listener {
         val wools = holdingCache.filterValues { it.contains(event.victim.id) }.keys
 
         for (wool in wools) {
-            ApiClient.emit(WoolDrop, WoolData(wool.id, event.player.id))
+            ApiClient.emit(OutboundEvent.WoolDrop, WoolData(wool.id, event.player.id))
             holdingCache[wool]?.remove(event.victim.id)
 
             if (event.killer != null) {
                 val killer = event.killer!!
 
-                ApiClient.emit(WoolDefend, WoolData(wool.id, killer.id))
+                ApiClient.emit(OutboundEvent.WoolDefend, WoolData(wool.id, killer.id))
             }
         }
     }
 
     @EventHandler
     fun onWoolPlaced(event: PlayerWoolPlaceEvent) {
-        ApiClient.emit(WoolCapture, WoolData(event.wool.id, event.player.id))
+        ApiClient.emit(OutboundEvent.WoolCapture, WoolData(event.wool.id, event.player.id))
 
         holdingCache[event.wool]?.clear()
     }

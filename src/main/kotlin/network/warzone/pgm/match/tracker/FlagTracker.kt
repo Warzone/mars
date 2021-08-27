@@ -2,8 +2,11 @@ package network.warzone.pgm.match.tracker
 
 import network.warzone.pgm.api.ApiClient
 import network.warzone.pgm.api.socket.OutboundEvent
+import network.warzone.pgm.api.socket.models.FlagCaptureData
+import network.warzone.pgm.api.socket.models.FlagDefendData
+import network.warzone.pgm.api.socket.models.FlagDropData
+import network.warzone.pgm.api.socket.models.FlagPickupData
 import network.warzone.pgm.utils.hasMode
-import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.map.Gamemode
@@ -11,7 +14,6 @@ import tc.oc.pgm.api.match.event.MatchStartEvent
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.events.PlayerParticipationStopEvent
 import tc.oc.pgm.flag.Flag
-import tc.oc.pgm.flag.event.FlagCaptureEvent
 import tc.oc.pgm.flag.event.FlagPickupEvent
 import tc.oc.pgm.flag.event.FlagStateChangeEvent
 import tc.oc.pgm.flag.state.Captured
@@ -21,15 +23,8 @@ import java.util.*
 
 class FlagTracker : Listener {
 
-    data class FlagPartial( val id: String, val name: String, val colour: ChatColor, val ownerName: String? )
-    data class FlagData( val flagId: String, val playerId: UUID )
-
-    object FlagPickup : OutboundEvent<FlagData>("FLAG_PICKUP")
-    object FlagCapture : OutboundEvent<FlagData>("FLAG_CAPTURE")
-    object FlagDrop : OutboundEvent<FlagData>("FLAG_DROP")
-    object FlagDefend : OutboundEvent<FlagData>("FLAG_DEFEND")
-
     private val heldFlagCache = mutableMapOf<UUID, Flag>()
+    private val heldTimeCache = mutableMapOf<UUID, Long>()
     private val lifeLockCache = mutableListOf<UUID>()
 
     @EventHandler
@@ -37,6 +32,7 @@ class FlagTracker : Listener {
         if (!event.match.hasMode(Gamemode.KING_OF_THE_FLAG, Gamemode.CAPTURE_THE_FLAG)) return
 
         heldFlagCache.clear()
+        heldTimeCache.clear()
         lifeLockCache.clear()
     }
 
@@ -44,17 +40,26 @@ class FlagTracker : Listener {
     fun onParticipantLeave(event: PlayerParticipationStopEvent) {
         if (!event.match.hasMode(Gamemode.KING_OF_THE_FLAG, Gamemode.CAPTURE_THE_FLAG)) return
 
-        heldFlagCache.remove(event.player.id)
-        lifeLockCache.remove(event.player.id)
+        if (heldFlagCache.contains(event.player.id)) {
+            val flag = heldFlagCache[event.player.id]!!
+
+            val pickupTime = heldTimeCache[event.player.id]!!
+            val heldTime = Date().time - pickupTime
+
+            ApiClient.emit(OutboundEvent.FlagDrop, FlagDropData(flag.id, event.player.id, heldTime))
+        }
+
+        remove(event.player.id)
     }
 
     @EventHandler
     fun onFlagPickup(event: FlagPickupEvent) {
         if (!lifeLockCache.contains(event.carrier.id)) {
-            ApiClient.emit(FlagPickup, FlagData(event.flag.id, event.carrier.id))
+            ApiClient.emit(OutboundEvent.FlagPickup, FlagPickupData(event.flag.id, event.carrier.id))
         }
 
         heldFlagCache[event.carrier.id] = event.flag
+        heldTimeCache[event.carrier.id] = Date().time
         lifeLockCache.add(event.carrier.id)
     }
 
@@ -63,30 +68,39 @@ class FlagTracker : Listener {
         if (event.oldState is Carried) {
             val carried = event.oldState as Carried
 
+            val pickupTime = heldTimeCache[carried.carrier.id]!!
+            val heldTime = Date().time - pickupTime
+
+            heldFlagCache.remove(carried.carrier.id)
+            heldTimeCache.remove(carried.carrier.id)
+
             if (event.newState is Dropped) {
-                ApiClient.emit(FlagDrop, FlagData(event.flag.id, carried.carrier.id))
+                ApiClient.emit(OutboundEvent.FlagDrop, FlagDropData(event.flag.id, carried.carrier.id, heldTime))
             } else if (event.newState is Captured) {
                 lifeLockCache.remove(carried.carrier.id)
+
+                ApiClient.emit(OutboundEvent.FlagCapture, FlagCaptureData(event.flag.id, carried.carrier.id, heldTime))
             }
         }
-    }
-
-    @EventHandler
-    fun onFlagCaptured(event: FlagCaptureEvent) {
-        ApiClient.emit(FlagCapture, FlagData(event.goal.id, event.carrier.id))
     }
 
     @EventHandler
     fun onFlagDefend(event: MatchPlayerDeathEvent) {
         if (!event.match.hasMode(Gamemode.CAPTURE_THE_FLAG, Gamemode.KING_OF_THE_FLAG)) return
 
-        lifeLockCache.remove(event.victim.id)
-
         val killer = event.killer ?: return
 
         val droppedFlag = heldFlagCache[event.victim.id] ?: return
 
-        ApiClient.emit(FlagDefend, FlagData(droppedFlag.id, killer.id))
+        remove(event.victim.id)
+
+        ApiClient.emit(OutboundEvent.FlagDefend, FlagDefendData(droppedFlag.id, killer.id))
+    }
+
+    private fun remove(playerId: UUID) {
+        lifeLockCache.remove(playerId)
+        heldTimeCache.remove(playerId)
+        heldFlagCache.remove(playerId)
     }
 
 }

@@ -9,7 +9,7 @@ data class GameMap (
     override var name: String,
     var nameLower: String,
     var version: String,
-    var gamemode: String?,
+    var gamemodes: List<String>,
     val loadedAt: Date,
     val updatedAt: Date,
     var authors: List<MapContributor>,

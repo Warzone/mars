@@ -50,9 +50,6 @@ object MapFeature : NamedCacheFeature<GameMap, MapService>() {
             // Try and find a currently loaded map by the same name.
             val existingMap = currentMaps.find { it.name == map.name }
 
-            // Indicate we should load the map if it isn't currently loaded.
-            var load = existingMap == null
-
             // If it is currently loaded, check its version.
             if (existingMap != null) {
                 // Get the current maps version components.
@@ -65,21 +62,21 @@ object MapFeature : NamedCacheFeature<GameMap, MapService>() {
                     Version(major, minor, 0)
                 }
 
-                // Indicate we should load the map if the existing version is older than the new version.
-                load = existingVersion.isOlderThan(map.version)
+                // Load the map if the existing version is older than the new version.
+                if (existingVersion.isOlderThan(map.version)) mapLoadRequests.add(toMapLoadRequest(map, existingMap._id))
+            } else {
+                // Else, convert the map into a map load request and add it the list.
+                mapLoadRequests.add(toMapLoadRequest(map, null))
             }
-
-            // If indicated we should load, convert the map into a map load request and add it the list.
-            if (load) mapLoadRequests.add(toMapLoadRequest(map))
         }
 
         // Send all the map load requests to the API.
         create(maps = mapLoadRequests)
     }
 
-    private fun toMapLoadRequest(map: MapInfo): MapService.MapLoadOneRequest {
+    private fun toMapLoadRequest(map: MapInfo, id: UUID?): MapService.MapLoadOneRequest {
         return MapService.MapLoadOneRequest(
-            _id = UUID.randomUUID(),
+            _id = id ?: UUID.randomUUID(),
             name = map.name,
             version = map.version.toString(),
             gamemodes = map.gamemodes.map { it.name },

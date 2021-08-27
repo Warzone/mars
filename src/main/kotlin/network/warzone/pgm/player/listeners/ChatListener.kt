@@ -1,24 +1,43 @@
 package network.warzone.pgm.player.listeners
 
 import kotlinx.coroutines.runBlocking
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextColor
+import network.warzone.pgm.api.socket.models.ChatChannel
+import network.warzone.pgm.api.socket.models.PlayerChatEvent
 import network.warzone.pgm.player.PlayerContext
 import network.warzone.pgm.player.PlayerManager
-import network.warzone.pgm.utils.AUDIENCE_PROVIDER
+import network.warzone.pgm.utils.KEvent
 import network.warzone.pgm.utils.color
+import network.warzone.pgm.utils.getMatch
 import org.bukkit.ChatColor.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import tc.oc.pgm.api.PGM
 import tc.oc.pgm.api.Permissions
 import tc.oc.pgm.api.match.Match
 import tc.oc.pgm.api.party.Party
+import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextColor
 
 class ChatListener : Listener {
+
+    class MatchPlayerChatEvent(
+        val matchPlayer: MatchPlayer,
+        val channel: ChatChannel,
+        val message: String) : KEvent()
+
+    @EventHandler
+    fun onPlayerChatApi(event: PlayerChatEvent) {
+        val (_, playerName, playerPrefix, channel, message) = event.data
+
+        if (channel != ChatChannel.STAFF) return
+
+        sendAdminChat(PGM.get().matchManager.getMatch(), playerPrefix, playerName, message)
+    }
 
     @EventHandler
     fun onPlayerChat(event: AsyncPlayerChatEvent) = runBlocking {
@@ -27,14 +46,28 @@ class ChatListener : Listener {
 
         val match = context.matchPlayer.match
 
-        when (context.matchPlayer.settings.getValue(SettingKey.CHAT)) {
-            SettingValue.CHAT_ADMIN -> sendAdminChat(match, context, event.message)
+        val chatChannel = context.matchPlayer.settings.getValue(SettingKey.CHAT)
+        when (chatChannel) {
+            SettingValue.CHAT_ADMIN -> sendAdminChat(match, context.getPrefix() ?: "", player.name, event.message)
             SettingValue.CHAT_TEAM -> sendTeamChat(context.matchPlayer.party, context, event.message)
             else -> sendGlobalChat(match, context, event.message)
         }
 
+        MatchPlayerChatEvent(
+            PGM.get().matchManager.getPlayer(player)!!,
+            when (chatChannel) {
+                SettingValue.CHAT_ADMIN -> ChatChannel.STAFF
+                SettingValue.CHAT_TEAM -> ChatChannel.TEAM
+                else -> ChatChannel.GLOBAL
+            },
+            event.message
+        ).callEvent()
+
         event.isCancelled = true
     }
+
+    @EventHandler
+
 
     private suspend fun sendGlobalChat(match: Match, context: PlayerContext, message: String) {
         //TODO: levels
@@ -58,34 +91,30 @@ class ChatListener : Listener {
 
         val messageComponent = messageBuilder.build()
 
-        match.players
-            .map { AUDIENCE_PROVIDER.player(it.id) }
-            .forEach { it.sendMessage(messageComponent) }
+        match.sendMessage(messageComponent)
     }
 
     private fun sendTeamChat(team: Party, context: PlayerContext, message: String) {
-        val teamColor = team.color
         val teamName = team.defaultName
-
         val username = context.player.name
 
-        team.players
-            .map { it.bukkit }
-            .forEach { it.sendMessage("$teamColor[$teamName] $username$WHITE: $message") }
+        val messageComponent = text()
+            .append { text("[$teamName] $username", TextColor.color(team.fullColor.asRGB())) }
+            .append { text(": $message", NamedTextColor.WHITE) }
+            .build()
+
+        team.sendMessage(messageComponent)
     }
 
-    private suspend fun sendAdminChat(match: Match, context: PlayerContext, message: String) {
-        val prefix = context.getPrefix()
-        val username = context.player.name
+    private fun sendAdminChat(match: Match, prefix: String, username: String, message: String) {
+        val coloredPrefix = prefix.color()
 
         val magicSpace = if (prefix == "") "" else " "
 
         match.players
             .map { it.bukkit }
             .filter { it.hasPermission(Permissions.ADMINCHAT) }
-            .forEach { it.sendMessage("$DARK_RED[STAFF] $RESET$prefix$magicSpace$GRAY$username: $GREEN$message") }
+            .forEach { it.sendMessage("$DARK_RED[STAFF] $RESET$coloredPrefix$magicSpace$GRAY$username: $GREEN$message") }
     }
-
-
 
 }

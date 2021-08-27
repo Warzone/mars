@@ -14,7 +14,8 @@ object MatchManager {
         WoolTracker(),
         FlagTracker(),
         DestroyableTracker(),
-        ControlPointTracker()
+        ControlPointTracker(),
+        ChatTracker()
     )
 
     lateinit var match: Match

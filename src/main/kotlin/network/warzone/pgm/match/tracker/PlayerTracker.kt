@@ -2,6 +2,9 @@ package network.warzone.pgm.match.tracker
 
 import network.warzone.pgm.api.ApiClient
 import network.warzone.pgm.api.socket.OutboundEvent
+import network.warzone.pgm.api.socket.models.PartyJoinData
+import network.warzone.pgm.api.socket.models.PartyLeaveData
+import network.warzone.pgm.api.socket.models.PlayerDeathData
 import network.warzone.pgm.match.deaths.LegacyTextDeathMessageBuilder
 import network.warzone.pgm.match.models.DeathCause
 import org.bukkit.event.EventHandler
@@ -11,27 +14,8 @@ import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.events.PlayerJoinPartyEvent
 import tc.oc.pgm.events.PlayerLeavePartyEvent
-import java.util.*
 
 class PlayerTracker : Listener {
-
-    data class PartyJoinData(val playerId: UUID, val playerName: String, val partyName: String)
-    data class PartyLeaveData(val playerId: UUID, val playerName: String)
-    data class PlayerDeathData(
-        val victimId: UUID,
-        val victimName: String,
-        val attackerId: UUID?,
-        val attackerName: String?,
-        val weapon: String?,
-        val entity: String?,
-        val distance: Long?,
-        val key: String,
-        val cause: DeathCause
-    )
-
-    object PartyJoin : OutboundEvent<PartyJoinData>("PARTY_JOIN")
-    object PartyLeave : OutboundEvent<PartyLeaveData>("PARTY_LEAVE")
-    object PlayerDeath : OutboundEvent<PlayerDeathData>("PLAYER_DEATH")
 
     @EventHandler
     fun onPartyJoin(event: PlayerJoinPartyEvent) {
@@ -40,7 +24,7 @@ class PlayerTracker : Listener {
         val party: Party = event.newParty!!
 
         ApiClient.emit(
-            PartyJoin,
+            OutboundEvent.PartyJoin,
             PartyJoinData(event.player.id, event.player.nameLegacy, party.defaultName)
         )
     }
@@ -50,7 +34,7 @@ class PlayerTracker : Listener {
         if (event.party !is Competitor || !event.match.isRunning) return // Leaving spectator
 
         ApiClient.emit(
-            PartyLeave,
+            OutboundEvent.PartyLeave,
             PartyLeaveData(event.player.id, event.player.nameLegacy)
         )
     }
@@ -64,7 +48,7 @@ class PlayerTracker : Listener {
         val distance = translatableComponent.distance
 
         ApiClient.emit(
-            PlayerDeath,
+            OutboundEvent.PlayerDeath,
             PlayerDeathData(
                 victimId = event.victim.id,
                 victimName = event.victim.nameLegacy,

@@ -50,7 +50,7 @@ dependencies {
     implementation("com.tinder.scarlet:scarlet:0.1.12")
     implementation("com.tinder.scarlet:websocket-okhttp:0.1.12")
     implementation("com.tinder.scarlet:message-adapter-gson:0.1.12")
-    implementation("com.tinder.scarlet:stream-adapter-coroutines:0.1.12")
+    implementation("com.tinder.scarlet:stream-adapter-rxjava2:0.1.12")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")

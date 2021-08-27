@@ -1,13 +1,16 @@
 package network.warzone.pgm.api.socket
 
+import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
+import io.reactivex.Flowable
+import network.warzone.pgm.api.Packet
 
 interface WarzoneService {
 
     @Send
-    fun send(bytes: List<Byte>)
+    fun send(packet: Packet<out Any>)
 
-//    @Send
-//    fun sendMatchStart()
+    @Receive
+    fun receive(): Flowable<Packet<Any>>
 
 }

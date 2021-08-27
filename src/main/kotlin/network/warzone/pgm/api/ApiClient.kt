@@ -5,8 +5,8 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
 import com.tinder.scarlet.Scarlet
+import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
-import com.tinder.streamadapter.coroutines.CoroutinesStreamAdapterFactory
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
@@ -14,9 +14,14 @@ import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import network.warzone.pgm.api.events.ApiConnectedEvent
+import network.warzone.pgm.api.socket.InboundEvent
 import network.warzone.pgm.api.socket.OutboundEvent
+import network.warzone.pgm.api.socket.SocketEventType
 import network.warzone.pgm.api.socket.WarzoneService
-import network.warzone.pgm.utils.*
+import network.warzone.pgm.utils.GSON
+import network.warzone.pgm.utils.GsonMessageAdapter
+import network.warzone.pgm.utils.MissingConfigPathException
+import network.warzone.pgm.utils.createLogger
 import okhttp3.OkHttpClient
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
@@ -24,7 +29,7 @@ import java.util.*
 import java.util.logging.Level
 
 data class Packet<T>(
-    @SerializedName("e") val event: String,
+    @SerializedName("e") val event: SocketEventType,
     @SerializedName("d") val data: T,
 )
 
@@ -99,12 +104,11 @@ object ApiClient {
         return client.delete(baseUrl + url)
     }
 
-    fun <T> emit(event: OutboundEvent<T>, data: T) {
-        val packet = Packet(event.eventName, data)
-        val jsonString = GSON.toJson(packet)
-        logger.finer("Emitting outbound packet. Type ${event.eventName}, Data: $jsonString")
+    fun <T : Any> emit(outboundEvent: OutboundEvent<T>, data: T) {
+        val packet = Packet(outboundEvent.event, data)
+        logger.finer("Emitting outbound packet. Type ${outboundEvent.event}, Data: ${GSON.toJson(packet)}")
 
-        socket.send(jsonString.zlibCompress().asList())
+        socket.send(packet)
     }
 
     private fun createSocket(url: String, serverId: String, secret: String) {
@@ -115,10 +119,16 @@ object ApiClient {
         val scarlet = Scarlet.Builder()
             .webSocketFactory(okHttp.newWebSocketFactory("$url/minecraft?id=$serverId&token=$secret"))
             .addMessageAdapterFactory(GsonMessageAdapter.Factory())
-            .addStreamAdapterFactory(CoroutinesStreamAdapterFactory())
+            .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
             .build()
 
         socket = scarlet.create()
+
+        socket.receive()
+            .subscribe {
+                val evt: InboundEvent<Any> = InboundEvent.get(it.event) ?: return@subscribe
+                evt.bukkitEventFactory.invoke(it.data).callEvent()
+            }
 
         Bukkit.getPluginManager().callEvent(ApiConnectedEvent(this))
 

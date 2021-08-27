@@ -28,7 +28,7 @@ class GsonMessageAdapter<T> private constructor(
     override fun fromMessage(message: Message): T {
         val stringValue = when (message) {
             is Message.Text -> message.value
-            is Message.Bytes -> String(message.value)
+            is Message.Bytes -> message.value.zlibDecompress()
         }
         val jsonReader = JsonReader(StringReader(stringValue))
         return typeAdapter.read(jsonReader)!!
@@ -41,11 +41,11 @@ class GsonMessageAdapter<T> private constructor(
         typeAdapter.write(jsonWriter, data)
         jsonWriter.close()
         val stringValue = buffer.readByteString().utf8()
-        return Message.Text(stringValue)
+        return Message.Bytes(stringValue.zlibCompress())
     }
 
     class Factory(
-        private val gson: Gson = DEFAULT_GSON
+        private val gson: Gson = GSON
     ) : MessageAdapter.Factory {
 
         override fun create(type: Type, annotations: Array<Annotation>): MessageAdapter<*> {
