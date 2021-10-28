@@ -55,15 +55,22 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.21")
+    implementation(kotlin("stdlib-jdk8"))
 
     implementation("com.github.kittinunf.result:result-jvm:5.1.0")
 }
 
 tasks.withType<ShadowJar> {
-    minimize()
-    archiveClassifier.set("")
+//    minimize()
+    manifest {
+        attributes["Main-Class"] = "network.warzone.pgm.WarzonePGMKt"
+    }
 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+tasks.withType<Jar> {
+//    dependsOn(project.tasks.shadowJar)
 }
