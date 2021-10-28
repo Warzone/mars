@@ -1,6 +1,7 @@
 package network.warzone.pgm.match.tracker
 
 import kotlinx.coroutines.runBlocking
+import network.warzone.pgm.WarzonePGM
 import network.warzone.pgm.api.ApiClient
 import network.warzone.pgm.api.socket.OutboundEvent
 import network.warzone.pgm.api.socket.models.PlayerChatData
@@ -21,7 +22,8 @@ class ChatTracker : Listener {
             event.matchPlayer.nameLegacy,
             context.getPrefix() ?: "",
             event.channel,
-            event.message
+            event.message,
+            WarzonePGM.instance.serverId
         ))
     }
 
