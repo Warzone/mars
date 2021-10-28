@@ -75,7 +75,7 @@ class MatchTracker : Listener {
     private fun getFlagPartials(match: Match):  List<FlagPartial> {
         return match.getModule(FlagMatchModule::class.java)
             ?.flags
-            ?.map { FlagPartial(it.id, it.name, it.bukkitColor, it.owner?.nameLegacy) } ?: listOf()
+            ?.map { FlagPartial(it.id, it.name, it.bukkitColor, it.owner?.nameLegacy) }?.distinctBy { it.id } ?: listOf()
     }
 
     private fun getWoolPartials(match: Match): List<WoolPartial> {
@@ -89,14 +89,14 @@ class MatchTracker : Listener {
                     it.owner?.nameLegacy,
                     BukkitUtils.dyeColorToChatColor(it.dyeColor)
                 )
-            } ?: listOf()
+            }?.distinctBy { it.id } ?: listOf()
     }
 
     private fun getCorePartials(match: Match): List<CorePartial> {
         return match.getModule(GoalMatchModule::class.java)
             ?.getGoals(Core::class.java)
             ?.values()
-            ?.map { CorePartial(it.id, it.name, it.owner.nameLegacy, it.material.itemType) } ?: listOf()
+            ?.map { CorePartial(it.id, it.name, it.owner.nameLegacy, it.material.itemType) }?.distinctBy { it.id } ?: listOf()
     }
 
     private fun getDestroyablePartial(match: Match): List<DestroyablePartial> {
@@ -113,13 +113,13 @@ class MatchTracker : Listener {
                     .maxByOrNull { group -> group.value }
                 !!.key,
                 it.blockRegion.blocks.size
-            ) } ?: listOf()
+            ) }?.distinctBy { it.id } ?: listOf()
     }
 
     private fun getControlPointPartial(match: Match): List<ControlPointPartial> {
         return match.getModule(GoalMatchModule::class.java)
             ?.getGoals(ControlPoint::class.java)
             ?.values()
-            ?.map { ControlPointPartial(it.id, it.name) } ?: listOf()
+            ?.map { ControlPointPartial(it.id, it.name) }?.distinctBy { it.id } ?: listOf()
     }
 }
