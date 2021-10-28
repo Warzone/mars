@@ -54,6 +54,8 @@ class FlagTracker : Listener {
 
     @EventHandler
     fun onFlagPickup(event: FlagPickupEvent) {
+        if (event.flag.match.hasMode(Gamemode.KING_OF_THE_FLAG, Gamemode.CAPTURE_THE_FLAG)) return
+
         if (!lifeLockCache.contains(event.carrier.id)) {
             ApiClient.emit(OutboundEvent.FlagPickup, FlagPickupData(event.flag.id, event.carrier.id))
         }
@@ -65,6 +67,7 @@ class FlagTracker : Listener {
 
     @EventHandler
     fun onFlagDrop(event: FlagStateChangeEvent) {
+        if (!event.match.hasMode(Gamemode.KING_OF_THE_FLAG, Gamemode.CAPTURE_THE_FLAG)) return
         if (event.oldState is Carried) {
             val carried = event.oldState as Carried
 

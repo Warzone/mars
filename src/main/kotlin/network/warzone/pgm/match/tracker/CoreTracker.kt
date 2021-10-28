@@ -15,7 +15,7 @@ class CoreTracker : Listener {
 
     @EventHandler
     fun onCoreDamage(event: CoreBlockBreakEvent) {
-        ApiClient.emit(OutboundEvent.CoreDamage, CoreDamageData(event.core.id, event.player.id))
+//        ApiClient.emit(OutboundEvent.CoreDamage, CoreDamageData(event.core.id, event.player.id))
     }
 
     @EventHandler

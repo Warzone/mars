@@ -23,6 +23,7 @@ class WarzonePGM : JavaPlugin() {
     lateinit var serverId: String
 
     override fun onEnable() {
+        println("enabling!")
         instance = this
 
         serverId = config.getString("server.id")
