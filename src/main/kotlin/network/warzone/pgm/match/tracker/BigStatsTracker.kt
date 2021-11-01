@@ -13,12 +13,21 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import tc.oc.pgm.api.match.event.MatchFinishEvent
+import tc.oc.pgm.api.match.event.MatchLoadEvent
 import tc.oc.pgm.api.player.ParticipantState
+import tc.oc.pgm.events.PlayerJoinMatchEvent
+import tc.oc.pgm.events.PlayerLeaveMatchEvent
+import tc.oc.pgm.stats.PlayerStats
+import tc.oc.pgm.stats.StatsMatchModule
 import tc.oc.pgm.tracker.TrackerMatchModule
 import java.util.*
+import kotlin.collections.HashMap
 
 
-data class PlayerBlocks(var blocksPlaced: EnumMap<Material, Int> = EnumMap(Material::class.java), var blocksBroken: EnumMap<Material, Int> = EnumMap(Material::class.java))
+data class PlayerBlocks(
+    var blocksPlaced: EnumMap<Material, Int> = EnumMap(Material::class.java),
+    var blocksBroken: EnumMap<Material, Int> = EnumMap(Material::class.java)
+)
 
 /*
 * Tracker for stats that are sent at end of match (PGM tracks most of the stats itself like Bow Shots etc.)
@@ -26,6 +35,14 @@ data class PlayerBlocks(var blocksPlaced: EnumMap<Material, Int> = EnumMap(Mater
 class BigStatsTracker : Listener {
     val blockCache = HashMap<UUID, PlayerBlocks>()
     val messageCache = HashMap<UUID, EnumMap<ChatChannel, Int>>()
+    val offlinePlayersPendingStatSave = mutableSetOf<UUID>()
+    private var matchStatsModule: StatsMatchModule? = null
+
+    @EventHandler
+    fun onMatchLoad(event: MatchLoadEvent) {
+        offlinePlayersPendingStatSave.clear()
+        matchStatsModule = event.match.getModule(StatsMatchModule::class.java)
+    }
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
@@ -60,5 +77,15 @@ class BigStatsTracker : Listener {
     fun onMatchEnd(event: MatchFinishEvent) {
         messageCache.clear()
         blockCache.clear()
+    }
+
+    @EventHandler
+    fun onPlayerLeave(event: PlayerLeaveMatchEvent) {
+        offlinePlayersPendingStatSave.add(event.player.id)
+    }
+
+    @EventHandler
+    fun onPlayerJoin(event: PlayerJoinMatchEvent) {
+        if (offlinePlayersPendingStatSave.contains(event.player.id)) offlinePlayersPendingStatSave.remove(event.player.id)
     }
 }

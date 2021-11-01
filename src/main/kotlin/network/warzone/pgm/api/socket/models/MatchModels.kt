@@ -31,4 +31,8 @@ data class BigStats(
     var damageGiven: Double = 0.0,
     var damageTaken: Double = 0.0,
     var damageGivenBow: Double = 0.0
-)
+) {
+    fun isDefault(): Boolean {
+        return blocks === null && messages === null && bowShotsTaken == 0 && bowShotsHit == 0 && damageGiven == 0.0 && damageTaken == 0.0 && damageGivenBow == 0.0
+    }
+}

@@ -76,11 +76,11 @@ class MatchTracker : Listener {
         val playerStatsMap: MutableMap<UUID, BigStats> = mutableMapOf()
         val statsModule = event.match.getModule(StatsMatchModule::class.java)
         if (statsModule != null) {
-            event.match.players.forEach {
+            event.match.players.map { it.id }.plus(bigStatsTracker.offlinePlayersPendingStatSave).distinct().forEach {
                 val stats = statsModule.getPlayerStat(it)
-                val blocks = bigStatsTracker.blockCache[it.id]
-                val messages = bigStatsTracker.messageCache[it.id]
-                playerStatsMap[it.id] = BigStats(
+                val blocks = bigStatsTracker.blockCache[it]
+                val messages = bigStatsTracker.messageCache[it]
+                val playerBigStats = BigStats(
                     blocks,
                     messages,
                     bowShotsTaken = stats.shotsTaken,
@@ -89,6 +89,7 @@ class MatchTracker : Listener {
                     damageTaken = stats.damageTaken,
                     damageGivenBow = stats.bowDamage
                 )
+                if (!playerBigStats.isDefault()) playerStatsMap[it] = playerBigStats
             }
         }
 
