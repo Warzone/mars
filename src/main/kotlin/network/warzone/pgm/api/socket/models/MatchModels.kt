@@ -30,4 +30,5 @@ data class BigStats(
     var bowShotsHit: Int = 0,
     var damageGiven: Double = 0.0,
     var damageTaken: Double = 0.0,
+    var damageGivenBow: Double = 0.0
 )

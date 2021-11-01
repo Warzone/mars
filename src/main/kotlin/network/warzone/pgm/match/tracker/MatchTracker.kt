@@ -86,7 +86,8 @@ class MatchTracker : Listener {
                     bowShotsTaken = stats.shotsTaken,
                     bowShotsHit = stats.shotsHit,
                     damageGiven = stats.damageDone,
-                    damageTaken = stats.damageTaken
+                    damageTaken = stats.damageTaken,
+                    damageGivenBow = stats.bowDamage
                 )
             }
         }
