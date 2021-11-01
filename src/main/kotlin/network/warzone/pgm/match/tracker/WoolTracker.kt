@@ -7,6 +7,7 @@ import network.warzone.pgm.utils.hasMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.map.Gamemode
+import tc.oc.pgm.api.match.Match
 import tc.oc.pgm.api.match.event.MatchStartEvent
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.events.PlayerParticipationStopEvent
@@ -18,7 +19,7 @@ import java.util.*
 
 class WoolTracker : Listener {
 
-    private val holdingCache = mutableMapOf<MonumentWool, MutableList<UUID>>()
+    val holdingCache = mutableMapOf<MonumentWool, MutableList<UUID>>()
 
     @EventHandler
     fun onMatchStart(event: MatchStartEvent) {

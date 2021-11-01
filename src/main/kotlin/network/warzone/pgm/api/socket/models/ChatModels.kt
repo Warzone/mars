@@ -9,6 +9,13 @@ enum class ChatChannel {
     STAFF
 }
 
-data class PlayerChatData(val playerId: UUID, val playerName: String, val playerPrefix: String, val channel: ChatChannel, val message: String)
+data class PlayerChatData(
+    val playerId: UUID,
+    val playerName: String,
+    val playerPrefix: String,
+    val channel: ChatChannel,
+    val message: String,
+    val serverId: String
+)
 
 data class PlayerChatEvent(val data: PlayerChatData) : KEvent()
