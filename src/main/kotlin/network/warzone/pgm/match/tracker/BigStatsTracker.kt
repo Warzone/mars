@@ -1,25 +1,17 @@
 package network.warzone.pgm.match.tracker
 
 import network.warzone.pgm.api.socket.models.ChatChannel
-import network.warzone.pgm.match.MatchManager
 import network.warzone.pgm.player.listeners.ChatListener
 import org.bukkit.Material
-import org.bukkit.entity.Arrow
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
 import tc.oc.pgm.api.match.event.MatchFinishEvent
 import tc.oc.pgm.api.match.event.MatchLoadEvent
-import tc.oc.pgm.api.player.ParticipantState
 import tc.oc.pgm.events.PlayerJoinMatchEvent
 import tc.oc.pgm.events.PlayerLeaveMatchEvent
-import tc.oc.pgm.stats.PlayerStats
 import tc.oc.pgm.stats.StatsMatchModule
-import tc.oc.pgm.tracker.TrackerMatchModule
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -29,12 +21,14 @@ data class PlayerBlocks(
     var blocksBroken: EnumMap<Material, Int> = EnumMap(Material::class.java)
 )
 
+data class PlayerMessages(var staff: Int = 0, var global: Int = 0, var team: Int = 0)
+
 /*
 * Tracker for stats that are sent at end of match (PGM tracks most of the stats itself like Bow Shots etc.)
 */
 class BigStatsTracker : Listener {
     val blockCache = HashMap<UUID, PlayerBlocks>()
-    val messageCache = HashMap<UUID, EnumMap<ChatChannel, Int>>()
+    val messageCache = HashMap<UUID, PlayerMessages>()
     val offlinePlayersPendingStatSave = mutableSetOf<UUID>()
     private var matchStatsModule: StatsMatchModule? = null
 
@@ -66,11 +60,13 @@ class BigStatsTracker : Listener {
 
     @EventHandler
     fun onPlayerChat(event: ChatListener.MatchPlayerChatEvent) {
-        val playerStats = messageCache[event.matchPlayer.id] ?: EnumMap<ChatChannel, Int>(ChatChannel::class.java)
-        var count = playerStats[event.channel] ?: 0
-        count++
-        playerStats[event.channel] = count
-        messageCache[event.matchPlayer.id] = playerStats
+        val messageStats = messageCache[event.matchPlayer.id] ?: PlayerMessages()
+        when (event.channel) {
+            ChatChannel.STAFF -> messageStats.staff++
+            ChatChannel.GLOBAL -> messageStats.global++
+            ChatChannel.TEAM -> messageStats.team++
+        }
+        messageCache[event.matchPlayer.id] = messageStats
     }
 
     @EventHandler

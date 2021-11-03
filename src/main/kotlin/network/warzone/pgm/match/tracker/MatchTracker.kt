@@ -82,7 +82,7 @@ class MatchTracker : Listener {
                 val messages = bigStatsTracker.messageCache[it]
                 val playerBigStats = BigStats(
                     blocks,
-                    messages,
+                    messages = messages ?: PlayerMessages(),
                     bowShotsTaken = stats.shotsTaken,
                     bowShotsHit = stats.shotsHit,
                     damageGiven = stats.damageDone,
@@ -95,7 +95,7 @@ class MatchTracker : Listener {
 
         ApiClient.emit(
             OutboundEvent.MatchEnd,
-            MatchEndData(event.match.winners.toMutableList()[0]?.nameLegacy, bigStats = playerStatsMap)
+            MatchEndData(event.match.winners.map { it.defaultName }, bigStats = playerStatsMap)
         )
     }
 

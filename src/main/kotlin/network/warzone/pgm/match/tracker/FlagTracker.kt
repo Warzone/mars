@@ -8,6 +8,7 @@ import network.warzone.pgm.api.socket.models.FlagDropData
 import network.warzone.pgm.api.socket.models.FlagPickupData
 import network.warzone.pgm.utils.hasMode
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.map.Gamemode
 import tc.oc.pgm.api.match.event.MatchStartEvent
@@ -54,7 +55,7 @@ class FlagTracker : Listener {
 
     @EventHandler
     fun onFlagPickup(event: FlagPickupEvent) {
-        if (event.flag.match.hasMode(Gamemode.KING_OF_THE_FLAG, Gamemode.CAPTURE_THE_FLAG)) return
+        if (!event.flag.match.hasMode(Gamemode.KING_OF_THE_FLAG, Gamemode.CAPTURE_THE_FLAG)) return
 
         if (!lifeLockCache.contains(event.carrier.id)) {
             ApiClient.emit(OutboundEvent.FlagPickup, FlagPickupData(event.flag.id, event.carrier.id))
@@ -95,7 +96,7 @@ class FlagTracker : Listener {
 
         val droppedFlag = heldFlagCache[event.victim.id] ?: return
 
-        remove(event.victim.id)
+        lifeLockCache.remove(event.victim.id)
 
         ApiClient.emit(OutboundEvent.FlagDefend, FlagDefendData(droppedFlag.id, killer.id))
     }
