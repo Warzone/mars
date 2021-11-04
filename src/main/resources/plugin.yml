@@ -1,5 +1,5 @@
-name: WarzonePGM
-version: ${project.version}
-main: network.warzone.pgm.WarzonePGM
+name: Mars
+version: 1.0-SNAPSHOT
+main: network.warzone.mars.Mars
 depend: [ PGM ]
 website: https://github.com/Warzone

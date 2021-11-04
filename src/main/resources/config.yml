@@ -3,8 +3,8 @@ server:
 
 api:
   socket:
-    url: 'ws.warz.one'
-    secret: 'fun!'
+    url: 'wss://api.warzone.network'
+    secret: 'fun'
   http:
-    url: 'api.warz.one'
+    url: 'https://api.warzone.network'
     secret: 'epic123'

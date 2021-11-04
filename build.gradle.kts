@@ -8,7 +8,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
-group = "network.warzone.pgm"
+group = "network.warzone.mars"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -63,7 +63,7 @@ dependencies {
 tasks.withType<ShadowJar> {
 //    minimize()
     manifest {
-        attributes["Main-Class"] = "network.warzone.pgm.WarzonePGMKt"
+        attributes["Main-Class"] = "network.warzone.mars.WarzonePGMKt"
     }
 }
 

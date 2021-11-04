@@ -1,3 +1,3 @@
 
-rootProject.name = "WarzonePGM"
+rootProject.name = "Mars"
 
