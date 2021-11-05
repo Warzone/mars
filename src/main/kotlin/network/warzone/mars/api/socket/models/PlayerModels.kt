@@ -1,6 +1,5 @@
 package network.warzone.mars.api.socket.models
 
-import kotlinx.serialization.Serializable
 import network.warzone.mars.match.models.DeathCause
 import java.util.*
 
