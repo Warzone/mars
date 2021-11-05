@@ -28,6 +28,7 @@ open class OutboundEvent<T : Any>(event: SocketEventType) : SocketEvent<T>(event
     object PartyJoin : OutboundEvent<PartyJoinData>(SocketEventType.PARTY_JOIN)
     object PartyLeave : OutboundEvent<PartyLeaveData>(SocketEventType.PARTY_LEAVE)
     object PlayerDeath : OutboundEvent<PlayerDeathData>(SocketEventType.PLAYER_DEATH)
+    object Killstreak : OutboundEvent<KillStreakData>(SocketEventType.KILLSTREAK)
 
     object WoolPickup : OutboundEvent<WoolData>(SocketEventType.WOOL_PICKUP)
     object WoolCapture : OutboundEvent<WoolData>(SocketEventType.WOOL_CAPTURE)

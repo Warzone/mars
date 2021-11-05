@@ -30,7 +30,7 @@ class BigStatsTracker : Listener {
     val blockCache = HashMap<UUID, PlayerBlocks>()
     val messageCache = HashMap<UUID, PlayerMessages>()
     val offlinePlayersPendingStatSave = mutableSetOf<UUID>()
-    private var matchStatsModule: StatsMatchModule? = null
+    var matchStatsModule: StatsMatchModule? = null
 
     @EventHandler
     fun onMatchLoad(event: MatchLoadEvent) {

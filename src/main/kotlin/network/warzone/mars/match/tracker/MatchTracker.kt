@@ -62,7 +62,7 @@ class MatchTracker : Listener {
         ApiClient.emit(
             OutboundEvent.MatchStart,
             MatchStartData(
-                participantData = event.match
+                participants = event.match
                     .participants
                     .map { ParticipantData(it.nameLegacy, it.id, it.party.nameLegacy) }
                     .toSet()
@@ -101,12 +101,7 @@ class MatchTracker : Listener {
 
     @EventHandler
     fun onWoolDrop(event: MatchPlayerDeathEvent) {
-        println("Wool drop event in MatchTracker")
         val tracker = MatchManager.getTracker(WoolTracker::class) ?: return
-        println("Tracker is here")
-        tracker.holdingCache.forEach {
-            Bukkit.broadcastMessage("${it.key} ${it.value}")
-        }
     }
 
     private fun getFlagPartials(match: Match): List<FlagPartial> {

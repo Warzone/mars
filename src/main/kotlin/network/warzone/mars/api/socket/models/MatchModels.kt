@@ -20,7 +20,7 @@ data class MatchLoadData(
     val goals: MatchLoadGoals
 )
 
-data class MatchStartData(val participantData: Set<ParticipantData>)
+data class MatchStartData(val participants: Set<ParticipantData>)
 data class MatchEndData(val winningParties: List<String>, val bigStats: Map<UUID, BigStats>)
 
 data class BigStats(

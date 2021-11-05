@@ -9,10 +9,11 @@ import kotlin.reflect.KClass
 
 object MatchManager {
 
-    public val trackers: List<Listener> = listOf(
+    val trackers: List<Listener> = listOf(
         CoreTracker(),
         MatchTracker(),
         PlayerTracker(),
+        KillstreakTracker(),
         WoolTracker(),
         FlagTracker(),
         DestroyableTracker(),

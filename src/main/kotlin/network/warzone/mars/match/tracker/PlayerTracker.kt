@@ -8,6 +8,7 @@ import network.warzone.mars.api.socket.models.PlayerDeathData
 import network.warzone.mars.match.deaths.LegacyTextDeathMessageBuilder
 import network.warzone.mars.match.models.DeathCause
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.party.Competitor
 import tc.oc.pgm.api.party.Party
@@ -39,7 +40,7 @@ class PlayerTracker : Listener {
         )
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerDeath(event: MatchPlayerDeathEvent) {
         val translatableComponent = LegacyTextDeathMessageBuilder(event)
 
