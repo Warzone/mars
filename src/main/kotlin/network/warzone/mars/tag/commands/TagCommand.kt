@@ -1,4 +1,4 @@
-package network.warzone.mars.tags.commands
+package network.warzone.mars.tag.commands
 
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
@@ -8,8 +8,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.tags.TagFeature
-import network.warzone.mars.tags.models.Tag
+import network.warzone.mars.tag.TagFeature
+import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.asTextComponent
 import org.bukkit.ChatColor.GREEN
 import org.bukkit.command.CommandSender

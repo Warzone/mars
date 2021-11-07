@@ -3,7 +3,7 @@ package network.warzone.mars.player
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.Session
-import network.warzone.mars.ranks.models.Rank
+import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.utils.color
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.PGM

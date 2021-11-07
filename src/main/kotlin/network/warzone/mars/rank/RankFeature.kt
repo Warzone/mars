@@ -1,4 +1,4 @@
-package network.warzone.mars.ranks
+package network.warzone.mars.rank
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.failure
@@ -6,10 +6,10 @@ import com.github.kittinunf.result.map
 import network.warzone.mars.feature.named.NamedCacheFeature
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.ranks.commands.RankCommands
-import network.warzone.mars.ranks.exceptions.RankConflictException
-import network.warzone.mars.ranks.exceptions.RankMissingException
-import network.warzone.mars.ranks.models.Rank
+import network.warzone.mars.rank.commands.RankCommands
+import network.warzone.mars.rank.exceptions.RankConflictException
+import network.warzone.mars.rank.exceptions.RankMissingException
+import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.utils.FeatureException
 import java.util.*
 

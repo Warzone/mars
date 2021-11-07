@@ -1,11 +1,11 @@
-package network.warzone.mars.ranks
+package network.warzone.mars.rank
 
 import com.github.kittinunf.result.Result
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.feature.Service
-import network.warzone.mars.ranks.exceptions.RankConflictException
-import network.warzone.mars.ranks.exceptions.RankMissingException
-import network.warzone.mars.ranks.models.Rank
+import network.warzone.mars.rank.exceptions.RankConflictException
+import network.warzone.mars.rank.exceptions.RankMissingException
+import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.utils.FeatureException
 import network.warzone.mars.utils.mapErrorSmart
 import network.warzone.mars.utils.parseHttpException

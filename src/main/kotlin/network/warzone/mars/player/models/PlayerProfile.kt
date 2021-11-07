@@ -3,8 +3,8 @@ package network.warzone.mars.player.models
 import network.warzone.mars.feature.named.NamedResource
 import network.warzone.mars.feature.relations.Relation
 import network.warzone.mars.feature.resource.ResourceType
-import network.warzone.mars.ranks.models.Rank
-import network.warzone.mars.tags.models.Tag
+import network.warzone.mars.rank.models.Rank
+import network.warzone.mars.tag.models.Tag
 import java.util.*
 
 data class PlayerProfile(

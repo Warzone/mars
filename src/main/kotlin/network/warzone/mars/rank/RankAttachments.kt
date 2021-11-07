@@ -1,4 +1,4 @@
-package network.warzone.mars.ranks
+package network.warzone.mars.rank
 
 import network.warzone.mars.Mars
 import network.warzone.mars.player.PlayerContext

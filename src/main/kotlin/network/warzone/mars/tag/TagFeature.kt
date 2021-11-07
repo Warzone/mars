@@ -1,15 +1,15 @@
-package network.warzone.mars.tags
+package network.warzone.mars.tag
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.failure
 import com.github.kittinunf.result.map
 import network.warzone.mars.feature.named.NamedCacheFeature
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.tags.commands.TagCommand
-import network.warzone.mars.tags.commands.TagsCommand
-import network.warzone.mars.tags.exceptions.TagConflictException
-import network.warzone.mars.tags.exceptions.TagMissingException
-import network.warzone.mars.tags.models.Tag
+import network.warzone.mars.tag.commands.TagCommand
+import network.warzone.mars.tag.commands.TagsCommand
+import network.warzone.mars.tag.exceptions.TagConflictException
+import network.warzone.mars.tag.exceptions.TagMissingException
+import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.FeatureException
 import java.util.*
 

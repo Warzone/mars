@@ -1,11 +1,11 @@
-package network.warzone.mars.tags
+package network.warzone.mars.tag
 
 import com.github.kittinunf.result.Result
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.feature.Service
-import network.warzone.mars.tags.exceptions.TagConflictException
-import network.warzone.mars.tags.exceptions.TagMissingException
-import network.warzone.mars.tags.models.Tag
+import network.warzone.mars.tag.exceptions.TagConflictException
+import network.warzone.mars.tag.exceptions.TagMissingException
+import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.FeatureException
 import network.warzone.mars.utils.mapErrorSmart
 import network.warzone.mars.utils.parseHttpException

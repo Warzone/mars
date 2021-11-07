@@ -1,4 +1,4 @@
-package network.warzone.mars.tags.commands
+package network.warzone.mars.tag.commands
 
 import app.ashcon.intake.Command
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
@@ -6,7 +6,7 @@ import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.audience.Audience
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.tags.models.Tag
+import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.color
 import network.warzone.mars.utils.menu.GUI
 import network.warzone.mars.utils.menu.gui

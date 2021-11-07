@@ -1,4 +1,4 @@
-package network.warzone.mars.ranks.commands
+package network.warzone.mars.rank.commands
 
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
@@ -11,8 +11,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.ranks.RankFeature
-import network.warzone.mars.ranks.models.Rank
+import network.warzone.mars.rank.RankFeature
+import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.utils.asTextComponent
 import org.bukkit.ChatColor.*
 import org.bukkit.command.CommandSender

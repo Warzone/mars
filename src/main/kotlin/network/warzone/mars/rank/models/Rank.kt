@@ -1,19 +1,25 @@
-package network.warzone.mars.tags.models
+package network.warzone.mars.rank.models
 
 import network.warzone.mars.feature.named.NamedResource
 import network.warzone.mars.feature.resource.Resource
 import java.util.*
 
-data class Tag(
+data class Rank (
     override val _id: UUID,
     override var name: String,
-    var display: String,
-    val createdAt: Date
+    var displayName: String?,
+    var prefix: String?,
+    var priority: Int,
+    var createdAt: Date,
+    var staff: Boolean,
+    var applyOnJoin: Boolean,
+    var permissions: MutableList<String>
 ) : NamedResource {
 
     val nameLower: String get() = name.toLowerCase(Locale.ROOT)
 
     override fun generate(): Resource {
+        // no relations?
         return this
     }
 
