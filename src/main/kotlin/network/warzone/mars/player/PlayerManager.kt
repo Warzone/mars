@@ -3,6 +3,7 @@ package network.warzone.mars.player
 import network.warzone.mars.Mars
 import network.warzone.mars.player.listeners.ChatListener
 import network.warzone.mars.player.models.Session
+import network.warzone.mars.punishment.models.Punishment
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -14,11 +15,12 @@ object PlayerManager {
         Mars.registerEvents(ChatListener())
     }
 
-    fun createPlayer(player: Player, session: Session): PlayerContext {
+    fun createPlayer(player: Player, session: Session, activePunishments: List<Punishment>): PlayerContext {
         return PlayerContext(
             uuid = player.uniqueId,
             player = player,
-            activeSession = session
+            activeSession = session,
+            activePunishments = activePunishments
         ).also { players[it.uuid] = it }
     }
 

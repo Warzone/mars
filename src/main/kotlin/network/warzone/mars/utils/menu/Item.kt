@@ -12,7 +12,7 @@ fun item(
 class Item(
     val type: Material
 ) {
-    val stack = ItemStack(type, 1)
+    var stack = ItemStack(type, 1)
     val meta: ItemMeta get() = stack.itemMeta
 
     fun stack(builder: ItemStack.() -> Unit) = stack

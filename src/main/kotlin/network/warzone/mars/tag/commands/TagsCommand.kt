@@ -32,7 +32,9 @@ class TagsCommand {
 
     private suspend fun createTagGUI(context: PlayerContext, tags: List<Tag>): GUI {
         val profile = context.getPlayerProfile()
-        return gui("${AQUA}Tags", 6) {
+        // todo: show locked tags?
+        val rows = (if (tags.count() < 9) 1 else tags.count() / 9) + 1
+        return gui("${DARK_AQUA}Tags", rows) {
             tags.forEachIndexed { index, tag ->
                 val isActive = profile.activeTagId != null && profile.activeTagId == tag._id
                 slot(index) {

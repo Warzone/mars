@@ -45,13 +45,13 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
 
         // Requests the creation of a new rank. Adds the created rank to the cache.
         return service.create(
-                name = name,
-                displayName = displayName ?: name,
-                priority = priority ?: 0,
-                prefix = prefix,
-                permissions = emptyList(),
-                staff = staff ?: false,
-                applyOnJoin = applyOnJoin ?: false
+           name = name,
+            displayName = displayName ?: name,
+            priority = priority ?: 0,
+            prefix = prefix,
+            permissions = emptyList(),
+            staff = staff ?: false,
+            applyOnJoin = applyOnJoin ?: false
         ).map { add(it) }
     }
 

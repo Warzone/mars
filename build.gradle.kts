@@ -14,16 +14,25 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
 
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/") {
+        name = "sonatype-oss-snapshots"
+    }
+
     maven("https://oss.sonatype.org/content/groups/public/")
 
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://repo.ashcon.app/nexus/content/repositories/snapshots/")
     maven("https://repo.aikar.co/nexus/content/groups/aikar/")
+    maven("https://repo.codemc.io/repository/maven-snapshots/")
 }
 
 dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     //implementation("com.google.code.gson:gson:2.8.2")
+
+    implementation("net.time4j:time4j-base:5.8")
+    implementation("net.time4j:time4j-sqlxml:5.8")
+    implementation("net.time4j:time4j-tzdata:5.0-2020a")
 
     implementation("app.ashcon:sportpaper:1.8.8-R0.1-SNAPSHOT")
     implementation("app.ashcon.intake:intake-bukkit:1.2-SNAPSHOT")
@@ -35,9 +44,17 @@ dependencies {
 
     compileOnly("net.kyori:adventure-api:4.8.1")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.8.1")
-    compileOnly("net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT") {
+    implementation("net.kyori:adventure-platform-bukkit:4.0.0") {
         exclude(group = "org.spigotmc", module = "spigot-api")
     }
+
+    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
+
+
+//    compileOnly("me.lucko:adventure-platform-bukkit:4.0.0") {
+//        exclude(group = "org.spigotmc", module = "spigot-api")
+//    }
+
 
     val ktorVersion = "1.6.2"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -63,7 +80,7 @@ dependencies {
 tasks.withType<ShadowJar> {
 //    minimize()
     manifest {
-        attributes["Main-Class"] = "network.warzone.mars.WarzonePGMKt"
+        attributes["Main-Class"] = "network.warzone.mars.MarsKt"
     }
 }
 

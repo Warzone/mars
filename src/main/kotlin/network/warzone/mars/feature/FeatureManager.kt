@@ -7,8 +7,9 @@ import network.warzone.mars.api.events.ApiConnectedEvent
 import network.warzone.mars.feature.resource.ResourceType
 import network.warzone.mars.map.MapFeature
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.ranks.RankFeature
-import network.warzone.mars.tags.TagFeature
+import network.warzone.mars.punishment.PunishmentFeature
+import network.warzone.mars.rank.RankFeature
+import network.warzone.mars.tag.TagFeature
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -18,7 +19,8 @@ object FeatureManager : Listener {
         ResourceType.Player to PlayerFeature,
         ResourceType.Rank to RankFeature,
         ResourceType.Tag to TagFeature,
-        ResourceType.Map to MapFeature
+        ResourceType.Map to MapFeature,
+        ResourceType.Punishment to PunishmentFeature
     )
 
     fun init() {

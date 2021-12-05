@@ -4,9 +4,9 @@ import app.ashcon.intake.argument.ArgumentParseException
 import app.ashcon.intake.argument.CommandArgs
 import app.ashcon.intake.argument.Namespace
 import app.ashcon.intake.bukkit.parametric.provider.BukkitProvider
-import network.warzone.mars.tags.TagFeature
-import network.warzone.mars.tags.exceptions.TagMissingException
-import network.warzone.mars.tags.models.Tag
+import network.warzone.mars.tag.TagFeature
+import network.warzone.mars.tag.exceptions.TagMissingException
+import network.warzone.mars.tag.models.Tag
 import org.bukkit.command.CommandSender
 
 class TagProvider : BukkitProvider<Tag> {

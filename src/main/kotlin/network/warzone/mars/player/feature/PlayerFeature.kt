@@ -9,6 +9,8 @@ import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
+import network.warzone.mars.player.models.Session
+import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.RankAttachments
 import network.warzone.mars.rank.exceptions.RankAlreadyPresentException
 import network.warzone.mars.rank.exceptions.RankNotPresentException
@@ -17,14 +19,18 @@ import network.warzone.mars.tag.exceptions.TagAlreadyPresentException
 import network.warzone.mars.tag.exceptions.TagNotPresentException
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.FeatureException
+import network.warzone.mars.utils.color
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 
 object PlayerFeature : NamedCacheFeature<PlayerProfile, PlayerService>(), Listener {
     override val service = PlayerService
+
+    val queuedJoins = hashMapOf<UUID, Triple<PlayerProfile, Session, List<Punishment>>>()
 
     init {
         Mars.registerEvents(this)
@@ -151,14 +157,33 @@ object PlayerFeature : NamedCacheFeature<PlayerProfile, PlayerService>(), Listen
     }
 
     @EventHandler
+    fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) = runBlocking {
+        val ip = event.address.hostAddress
+        val (playerProfile, activeSession, activePunishments) = service.login(event.uniqueId, event.name, ip)
+        if (activeSession == null) { // Player is not allowed to join (banned)
+            val ban = activePunishments.find { it.action.isBan() }!!
+            val expiryString =
+                if (ban.action.isPermanent()) "&7This ban is permanent." else "&7This ban will expire on &f${ban.expiresAt}&7."
+            event.kickMessage =
+                "&7You have been ${ban.action.kind.pastTense} from the server for &c${ban.reason.name}&7.\n\n&c${ban.reason.message}\n\n$expiryString\n&7Appeal at &bhttps://warzone.network/appeal".color()
+            event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
+        } else {
+            queuedJoins[event.uniqueId] = Triple(playerProfile, activeSession, activePunishments)
+        }
+    }
+
+    @EventHandler
     fun onPlayerLogin(event: PlayerLoginEvent) = runBlocking {
         val player = event.player
         val ip = event.address.hostAddress
 
-        val (playerProfile, activeSession) = service.login(player.uniqueId, player.name, ip)
-        val context = PlayerManager.createPlayer(player, activeSession)
+        val (profile, session, activePuns) = queuedJoins[player.uniqueId]
+            ?: throw RuntimeException("Queued join unavailable: ${player.name}")
 
-        add(playerProfile.generate())
+        val context = PlayerManager.createPlayer(player, session, activePuns)
+        println(activePuns)
+
+        add(profile.generate())
 
         RankAttachments.createAttachment(context)
         RankAttachments.refresh(context)

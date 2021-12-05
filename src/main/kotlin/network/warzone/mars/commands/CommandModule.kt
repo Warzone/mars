@@ -9,8 +9,8 @@ import network.warzone.mars.commands.providers.PlayerContextProvider
 import network.warzone.mars.commands.providers.RankProvider
 import network.warzone.mars.commands.providers.TagProvider
 import network.warzone.mars.player.PlayerContext
-import network.warzone.mars.ranks.models.Rank
-import network.warzone.mars.tags.models.Tag
+import network.warzone.mars.rank.models.Rank
+import network.warzone.mars.tag.models.Tag
 import java.util.function.Supplier
 import kotlin.reflect.KClass
 

@@ -5,10 +5,10 @@ import network.warzone.mars.api.socket.models.ChatChannel
 import network.warzone.mars.api.socket.models.PlayerChatEvent
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.punishment.models.PunishmentKind
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
 import network.warzone.mars.utils.getMatch
-import org.bukkit.ChatColor.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -22,13 +22,15 @@ import tc.oc.pgm.api.setting.SettingValue
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextColor
+import org.bukkit.ChatColor.*
 
 class ChatListener : Listener {
 
     class MatchPlayerChatEvent(
         val matchPlayer: MatchPlayer,
         val channel: ChatChannel,
-        val message: String) : KEvent()
+        val message: String
+    ) : KEvent()
 
     @EventHandler
     fun onPlayerChatApi(event: PlayerChatEvent) {
@@ -45,6 +47,20 @@ class ChatListener : Listener {
         val context = PlayerManager.getPlayer(player.uniqueId)!!
 
         val match = context.matchPlayer.match
+
+        println(context.activePunishments)
+
+        context.activePunishments = context.activePunishments.filter { it.isActive }
+
+        val activeMute =
+            context.activePunishments.filter { it.action.kind == PunishmentKind.MUTE }.maxByOrNull { it.issuedAt }
+
+        if (activeMute != null) {
+            event.isCancelled = true
+            if (activeMute.action.isPermanent()) player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}https://warzone.network/appeal")
+            else player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name} ${GRAY}until ${WHITE}${activeMute.expiresAt}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}https://warzone.network/appeal")
+            return@runBlocking
+        }
 
         val chatChannel = context.matchPlayer.settings.getValue(SettingKey.CHAT)
         when (chatChannel) {
@@ -67,8 +83,6 @@ class ChatListener : Listener {
     }
 
     @EventHandler
-
-
     private suspend fun sendGlobalChat(match: Match, context: PlayerContext, message: String) {
         //TODO: levels
         val prefix = context.getPrefix()
@@ -82,7 +96,7 @@ class ChatListener : Listener {
 
         if (prefix != null) messageBuilder.append { text("$prefix ") }
 
-        messageBuilder.append { text(username, TextColor.color(teamColor.red, teamColor.green, teamColor.blue))  }
+        messageBuilder.append { text(username, TextColor.color(teamColor.red, teamColor.green, teamColor.blue)) }
 
         if (tag != null) messageBuilder.append { text(" $GRAY[${tag.display.color()}$GRAY]") }
 

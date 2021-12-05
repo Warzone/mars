@@ -4,9 +4,9 @@ import app.ashcon.intake.argument.ArgumentParseException
 import app.ashcon.intake.argument.CommandArgs
 import app.ashcon.intake.argument.Namespace
 import app.ashcon.intake.bukkit.parametric.provider.BukkitProvider
-import network.warzone.mars.ranks.RankFeature
-import network.warzone.mars.ranks.exceptions.RankMissingException
-import network.warzone.mars.ranks.models.Rank
+import network.warzone.mars.rank.RankFeature
+import network.warzone.mars.rank.exceptions.RankMissingException
+import network.warzone.mars.rank.models.Rank
 import org.bukkit.command.CommandSender
 
 class RankProvider : BukkitProvider<Rank> {

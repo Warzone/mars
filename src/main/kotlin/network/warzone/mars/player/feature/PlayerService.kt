@@ -8,6 +8,7 @@ import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.Session
+import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.RankFeature
 import network.warzone.mars.rank.exceptions.RankAlreadyPresentException
 import network.warzone.mars.rank.exceptions.RankNotPresentException
@@ -22,23 +23,27 @@ import java.util.*
 object PlayerService : Service<PlayerProfile>() {
 
     suspend fun login(playerId: UUID, playerName: String, ip: String): PlayerLoginResponse {
-        return apiClient.post("/mc/players/login", PlayerLoginRequest(
-            playerId,
-            playerName,
-            ip
-        ))
+        return apiClient.post(
+            "/mc/players/login", PlayerLoginRequest(
+                playerId,
+                playerName,
+                ip
+            )
+        )
     }
 
     suspend fun logout(playerId: UUID, playtime: Long) {
-        apiClient.post<ApiExceptionResponse, PlayerLogoutRequest>("/mc/players/logout", PlayerLogoutRequest(
-            playerId,
-            playtime
-        ))
+        apiClient.post<ApiExceptionResponse, PlayerLogoutRequest>(
+            "/mc/players/logout", PlayerLogoutRequest(
+                playerId,
+                playtime
+            )
+        )
     }
 
     suspend fun addRankToPlayer(playerId: UUID, rankId: UUID): Result<Unit, RankAlreadyPresentException> {
         return parseHttpException {
-            apiClient.post<Unit>("/mc/players/$playerId/ranks/$rankId")
+            apiClient.put<Unit>("/mc/players/$playerId/ranks/$rankId")
         }.mapErrorSmart {
             when (it.code) {
                 ApiExceptionType.RANK_ALREADY_PRESENT -> RankAlreadyPresentException(
@@ -107,9 +112,18 @@ object PlayerService : Service<PlayerProfile>() {
         }
     }
 
+    suspend fun getPunishments(target: String): Result<List<Punishment>, PlayerMissingException> {
+        return parseHttpException<List<Punishment>> { apiClient.get("/mc/players/$target/punishments") }.mapErrorSmart {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
+                else -> TODO()
+            }
+        }
+    }
+
     override suspend fun get(target: String): Result<PlayerProfile, PlayerMissingException> {
         return parseHttpException {
-            apiClient.get<PlayerProfile>("/mc/player/$target")
+            apiClient.get<PlayerProfile>("/mc/players/$target")
         }.mapErrorSmart {
             when (it.code) {
                 ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
@@ -122,7 +136,8 @@ object PlayerService : Service<PlayerProfile>() {
 
     data class PlayerLoginResponse(
         val player: PlayerProfile,
-        val activeSession: Session
+        val activeSession: Session?,
+        val activePunishments: List<Punishment>
     )
 
     data class PlayerLogoutRequest(val playerId: UUID, val playtime: Long)
