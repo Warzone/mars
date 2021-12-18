@@ -50,6 +50,10 @@ object PunishmentFeature : Feature<Punishment, PunishmentService>() {
         )
     }
 
+    suspend fun revertPunishment(punishment: UUID, reason: String, reverter: SimplePlayer): Result<Punishment, FeatureException> {
+        return service.revert(punishment, reason, reverter)
+    }
+
     override fun getCommands(): List<Any> {
         return listOf(PunishCommands())
     }

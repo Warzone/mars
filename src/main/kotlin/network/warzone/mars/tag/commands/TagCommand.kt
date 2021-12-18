@@ -3,9 +3,9 @@ package network.warzone.mars.tag.commands
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import kotlinx.coroutines.runBlocking
-import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
+import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.tag.TagFeature

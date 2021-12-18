@@ -2,7 +2,7 @@ package network.warzone.mars.commands.providers
 
 import app.ashcon.intake.argument.CommandArgs
 import app.ashcon.intake.bukkit.parametric.provider.BukkitProvider
-import net.kyori.adventure.audience.Audience
+import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
 import network.warzone.mars.utils.AUDIENCE_PROVIDER
 import org.bukkit.command.CommandSender
 

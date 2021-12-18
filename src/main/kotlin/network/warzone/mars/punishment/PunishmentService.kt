@@ -8,6 +8,7 @@ import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.Service
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
+import network.warzone.mars.punishment.exceptions.PunishmentAlreadyRevertedException
 import network.warzone.mars.punishment.exceptions.PunishmentMissingException
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.punishment.models.PunishmentAction
@@ -62,6 +63,24 @@ object PunishmentService : Service<Punishment>() {
         }
     }
 
+    suspend fun revert(
+        punishment: UUID,
+        reason: String,
+        reverter: SimplePlayer
+    ): Result<Punishment, FeatureException> {
+        return parseHttpException<Punishment> {
+            apiClient.post(
+                "/mc/punishments/${punishment}/revert", PunishmentRevertRequest(reason, reverter)
+            )
+        }.mapErrorSmart {
+            when (it.code) {
+                ApiExceptionType.PUNISHMENT_MISSING -> PunishmentMissingException(punishment.toString())
+                ApiExceptionType.PUNISHMENT_ALREADY_REVERTED -> PunishmentAlreadyRevertedException(punishment.toString())
+                else -> TODO()
+            }
+        }
+    }
+
     suspend fun listTypes(): List<PunishmentType> {
         return apiClient.get("/mc/punishments/types")
     }
@@ -76,4 +95,6 @@ object PunishmentService : Service<Punishment>() {
         val targetIps: List<String>,
         val silent: Boolean
     )
+
+    data class PunishmentRevertRequest(val reason: String, val reverter: SimplePlayer)
 }

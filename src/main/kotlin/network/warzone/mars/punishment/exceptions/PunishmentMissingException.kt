@@ -1,8 +1,8 @@
 package network.warzone.mars.punishment.exceptions
 
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.format.NamedTextColor
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.TextComponent
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.utils.FeatureException
 
 data class PunishmentMissingException(val id: String) : FeatureException() {

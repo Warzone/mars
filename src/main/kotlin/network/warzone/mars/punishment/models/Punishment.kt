@@ -3,7 +3,6 @@ package network.warzone.mars.punishment.models
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.resource.Resource
 import java.util.*
-import kotlin.math.exp
 
 data class Punishment(
     override val _id: UUID,
@@ -32,18 +31,13 @@ data class Punishment(
             if (reversion != null) return false
             return action.isPermanent() || Date().time < expiresAt.time
         }
+
+    val isReverted: Boolean
+    get() {
+        return reversion != null
+    }
 }
 
 data class PunishmentReason(val name: String, val message: String, val short: String)
 
-data class PunishmentReversion(
-    val revertedAt: Long,
-    val note: StaffNote,
-    val reverter: SimplePlayer,
-    val reason: ReversionReason
-)
-
-enum class ReversionReason {
-    FALSE_PUNISHMENT,
-    COMPASSIONATE
-}
+data class PunishmentReversion(val revertedAt: Long, val reverter: SimplePlayer, val reason: String)

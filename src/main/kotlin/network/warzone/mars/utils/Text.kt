@@ -1,22 +1,23 @@
 package network.warzone.mars.utils
 
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.event.ClickEvent
-import net.kyori.adventure.text.event.HoverEvent
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import net.time4j.ClockUnit
 import network.warzone.mars.Mars
+import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.models.Tag
+import org.bukkit.ChatColor
 import org.bukkit.ChatColor.RED
 import org.bukkit.ChatColor.translateAlternateColorCodes
+import tc.oc.pgm.lib.net.kyori.adventure.platform.bukkit.BukkitAudiences
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.*
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.TextComponent
+import tc.oc.pgm.lib.net.kyori.adventure.text.event.ClickEvent
+import tc.oc.pgm.lib.net.kyori.adventure.text.event.HoverEvent
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
 import java.time.Duration
 import java.util.*
-
 
 val AUDIENCE_PROVIDER: BukkitAudiences = BukkitAudiences.create(Mars.get())
 
@@ -53,6 +54,53 @@ fun Rank.asTextComponent(editable: Boolean = true): TextComponent {
     if (editable) finalComponent = finalComponent.clickEvent(ClickEvent.suggestCommand("/rank edit ${this.name}"))
 
     return finalComponent.build()
+}
+
+fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
+    var hover = text()
+        .append(
+            text("${this.action.kind.colour}${this.reason.name} (${this.offence}) – ${this.action.kind.noun} (${this.action.formatLength()})"),
+            newline(),
+            newline()
+        )
+        .append { createUncolouredLabelled("Issued by", this.punisher.name) }
+        .append { createUncolouredLabelled("Issued at", "${this.issuedAt} (${this.issuedAt.getTimeAgo()})") }
+        .append { createUncolouredLabelled("Expires at", this.expiresAt.toString()) }
+//        .append { createNumberedLabelled("Known IPs", this.targetIps.size) }
+
+    if (this.note != null) hover = hover.append { createStandardLabelled("Note", this.note) }
+
+    hover = hover
+        .append { createBooleanLabelled("Silent", this.silent) }
+        .append { createBooleanLabelled("Active", this.isActive) }
+        .append { createBooleanLabelled("Reverted", this.reversion != null) }
+
+    if (this.reversion != null) hover = hover.append { newline() }
+        .append { createUncolouredLabelled("Reverted by", this.reversion.reverter.name) }
+        .append {
+            createUncolouredLabelled(
+                "Reverted at",
+                "${Date(this.reversion.revertedAt)} (${Date(this.reversion.revertedAt).getTimeAgo()})"
+            )
+        }
+        .append { createUncolouredLabelled("Reversion reason", this.reversion.reason) }
+
+    if (revertable) hover.append(newline(), text("Click to revert", NamedTextColor.LIGHT_PURPLE, TextDecoration.ITALIC))
+
+    var finalComponent =
+        text("[", NamedTextColor.GRAY)
+            .append(text(this.issuedAt.getTimeAgo().toUpperCase(), NamedTextColor.GRAY))
+            .append(text("]", NamedTextColor.GRAY))
+            .append(space())
+            .append(text("${if (this.isActive) this.action.kind.colour else ChatColor.GRAY}${if (this.isReverted) ChatColor.STRIKETHROUGH else ""}${this.action.kind.verb.toUpperCase()}"))
+            .append(space())
+            .append(text(this.target.name, NamedTextColor.WHITE))
+
+    finalComponent = finalComponent.hoverEvent(HoverEvent.showText(hover.build()))
+
+    if (revertable) finalComponent = finalComponent.clickEvent(ClickEvent.runCommand("/revertp ${this._id}"))
+
+    return finalComponent
 }
 
 fun Tag.asTextComponent(complex: Boolean = false): TextComponent {

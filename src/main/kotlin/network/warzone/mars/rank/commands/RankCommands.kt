@@ -6,9 +6,6 @@ import app.ashcon.intake.parametric.annotation.Default
 import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
 import kotlinx.coroutines.runBlocking
-import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.rank.RankFeature
@@ -16,6 +13,9 @@ import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.utils.asTextComponent
 import org.bukkit.ChatColor.*
 import org.bukkit.command.CommandSender
+import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import javax.annotation.Nullable
 
 class RankCommands {

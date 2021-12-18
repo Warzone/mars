@@ -5,11 +5,12 @@ import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
+import com.github.kittinunf.result.getOrNull
 import kotlinx.coroutines.runBlocking
-import net.kyori.adventure.audience.Audience
 import net.wesjd.anvilgui.AnvilGUI
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
+import network.warzone.mars.match.MatchManager
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
@@ -23,12 +24,17 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
 import org.bukkit.Material
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
+import tc.oc.pgm.lib.net.kyori.adventure.platform.bukkit.BukkitAudiences
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component.*
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
 import java.time.Duration
+import java.util.*
 import javax.annotation.Nullable
 
 class PunishCommands {
@@ -79,6 +85,57 @@ class PunishCommands {
 
         player.open(createPunishGUI(context, target, history, types, isSilent))
     }
+
+    @Command(aliases = ["revertp"], desc = "Revert a punishment by ID")
+    fun onRevert(
+        @Sender player: Player,
+        context: PlayerContext,
+        punishment: Punishment,
+        @Nullable @Text reason: String?
+    ) = runBlocking {
+        if (punishment.reversion != null) throw CommandException("This punishment was already reverted ${Date(punishment.reversion.revertedAt).getTimeAgo()} by ${punishment.reversion.reverter.name} for ${ChatColor.WHITE}${punishment.reversion.reason}${ChatColor.RED}.")
+
+        if (reason == null) {
+            val anvil =
+                AnvilGUI.Builder().text("Reversion reason").plugin(Mars.get())
+            anvil.onComplete { player, reason ->
+                player.performCommand("mars:revertp ${punishment._id} $reason")
+                return@onComplete AnvilGUI.Response.close()
+            }
+            anvil.open(player)
+        } else {
+            val pun = PunishmentFeature.revertPunishment(
+                punishment._id,
+                reason,
+                SimplePlayer(id = player.uniqueId, name = player.name)
+            ).get() ?: throw CommandException("Returned punishment is null?")
+
+            val target = PlayerManager.getPlayer(pun.target.id)
+            if (target != null) { // Target is online
+                target.activePunishments = target.activePunishments.filterNot { it._id == pun._id }
+            }
+
+            sendModeratorBroadcast(
+                text(player.name, NamedTextColor.YELLOW).append(space()).append(text("reverted", NamedTextColor.YELLOW))
+                    .append(
+                        space()
+                    ).append(pun.asTextComponent(false))
+            )
+        }
+    }
+
+    @Command(aliases = ["punishments", "puns"], desc = "View a player's punishment history")
+    fun onPunishmentHistory(@Sender sender: CommandSender, audience: Audience, context: PlayerContext, target: String) =
+        runBlocking {
+            val history = PlayerService.getPunishments(target).getOrNull() ?: throw CommandException("Invalid player")
+            if (history.isEmpty()) return@runBlocking sender.sendMessage("${ChatColor.YELLOW}${target} has no punishment history")
+
+            sender.sendMessage("${ChatColor.RED}Punishments for ${target}:")
+            history
+                .map(Punishment::asTextComponent)
+                .map { text("- ", NamedTextColor.GRAY).append(it) }
+                .forEach(audience::sendMessage)
+        }
 
     private suspend fun createPunishGUI(
         context: PlayerContext,
@@ -265,10 +322,10 @@ class PunishCommands {
     private fun createPlayerLore(player: PlayerProfile, punHistory: List<Punishment>): List<String> {
         val historyLore = mutableListOf<String>()
         punHistory.forEach {
-            val time = "${ChatColor.WHITE}${ChatColor.BOLD}${it.issuedAt.getTimeAgo()}"
-            val kind = "${it.action.kind.colour}${it.action.kind.noun}"
+            val time = "${ChatColor.WHITE}${ChatColor.BOLD}${it.issuedAt.getTimeAgo()}${if (it.isReverted) " ${ChatColor.RED}${ChatColor.BOLD}✗" else ""}"
+            val kind = "${if (!it.isReverted) it.action.kind.colour else ChatColor.GRAY}${it.action.kind.noun}"
             val bullet = "${ChatColor.GRAY}•"
-            val reason = "${ChatColor.RED}${it.reason.name} (${it.offence})"
+            val reason = "${if (!it.isReverted) ChatColor.RED else ChatColor.GRAY}${it.reason.name} (${it.offence})"
             val length = it.action.formatLength()
             val staff = "${ChatColor.AQUA}${it.punisher.name}"
             val note = if (it.note != null) "${ChatColor.GRAY}[${it.note}]" else ""
@@ -384,5 +441,10 @@ class PunishCommands {
                 if (!punishment.silent && !it.hasPermission("mars.punish")) it.sendMessage(publicBroadcast)
             }
         }
+    }
+
+    fun sendModeratorBroadcast(message: Component) {
+        MatchManager.match.players.filter { it.bukkit.hasPermission("mars.punish") }
+            .forEach { it.player?.sendMessage(message) }
     }
 }

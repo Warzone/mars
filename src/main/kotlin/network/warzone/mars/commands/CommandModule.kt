@@ -3,12 +3,10 @@ package network.warzone.mars.commands
 import app.ashcon.intake.argument.CommandArgs
 import app.ashcon.intake.parametric.AbstractModule
 import app.ashcon.intake.parametric.Provider
-import net.kyori.adventure.audience.Audience
-import network.warzone.mars.commands.providers.AudienceProvider
-import network.warzone.mars.commands.providers.PlayerContextProvider
-import network.warzone.mars.commands.providers.RankProvider
-import network.warzone.mars.commands.providers.TagProvider
+import network.warzone.mars.commands.providers.*
+import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
 import network.warzone.mars.player.PlayerContext
+import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.models.Tag
 import java.util.function.Supplier
@@ -21,6 +19,7 @@ object CommandModule : AbstractModule() {
         bind(Rank::class, RankProvider())
         bind(Tag::class, TagProvider())
         bind(PlayerContext::class, PlayerContextProvider())
+        bind(Punishment::class, PunishmentProvider())
     }
 
     private fun <T : Any> bind(type: KClass<T>, provider: Provider<T>) {
