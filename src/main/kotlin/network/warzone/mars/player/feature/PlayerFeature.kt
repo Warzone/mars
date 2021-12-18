@@ -7,9 +7,11 @@ import network.warzone.mars.Mars
 import network.warzone.mars.feature.named.NamedCacheFeature
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.commands.PlayerCommands
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.Session
+import network.warzone.mars.punishment.commands.PunishCommands
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.RankAttachments
 import network.warzone.mars.rank.exceptions.RankAlreadyPresentException
@@ -205,4 +207,8 @@ object PlayerFeature : NamedCacheFeature<PlayerProfile, PlayerService>(), Listen
         service.logout(uuid, sessionLength)
     }
 
+
+    override fun getCommands(): List<Any> {
+        return listOf(PlayerCommands())
+    }
 }

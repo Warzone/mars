@@ -1,6 +1,7 @@
 package network.warzone.mars.player.feature
 
 import com.github.kittinunf.result.Result
+import network.warzone.mars.api.exceptions.ApiException
 import network.warzone.mars.api.http.ApiExceptionResponse
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.feature.Service
@@ -39,6 +40,15 @@ object PlayerService : Service<PlayerProfile>() {
                 playtime
             )
         )
+    }
+
+    suspend fun lookupPlayer(target: String): Result<PlayerLookupResponse, PlayerMissingException> {
+        return parseHttpException<PlayerLookupResponse> { apiClient.get("/mc/players/$target/lookup") }.mapErrorSmart {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
+                else -> TODO()
+            }
+        }
     }
 
     suspend fun addRankToPlayer(playerId: UUID, rankId: UUID): Result<Unit, RankAlreadyPresentException> {
@@ -144,4 +154,7 @@ object PlayerService : Service<PlayerProfile>() {
 
     data class PlayerActiveTagRequest(val activeTagId: UUID?)
 
+    data class PlayerLookupResponse(val player: PlayerProfile, val alts: List<PlayerAltResponse>)
+
+    data class PlayerAltResponse(val player: PlayerProfile, val punishments: List<Punishment>)
 }

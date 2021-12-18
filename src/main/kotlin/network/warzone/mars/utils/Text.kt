@@ -2,7 +2,9 @@ package network.warzone.mars.utils
 
 import net.time4j.ClockUnit
 import network.warzone.mars.Mars
-import network.warzone.mars.punishment.models.Punishment
+import network.warzone.mars.player.feature.PlayerService
+import network.warzone.mars.punishment.commands.PunishCommands
+import network.warzone.mars.punishment.models.*
 import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.models.Tag
 import org.bukkit.ChatColor
@@ -16,6 +18,7 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.event.ClickEvent
 import tc.oc.pgm.lib.net.kyori.adventure.text.event.HoverEvent
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
+import tc.oc.pgm.lib.net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import java.time.Duration
 import java.util.*
 
@@ -101,6 +104,20 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
     if (revertable) finalComponent = finalComponent.clickEvent(ClickEvent.runCommand("/revertp ${this._id}"))
 
     return finalComponent
+}
+
+fun PlayerService.PlayerAltResponse.asTextComponent(): TextComponent {
+    val isMuted = this.punishments.find { it.action.kind == PunishmentKind.MUTE && it.isActive } != null
+    val isBanned = this.punishments.find { it.action.isBan() && it.isActive } != null
+    val colour = if (isBanned) NamedTextColor.RED else if (isMuted) NamedTextColor.YELLOW else NamedTextColor.GRAY
+
+    val hover = PunishCommands.createPlayerLore(player, this.punishments)
+    val component = text(this.player.name, colour).hoverEvent(
+        HoverEvent.showText(
+            PlainTextComponentSerializer.plainText().deserialize(hover.joinToString("\n"))
+        )
+    )
+    return component
 }
 
 fun Tag.asTextComponent(complex: Boolean = false): TextComponent {

@@ -319,47 +319,52 @@ class PunishCommands {
         }
     }
 
-    private fun createPlayerLore(player: PlayerProfile, punHistory: List<Punishment>): List<String> {
-        val historyLore = mutableListOf<String>()
-        punHistory.forEach {
-            val time = "${ChatColor.WHITE}${ChatColor.BOLD}${it.issuedAt.getTimeAgo()}${if (it.isReverted) " ${ChatColor.RED}${ChatColor.BOLD}✗" else ""}"
-            val kind = "${if (!it.isReverted) it.action.kind.colour else ChatColor.GRAY}${it.action.kind.noun}"
-            val bullet = "${ChatColor.GRAY}•"
-            val reason = "${if (!it.isReverted) ChatColor.RED else ChatColor.GRAY}${it.reason.name} (${it.offence})"
-            val length = it.action.formatLength()
-            val staff = "${ChatColor.AQUA}${it.punisher.name}"
-            val note = if (it.note != null) "${ChatColor.GRAY}[${it.note}]" else ""
+    companion object {
 
-            historyLore.addAll(
-                "$time $bullet $kind ${if (!it.action.isInstant()) "($length) " else ""}$bullet $reason $bullet by $staff $note".chunkedWords(
-                    13
-                ).takeWhile { it.isNotEmpty() }.map { "${ChatColor.RED}$it" }
+        fun createPlayerLore(player: PlayerProfile, punHistory: List<Punishment>): List<String> {
+            val historyLore = mutableListOf<String>()
+            punHistory.forEach {
+                val time =
+                    "${ChatColor.WHITE}${ChatColor.BOLD}${it.issuedAt.getTimeAgo()}${if (it.isReverted) " ${ChatColor.RED}${ChatColor.BOLD}✗" else ""}"
+                val kind = "${if (!it.isReverted) it.action.kind.colour else ChatColor.GRAY}${it.action.kind.noun}"
+                val bullet = "${ChatColor.GRAY}•"
+                val reason = "${if (!it.isReverted) ChatColor.RED else ChatColor.GRAY}${it.reason.name} (${it.offence})"
+                val length = it.action.formatLength()
+                val staff = "${ChatColor.AQUA}${it.punisher.name}"
+                val note = if (it.note != null) "${ChatColor.GRAY}[${it.note}]" else ""
+
+                historyLore.addAll(
+                    "$time $bullet $kind ${if (!it.action.isInstant()) "($length) " else ""}$bullet $reason $bullet by $staff $note".chunkedWords(
+                        13
+                    ).takeWhile { it.isNotEmpty() }.map { "${ChatColor.RED}$it" }
+                )
+            }
+
+            val isPlayerOnline = Bukkit.getPlayer(player._id) != null
+
+            val profile = mutableListOf<Pair<String, String>>()
+            profile.add(Pair("First Joined", player.firstJoinedAt.getTimeAgo()))
+            profile.add(
+                Pair(
+                    "Last Joined",
+                    if (isPlayerOnline) "${ChatColor.GREEN}Online" else player.lastJoinedAt.getTimeAgo()
+                )
+            )
+            profile.add(Pair("Playtime", Duration.ofMillis(player.stats.serverPlaytime).conciseFormat()))
+            profile.add(Pair("Known IPs", player.ips.count().toString()))
+
+            return mutableListOf(
+                "",
+                "${ChatColor.AQUA}${ChatColor.UNDERLINE}Profile",
+                "",
+                *profile.map { "${ChatColor.GRAY}${it.first}: ${ChatColor.WHITE}${it.second}" }.toTypedArray(),
+                "",
+                "${ChatColor.RED}${ChatColor.UNDERLINE}Punishment History",
+                "",
+                *historyLore.toTypedArray()
             )
         }
 
-        val isPlayerOnline = Bukkit.getPlayer(player._id) != null
-
-        val profile = mutableListOf<Pair<String, String>>()
-        profile.add(Pair("First Joined", player.firstJoinedAt.getTimeAgo()))
-        profile.add(
-            Pair(
-                "Last Joined",
-                if (isPlayerOnline) "${ChatColor.GREEN}Online" else player.lastJoinedAt.getTimeAgo()
-            )
-        )
-        profile.add(Pair("Playtime", Duration.ofMillis(player.stats.serverPlaytime).conciseFormat()))
-        profile.add(Pair("Known IPs", player.ips.count().toString()))
-
-        return mutableListOf(
-            "",
-            "${ChatColor.AQUA}${ChatColor.UNDERLINE}Profile",
-            "",
-            *profile.map { "${ChatColor.GRAY}${it.first}: ${ChatColor.WHITE}${it.second}" }.toTypedArray(),
-            "",
-            "${ChatColor.RED}${ChatColor.UNDERLINE}Punishment History",
-            "",
-            *historyLore.toTypedArray()
-        )
     }
 
     private suspend fun issuePunishment(
