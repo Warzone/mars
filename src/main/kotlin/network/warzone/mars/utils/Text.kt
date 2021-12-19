@@ -120,6 +120,26 @@ fun PlayerService.PlayerAltResponse.asTextComponent(): TextComponent {
     return component
 }
 
+fun StaffNote.asTextComponent(player: String, deletable: Boolean): TextComponent {
+    var hover = text()
+        .append { createNumberedLabelled("ID", this.id) }
+        .append { createUncolouredLabelled("Added at", "${this.createdAt} (${this.createdAt.getTimeAgo()})") }
+        .append { createStandardLabelled("Author", this.author.name) }
+
+    if (deletable) hover = hover.append { newline() }.append { text("Click to delete", NamedTextColor.LIGHT_PURPLE) }
+
+    var finalComponent = text("${this.id}.", NamedTextColor.AQUA)
+        .append { space() }
+        .append { text(this.content, NamedTextColor.YELLOW) }
+        .append { space() }
+        .append { text("(${this.author.name})", NamedTextColor.GRAY) }
+        .hoverEvent(HoverEvent.showText(hover.build()))
+
+    if (deletable) finalComponent = finalComponent.clickEvent(ClickEvent.suggestCommand("/notes $player del $id"))
+
+    return finalComponent
+}
+
 fun Tag.asTextComponent(complex: Boolean = false): TextComponent {
     return if (complex) {
         text()

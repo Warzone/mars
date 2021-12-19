@@ -1,11 +1,14 @@
 package network.warzone.mars.player.feature
 
 import com.github.kittinunf.result.Result
+import kotlinx.serialization.Serializable
 import network.warzone.mars.api.exceptions.ApiException
 import network.warzone.mars.api.http.ApiExceptionResponse
 import network.warzone.mars.api.http.ApiExceptionType
+import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.Service
 import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.feature.exceptions.NoteMissingException
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.Session
@@ -42,10 +45,43 @@ object PlayerService : Service<PlayerProfile>() {
         )
     }
 
-    suspend fun lookupPlayer(target: String): Result<PlayerLookupResponse, PlayerMissingException> {
-        return parseHttpException<PlayerLookupResponse> { apiClient.get("/mc/players/$target/lookup") }.mapErrorSmart {
+    suspend fun lookupPlayer(
+        target: String,
+        includeAlts: Boolean = false
+    ): Result<PlayerLookupResponse, PlayerMissingException> {
+        return parseHttpException<PlayerLookupResponse> { apiClient.get("/mc/players/$target/lookup?alts=${includeAlts}") }.mapErrorSmart {
             when (it.code) {
                 ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
+                else -> TODO()
+            }
+        }
+    }
+
+    suspend fun addNote(
+        target: String,
+        content: String,
+        author: SimplePlayer
+    ): Result<PlayerProfile, PlayerMissingException> {
+        return parseHttpException {
+            apiClient.post<PlayerProfile, PlayerAddNoteRequest>(
+                "/mc/players/$target/notes",
+                PlayerAddNoteRequest(author, content)
+            )
+        }.mapErrorSmart {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
+                else -> TODO()
+            }
+        }
+    }
+
+    suspend fun deleteNote(target: String, noteId: Int): Result<PlayerProfile, FeatureException> {
+        return parseHttpException {
+            apiClient.delete<PlayerProfile>("/mc/players/$target/notes/$noteId")
+        }.mapErrorSmart {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
+                ApiExceptionType.NOTE_MISSING -> NoteMissingException(noteId)
                 else -> TODO()
             }
         }
@@ -157,4 +193,6 @@ object PlayerService : Service<PlayerProfile>() {
     data class PlayerLookupResponse(val player: PlayerProfile, val alts: List<PlayerAltResponse>)
 
     data class PlayerAltResponse(val player: PlayerProfile, val punishments: List<Punishment>)
+
+    data class PlayerAddNoteRequest(val author: SimplePlayer, val content: String)
 }

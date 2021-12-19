@@ -1,9 +1,9 @@
 package network.warzone.mars.player.feature
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.failure
+import com.github.kittinunf.result.*
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
+import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.named.NamedCacheFeature
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
@@ -13,7 +13,9 @@ import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.Session
 import network.warzone.mars.punishment.commands.PunishCommands
 import network.warzone.mars.punishment.models.Punishment
+import network.warzone.mars.punishment.models.StaffNote
 import network.warzone.mars.rank.RankAttachments
+import network.warzone.mars.rank.commands.RankCommands
 import network.warzone.mars.rank.exceptions.RankAlreadyPresentException
 import network.warzone.mars.rank.exceptions.RankNotPresentException
 import network.warzone.mars.rank.models.Rank
@@ -156,6 +158,44 @@ object PlayerFeature : NamedCacheFeature<PlayerProfile, PlayerService>(), Listen
         profile.generate()
 
         return Result.success(player)
+    }
+
+    suspend fun addNote(
+        target: String,
+        content: String,
+        author: SimplePlayer
+    ): Result<PlayerProfile, FeatureException> {
+        val context = PlayerManager.getPlayer(target)
+
+        val result = PlayerService.addNote(target, content, author)
+
+        if (result.isSuccess()) {
+            val newProfile = result.get() ?: throw RuntimeException()
+            if (context != null) {
+                val profile = context.getPlayerProfile()
+                profile.notes = newProfile.notes
+                profile.generate()
+            }
+        }
+
+        return result
+    }
+
+    suspend fun deleteNote(target: String, noteId: Int): Result<PlayerProfile, FeatureException> {
+        val context = PlayerManager.getPlayer(target)
+
+        val result = PlayerService.deleteNote(target, noteId)
+
+        if (result.isSuccess()) {
+            val newProfile = result.get() ?: throw RuntimeException()
+            if (context != null) {
+                val profile = context.getPlayerProfile()
+                profile.notes = newProfile.notes
+                profile.generate()
+            }
+        }
+
+        return result
     }
 
     @EventHandler
