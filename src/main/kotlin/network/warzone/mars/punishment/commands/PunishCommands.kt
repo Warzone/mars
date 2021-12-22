@@ -158,7 +158,7 @@ class PunishCommands {
                 val chunkedMessage = type.message.chunkedWords(6)
 
                 slot(currentSlot++) {
-                    val material = Material.matchMaterial(type.material)
+                    val material = Material.matchMaterial(type.material) ?: throw RuntimeException("Material not found: ${type.material}")
 
                     item = item(material) {
                         name = "${ChatColor.YELLOW}${type.name}"
