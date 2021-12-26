@@ -19,3 +19,6 @@ data class PlayerChatData(
 )
 
 data class PlayerChatEvent(val data: PlayerChatData) : KEvent()
+
+data class MessageData(val message: String, val sound: String?, val players: List<UUID>)
+data class MessageEvent(val data: MessageData) : KEvent()

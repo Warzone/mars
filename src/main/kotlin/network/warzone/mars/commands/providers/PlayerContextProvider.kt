@@ -1,10 +1,12 @@
 package network.warzone.mars.commands.providers
 
 import app.ashcon.intake.argument.CommandArgs
+import app.ashcon.intake.argument.Namespace
 import app.ashcon.intake.bukkit.parametric.provider.BukkitProvider
 import app.ashcon.intake.parametric.ProvisionException
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.rank.RankFeature
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 

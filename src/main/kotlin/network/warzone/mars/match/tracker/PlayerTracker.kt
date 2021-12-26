@@ -1,5 +1,7 @@
 package network.warzone.mars.match.tracker
 
+import com.github.kittinunf.result.getOrNull
+import kotlinx.coroutines.runBlocking
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.models.PartyJoinData
@@ -7,6 +9,12 @@ import network.warzone.mars.api.socket.models.PartyLeaveData
 import network.warzone.mars.api.socket.models.PlayerDeathData
 import network.warzone.mars.match.deaths.LegacyTextDeathMessageBuilder
 import network.warzone.mars.match.models.DeathCause
+import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.feature.PlayerFeature
+import network.warzone.mars.utils.KEvent
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.Sound
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -15,6 +23,7 @@ import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.events.PlayerJoinPartyEvent
 import tc.oc.pgm.events.PlayerLeavePartyEvent
+import java.util.*
 
 class PlayerTracker : Listener {
 
@@ -64,4 +73,18 @@ class PlayerTracker : Listener {
         )
     }
 
+    @EventHandler
+    fun onPlayerLevelUp(event: PlayerLevelUpEvent) = runBlocking {
+        val player = Bukkit.getPlayer(event.data.playerId) ?: return@runBlocking
+        player.sendMessage("${ChatColor.GREEN}${ChatColor.BOLD}Level up! ${ChatColor.GREEN}You are now level ${ChatColor.WHITE}${ChatColor.BOLD}${event.data.newLevel}${ChatColor.GREEN}!") // todo: make nicer message
+        player.playSound(player.location, Sound.LEVEL_UP, 1000f, 1f)
+
+        val context = PlayerManager.getPlayer(event.data.playerId)!!
+        val profile = context.getPlayerProfile()
+        profile.stats.xp = event.data.xp
+        PlayerFeature.add(profile)
+    }
 }
+
+data class PlayerLevelUpEvent(val data: PlayerLevelUpData) : KEvent()
+data class PlayerLevelUpData(val playerId: UUID, val newLevel: Int, val xp: Int)

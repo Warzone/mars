@@ -9,7 +9,10 @@ import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.color
 import org.bukkit.ChatColor
+import tc.oc.pgm.api.map.Gamemode
 import java.util.*
+import kotlin.collections.HashMap
+import kotlin.math.floor
 
 data class PlayerProfile(
     override val _id: UUID,
@@ -24,6 +27,7 @@ data class PlayerProfile(
     var notes: List<StaffNote>,
 
     val stats: PlayerStats,
+    val gamemodeStats: HashMap<Gamemode, PlayerStats>,
 
     val rankIds: MutableList<UUID>,
     @Transient var ranks: List<Relation<Rank>> = emptyList(),
@@ -75,7 +79,7 @@ data class PlayerProfile(
 }
 
 data class PlayerStats(
-    var xp: Int = 0, // todo
+    var xp: Int = 0,
     var serverPlaytime: Long = 0,
     var gamePlaytime: Long = 0,
     var kills: Int = 0,
@@ -103,8 +107,12 @@ data class PlayerStats(
     var mvps: Int = 0, // todo
     val records: PlayerRecords = PlayerRecords(), // todo
     val weaponKills: MutableMap<String, Int> = mutableMapOf(),
+    val weaponDeaths: MutableMap<String, Int> = mutableMapOf(),
     val killstreaks: MutableMap<Int, Int> = mutableMapOf(5 to 0, 10 to 0, 25 to 0, 50 to 0, 100 to 0),
-)
+) {
+    val level: Int
+        get() = floor(((xp + 5000) / 5000).toDouble()).toInt()
+}
 
 data class PlayerRecords(
     var highestKillstreak: Int = 0,

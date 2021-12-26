@@ -13,6 +13,7 @@ import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.feature.PlayerService
+import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.*
 import org.bukkit.command.CommandSender
 import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
@@ -76,12 +77,10 @@ class PlayerCommands {
         @Sender sender: Player,
         audience: Audience,
         context: PlayerContext,
-        target: String,
+        profile: PlayerProfile,
         @Nullable op: String?,
         @Nullable @Text value: String?
     ) = runBlocking {
-        val lookup = PlayerService.lookupPlayer(target).getOrNull() ?: throw CommandException("Invalid player")
-        val profile = lookup.player
         when (op) {
             null -> {
                 var message = text("Notes for ${profile.name}", NamedTextColor.GREEN).append { newline() }

@@ -43,22 +43,13 @@ class PunishCommands {
     fun onPunish(
         @Sender player: Player,
         context: PlayerContext,
-        audience: Audience,
-        name: String,
+        target: PlayerProfile,
         @Nullable @Text reason: String?,
         @Switch('s') isSilent: Boolean = false
     ) = runBlocking {
         val types = PunishmentFeature.punishmentTypes.filter { player.hasPermission(it.requiredPermission) }
 
-        val target: PlayerProfile?
-        val history: List<Punishment>?
-        try {
-            target = PlayerFeature.get(name).get()
-            history = PlayerService.getPunishments(target?._id.toString()).get()
-        } catch (ex: Exception) {
-            throw CommandException("Invalid player")
-        }
-        if (target == null || history == null) throw CommandException("Invalid player")
+        val history = PlayerService.getPunishments(target._id.toString()).get() ?: throw CommandException("Could not load punishment history")
 
         if (reason != null) {
             val searchResults = types.filter {
@@ -89,7 +80,6 @@ class PunishCommands {
     @Command(aliases = ["revertp"], desc = "Revert a punishment by ID")
     fun onRevert(
         @Sender player: Player,
-        context: PlayerContext,
         punishment: Punishment,
         @Nullable @Text reason: String?
     ) = runBlocking {

@@ -22,5 +22,7 @@ enum class SocketEventType {
     KILLSTREAK,
     PLAYER_CHAT,
     PARTY_JOIN,
-    PARTY_LEAVE
+    PARTY_LEAVE,
+    MESSAGE,
+    PLAYER_LEVEL_UP
 }

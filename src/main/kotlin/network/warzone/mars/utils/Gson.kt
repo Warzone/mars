@@ -57,4 +57,15 @@ class GsonMessageAdapter<T> private constructor(
             private val DEFAULT_GSON = Gson()
         }
     }
+
+    inline fun <reified T> fromJson(json: String): T? {
+        return GSON.fromJson(json, object : TypeToken<T>() {}.type)
+    }
+
+    fun <T> mapToObject(map: Map<String, Any?>?, type: Class<T>): T? {
+        if (map == null) return null
+
+        val json = GSON.toJson(map)
+        return GSON.fromJson(json, type)
+    }
 }

@@ -1,7 +1,9 @@
 package network.warzone.mars.player.listeners
 
 import kotlinx.coroutines.runBlocking
+import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.ChatChannel
+import network.warzone.mars.api.socket.models.MessageEvent
 import network.warzone.mars.api.socket.models.PlayerChatEvent
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
@@ -9,6 +11,8 @@ import network.warzone.mars.punishment.models.PunishmentKind
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
 import network.warzone.mars.utils.getMatch
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -23,6 +27,9 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextColor
 import org.bukkit.ChatColor.*
+import org.bukkit.Sound
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.space
+import java.util.*
 
 class ChatListener : Listener {
 
@@ -33,12 +40,35 @@ class ChatListener : Listener {
     ) : KEvent()
 
     @EventHandler
+    fun onMessage(event: MessageEvent) {
+        val (rawMessage, soundName, players) = event.data
+        val message = translateAlternateColorCodes('&', rawMessage)
+        if (soundName != null) {
+            try {
+                val sound = Sound.valueOf(soundName)
+                players.mapNotNull { Bukkit.getPlayer(it) }.forEach {
+                    val location = it.location
+                    it.playSound(location, sound, 1000f, 1f)
+                    it.sendMessage(message)
+                }
+            } catch (e: Exception) {
+                Bukkit.getLogger()
+                    .warning("Exception occurred receiving MESSAGE socket event - Sound: $soundName, Message: $rawMessage")
+            }
+        } else {
+            players.mapNotNull { Bukkit.getPlayer(it) }.forEach {
+                it.sendMessage(message)
+            }
+        }
+    }
+
+    @EventHandler
     fun onPlayerChatApi(event: PlayerChatEvent) {
-        val (_, playerName, playerPrefix, channel, message) = event.data
+        val (_, playerName, playerPrefix, channel, message, serverId) = event.data
 
         if (channel != ChatChannel.STAFF) return
 
-        sendAdminChat(PGM.get().matchManager.getMatch(), playerPrefix, playerName, message)
+        sendAdminChat(PGM.get().matchManager.getMatch(), playerPrefix, playerName, message, serverId)
     }
 
     @EventHandler
@@ -64,7 +94,7 @@ class ChatListener : Listener {
 
         val chatChannel = context.matchPlayer.settings.getValue(SettingKey.CHAT)
         when (chatChannel) {
-            SettingValue.CHAT_ADMIN -> sendAdminChat(match, context.getPrefix() ?: "", player.name, event.message)
+            SettingValue.CHAT_ADMIN -> sendAdminChat(match, context.getPrefix() ?: "", player.name, event.message, null)
             SettingValue.CHAT_TEAM -> sendTeamChat(context.matchPlayer.party, context, event.message)
             else -> sendGlobalChat(match, context, event.message)
         }
@@ -94,6 +124,8 @@ class ChatListener : Listener {
 
         val messageBuilder = text()
 
+        messageBuilder.append { text("[${profile.stats.level}]", NamedTextColor.GRAY) }.append(space())
+
         if (prefix != null) messageBuilder.append { text("$prefix ") }
 
         messageBuilder.append { text(username, TextColor.color(teamColor.red, teamColor.green, teamColor.blue)) }
@@ -120,15 +152,16 @@ class ChatListener : Listener {
         team.sendMessage(messageComponent)
     }
 
-    private fun sendAdminChat(match: Match, prefix: String, username: String, message: String) {
+    private fun sendAdminChat(match: Match, prefix: String, username: String, message: String, serverId: String?) {
         val coloredPrefix = prefix.color()
 
         val magicSpace = if (prefix == "") "" else " "
+        val server = if (serverId != null) "${LIGHT_PURPLE}@$serverId${GRAY}" else ""
 
         match.players
             .map { it.bukkit }
             .filter { it.hasPermission(Permissions.ADMINCHAT) }
-            .forEach { it.sendMessage("$DARK_RED[STAFF] $RESET$coloredPrefix$magicSpace$GRAY$username: $GREEN$message") }
+            .forEach { it.sendMessage("$DARK_RED[STAFF] $RESET$coloredPrefix$magicSpace$GRAY$username$server: $GREEN$message") }
     }
 
 }

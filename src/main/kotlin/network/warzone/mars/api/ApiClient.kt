@@ -4,6 +4,7 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
@@ -14,10 +15,13 @@ import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import network.warzone.mars.api.events.ApiConnectedEvent
-import network.warzone.mars.api.socket.InboundEvent
-import network.warzone.mars.api.socket.OutboundEvent
-import network.warzone.mars.api.socket.SocketEventType
-import network.warzone.mars.api.socket.WarzoneService
+import network.warzone.mars.api.socket.*
+import network.warzone.mars.api.socket.models.MessageData
+import network.warzone.mars.api.socket.models.MessageEvent
+import network.warzone.mars.api.socket.models.PlayerChatData
+import network.warzone.mars.api.socket.models.PlayerChatEvent
+import network.warzone.mars.match.tracker.PlayerLevelUpData
+import network.warzone.mars.match.tracker.PlayerLevelUpEvent
 import network.warzone.mars.utils.GSON
 import network.warzone.mars.utils.GsonMessageAdapter
 import network.warzone.mars.utils.MissingConfigPathException
@@ -27,6 +31,10 @@ import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import java.util.*
 import java.util.logging.Level
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.instanceParameter
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.javaType
 
 data class Packet<T>(
     @SerializedName("e") val event: SocketEventType,
@@ -126,8 +134,22 @@ object ApiClient {
 
         socket.receive()
             .subscribe {
-                val evt: InboundEvent<Any> = InboundEvent.get(it.event) ?: return@subscribe
-                evt.bukkitEventFactory.invoke(it.data).callEvent()
+                println("Received event ${it.event}, data: ${it.data}")
+                val json = GSON.toJson(it.data)
+                when (it.event) {
+                    SocketEventType.PLAYER_CHAT -> {
+                        val data = GSON.fromJson(json, PlayerChatData::class.java)
+                        PlayerChatEvent(data).callEvent()
+                    }
+                    SocketEventType.MESSAGE -> {
+                        val data = GSON.fromJson(json, MessageData::class.java)
+                        MessageEvent(data).callEvent()
+                    }
+                    SocketEventType.PLAYER_LEVEL_UP -> {
+                        val data = GSON.fromJson(json, PlayerLevelUpData::class.java)
+                        PlayerLevelUpEvent(data).callEvent()
+                    }
+                }
             }
 
         Bukkit.getPluginManager().callEvent(ApiConnectedEvent(this))

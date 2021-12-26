@@ -6,6 +6,7 @@ import app.ashcon.intake.parametric.Provider
 import network.warzone.mars.commands.providers.*
 import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
 import network.warzone.mars.player.PlayerContext
+import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.models.Tag
@@ -20,6 +21,7 @@ object CommandModule : AbstractModule() {
         bind(Tag::class, TagProvider())
         bind(PlayerContext::class, PlayerContextProvider())
         bind(Punishment::class, PunishmentProvider())
+        bind(PlayerProfile::class, PlayerProfileProvider())
     }
 
     private fun <T : Any> bind(type: KClass<T>, provider: Provider<T>) {
