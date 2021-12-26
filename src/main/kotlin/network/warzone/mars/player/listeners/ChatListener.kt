@@ -114,7 +114,6 @@ class ChatListener : Listener {
 
     @EventHandler
     private suspend fun sendGlobalChat(match: Match, context: PlayerContext, message: String) {
-        //TODO: levels
         val prefix = context.getPrefix()
         val teamColor = context.matchPlayer.party.fullColor
         val username = context.player.name
@@ -124,6 +123,7 @@ class ChatListener : Listener {
 
         val messageBuilder = text()
 
+        // todo: level colours
         messageBuilder.append { text("[${profile.stats.level}]", NamedTextColor.GRAY) }.append(space())
 
         if (prefix != null) messageBuilder.append { text("$prefix ") }
