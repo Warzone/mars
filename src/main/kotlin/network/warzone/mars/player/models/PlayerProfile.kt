@@ -1,6 +1,7 @@
 package network.warzone.mars.player.models
 
 import kotlinx.serialization.Serializable
+import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.named.NamedResource
 import network.warzone.mars.feature.relations.Relation
 import network.warzone.mars.feature.resource.ResourceType
@@ -9,6 +10,7 @@ import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.color
 import org.bukkit.ChatColor
+import org.bukkit.entity.EntityType
 import tc.oc.pgm.api.map.Gamemode
 import java.util.*
 import kotlin.collections.HashMap
@@ -115,16 +117,23 @@ data class PlayerStats(
 }
 
 data class PlayerRecords(
-    var highestKillstreak: Int = 0,
-    var longestSession: Int = 0,
-    var longestBowShot: Int = 0,
-    var fastestWoolCapture: Int = 0,
-    var fastestFirstBlood: Int = 0,
-    var fastestFlagCapture: Int = 0,
-    var killsPerMatch: Int = 0,
-    var deathsInMatch: Int = 0,
-    var highestScore: Int = 0
+//    var highestKillstreak: Int = 0, -- this can be calculated from profile
+    var longestSession: Long = 0,
+    var longestProjectileHit: ProjectileRecord? = null,
+    var longestProjectileKill: ProjectileRecord? = null,
+    var fastestWoolCapture: IntRecord? = null,
+    var fastestFirstBlood: FirstBloodRecord? = null,
+    var fastestFlagCapture: IntRecord? = null,
+    var killsPerMatch: IntRecord? = null,
+    var deathsInMatch: IntRecord? = null,
+    var highestScore: IntRecord? = null
 )
+
+data class ProjectileRecord(val matchId: String, val type: EntityType, val distance: Int)
+
+data class FirstBloodRecord(val matchId: String, val victim: SimplePlayer, val time: Int)
+
+data class IntRecord(val matchId: String, val value: Int)
 
 data class PlayerObjectiveStatistics(
     var coreLeaks: Int = 0,

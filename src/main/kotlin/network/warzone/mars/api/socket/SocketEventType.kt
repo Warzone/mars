@@ -24,5 +24,6 @@ enum class SocketEventType {
     PARTY_JOIN,
     PARTY_LEAVE,
     MESSAGE,
-    PLAYER_LEVEL_UP
+    PLAYER_LEVEL_UP,
+    PROJECTILE_HIT
 }

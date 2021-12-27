@@ -1,6 +1,7 @@
 package network.warzone.mars.api.socket
 
 import network.warzone.mars.api.socket.models.*
+import network.warzone.mars.match.tracker.ProjectileHitData
 import network.warzone.mars.utils.KEvent
 import java.util.*
 import kotlin.collections.HashMap
@@ -38,4 +39,6 @@ open class OutboundEvent<T : Any>(event: SocketEventType) : SocketEvent<T>(event
     object WoolCapture : OutboundEvent<WoolData>(SocketEventType.WOOL_CAPTURE)
     object WoolDrop : OutboundEvent<WoolData>(SocketEventType.WOOL_DROP)
     object WoolDefend : OutboundEvent<WoolData>(SocketEventType.WOOL_DEFEND)
+
+    object ProjectileHit : OutboundEvent<ProjectileHitData>(SocketEventType.PROJECTILE_HIT)
 }
