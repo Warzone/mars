@@ -1,12 +1,6 @@
 package network.warzone.mars.api.socket
 
 import network.warzone.mars.api.socket.models.*
-import network.warzone.mars.utils.KEvent
-import java.util.*
-import kotlin.collections.HashMap
-import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
-import kotlin.reflect.full.isSubclassOf
 
 open class SocketEvent<T : Any>(val event: SocketEventType)
 
@@ -14,10 +8,8 @@ open class OutboundEvent<T : Any>(event: SocketEventType) : SocketEvent<T>(event
     object PlayerChat : OutboundEvent<PlayerChatData>(SocketEventType.PLAYER_CHAT)
     object PointCapture : OutboundEvent<PointCaptureData>(SocketEventType.CONTROL_POINT_CAPTURE)
 
-    object CoreDamage : OutboundEvent<CoreDamageData>(SocketEventType.CORE_DAMAGE)
     object CoreLeak : OutboundEvent<CoreLeakData>(SocketEventType.CORE_LEAK)
 
-    object DestroyableDamage : OutboundEvent<DestroyableDamageData>(SocketEventType.DESTROYABLE_DAMAGE)
     object DestroyableDestroy : OutboundEvent<DestroyableDestroyData>(SocketEventType.DESTROYABLE_DESTROY)
 
     object FlagPickup : OutboundEvent<FlagPickupData>(SocketEventType.FLAG_PICKUP)
