@@ -98,35 +98,7 @@ class PlayerTracker : Listener {
         profile.stats.xp = event.data.xp
         PlayerFeature.add(profile)
     }
-
-    @EventHandler
-    fun onProjectileShoot(event: ProjectileLaunchEvent) {
-        if (event.actor !is Player) return
-        projectileCache[event.entity.uniqueId] = Pair(event.actor.uniqueId, event.actor.location.toVector())
-    }
-
-    @EventHandler
-    fun onProjectileHit(event: EntityDamageByEntityEvent) = runBlocking {
-        event.damager as? Projectile
-        event.entity as? Player
-        println(event.entity.type)
-        val info = projectileCache[event.damager.uniqueId] ?: return@runBlocking
-        val shooter = PlayerFeature.getOrNull(info.first) ?: return@runBlocking
-
-        val originalLocation = info.second
-        val newLocation = event.entity.location.toVector()
-
-        val distance = originalLocation.distance(newLocation).roundToInt()
-
-        if (distance <= (shooter.stats.records.longestProjectileHit?.distance ?: 0)) return@runBlocking // doesn't beat record
-
-        projectileCache.remove(event.damager.uniqueId)
-//        shooter.stats.records.longestProjectileHit = ProjectileRecord(MatchManager.match.id, event.damager.type, distance)
-        ApiClient.emit(OutboundEvent.ProjectileHit, ProjectileHitData(event.actor.uniqueId, event.damager.type, distance))
-    }
 }
 
 data class PlayerLevelUpEvent(val data: PlayerLevelUpData) : KEvent()
 data class PlayerLevelUpData(val playerId: UUID, val newLevel: Int, val xp: Int)
-
-data class ProjectileHitData(val playerId: UUID, val type: EntityType, val distance: Int)
