@@ -21,4 +21,4 @@ data class PlayerDeathData(
     val cause: DeathCause
 )
 
-data class KillStreakData(val amount: Int, val player: SimplePlayer, val ended: Boolean)
+data class KillstreakData(val amount: Int, val player: SimplePlayer, val ended: Boolean)

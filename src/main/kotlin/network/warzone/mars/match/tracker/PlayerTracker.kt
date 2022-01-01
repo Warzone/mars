@@ -37,7 +37,6 @@ import java.util.*
 import kotlin.math.roundToInt
 
 class PlayerTracker : Listener {
-
     // entity uuid mapped to player uuid & location
     val projectileCache = hashMapOf<UUID, Pair<UUID, Vector>>()
 

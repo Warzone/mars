@@ -2,7 +2,7 @@ package network.warzone.mars.match.tracker
 
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.OutboundEvent
-import network.warzone.mars.api.socket.models.KillStreakData
+import network.warzone.mars.api.socket.models.KillstreakData
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.match.MatchManager
 import org.bukkit.event.EventHandler
@@ -10,8 +10,6 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.player.ParticipantState
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
-import tc.oc.pgm.lib.net.kyori.adventure.key.Key
-import tc.oc.pgm.lib.net.kyori.adventure.sound.Sound
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
@@ -38,7 +36,7 @@ class KillstreakTracker : Listener {
         )
         ApiClient.emit(
             OutboundEvent.Killstreak,
-            KillStreakData(stats.killstreak, SimplePlayer(killer.id, killer.nameLegacy), false)
+            KillstreakData(stats.killstreak, SimplePlayer(killer.id, killer.nameLegacy), false)
         )
     }
 

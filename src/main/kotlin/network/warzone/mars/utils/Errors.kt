@@ -16,7 +16,7 @@ import java.nio.charset.Charset
  *
  * @return The non-null result [T] of the block or [ApiException] if a [ClientRequestException] was thrown.
  */
-suspend fun <T> parseHttpException(block: suspend() -> T?): Result<T, ApiException> {
+suspend fun <T> parseHttpException(block: suspend () -> T?): Result<T, ApiException> {
     try {
         // Try running the block, asserting it to be non-null if no http exception was thrown.
         return Result.success(block()!!)
@@ -40,19 +40,18 @@ suspend fun <T> parseHttpException(block: suspend() -> T?): Result<T, ApiExcepti
     }
 }
 
-
-
 /**
  * Really surprised this method doesn't exist already. They have [Result.mapError] but it randomly drops [T] and uses star projection instead.
  */
-inline fun <reified T, reified E : Throwable, reified EE : Throwable> Result<T, E>.mapErrorSmart(transform: (E) -> EE): Result<T, EE> = try {
-    when (this) {
-        is Result.Success -> Result.success(value)
-        is Result.Failure -> Result.failure(transform(error))
+inline fun <reified T, reified E : Throwable, reified EE : Throwable> Result<T, E>.mapErrorSmart(transform: (E) -> EE): Result<T, EE> =
+    try {
+        when (this) {
+            is Result.Success -> Result.success(value)
+            is Result.Failure -> Result.failure(transform(error))
+        }
+    } catch (ex: Exception) {
+        when (ex) {
+            is EE -> Result.failure(ex)
+            else -> throw ex
+        }
     }
-} catch (ex: Exception) {
-    when (ex) {
-        is EE -> Result.failure(ex)
-        else -> throw ex
-    }
-}

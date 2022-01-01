@@ -9,7 +9,6 @@ import network.warzone.mars.tag.TagFeature
 import kotlin.reflect.KClass
 
 sealed class ResourceType<out T : Feature<*, *>>(type: KClass<T>) {
-
     object Player : ResourceType<PlayerFeature>(PlayerFeature::class)
     object Rank : ResourceType<RankFeature>(RankFeature::class)
     object Tag : ResourceType<TagFeature>(TagFeature::class)
@@ -25,5 +24,4 @@ sealed class ResourceType<out T : Feature<*, *>>(type: KClass<T>) {
     fun cast(obj: Any): T {
         return type.cast(obj)
     }
-
 }

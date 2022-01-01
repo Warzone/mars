@@ -8,9 +8,7 @@ import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.utils.FeatureException
 
 data class RankAlreadyPresentException(val player: PlayerContext, val rank: Rank) : FeatureException() {
-
     override fun asTextComponent(): TextComponent {
         return Component.text("${player.player.name} already has ${rank.name}", NamedTextColor.RED)
     }
-
 }

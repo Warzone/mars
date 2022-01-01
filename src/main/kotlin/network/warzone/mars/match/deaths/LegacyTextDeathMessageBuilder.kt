@@ -57,5 +57,4 @@ class LegacyTextDeathMessageBuilder(event: MatchPlayerDeathEvent)
         if (test("mob")) mobString = mobInfo.identifier
         return super.mob(mobInfo)
     }
-
 }

@@ -12,7 +12,6 @@ import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
 object RankService : Service<Rank>() {
-
     suspend fun create(
         name: String,
         displayName: String?,
@@ -104,5 +103,4 @@ object RankService : Service<Rank>() {
         val staff: Boolean?,
         val applyOnJoin: Boolean?
     )
-
 }

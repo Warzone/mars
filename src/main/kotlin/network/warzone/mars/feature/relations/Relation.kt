@@ -7,9 +7,7 @@ import network.warzone.mars.feature.resource.ResourceType
 import java.util.*
 
 class Relation<T : Resource>(private val type: ResourceType<Feature<T, *>>, val id: UUID) {
-
     suspend fun get(): T {
         return FeatureManager.getFeature(type).getKnown(id)
     }
-
 }

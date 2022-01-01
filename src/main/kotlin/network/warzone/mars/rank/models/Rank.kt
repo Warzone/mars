@@ -15,12 +15,10 @@ data class Rank (
     var applyOnJoin: Boolean,
     var permissions: MutableList<String>
 ) : NamedResource {
-
     val nameLower: String get() = name.toLowerCase(Locale.ROOT)
 
     override fun generate(): Resource {
         // no relations?
         return this
     }
-
 }

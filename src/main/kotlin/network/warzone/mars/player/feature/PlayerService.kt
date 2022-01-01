@@ -25,7 +25,6 @@ import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
 object PlayerService : Service<PlayerProfile>() {
-
     suspend fun login(playerId: UUID, playerName: String, ip: String): PlayerLoginResponse {
         return apiClient.post(
             "/mc/players/login", PlayerLoginRequest(

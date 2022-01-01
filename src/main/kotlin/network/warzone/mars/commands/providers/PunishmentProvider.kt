@@ -11,18 +11,19 @@ import org.bukkit.command.CommandSender
 import java.util.*
 
 class PunishmentProvider : BukkitProvider<Punishment> {
-
     override fun getName(): String {
         return "punishment"
     }
 
-    override fun get(sender: CommandSender?, args: CommandArgs, annotations: MutableList<out Annotation>?): Punishment = runBlocking {
-        val punId = UUID.fromString(args.next())
+    override fun get(sender: CommandSender?, args: CommandArgs, annotations: MutableList<out Annotation>?): Punishment =
+        runBlocking {
+            val punId = UUID.fromString(args.next())
 
-        val punishment: Punishment? = PunishmentFeature.get(punId).get()
-        punishment ?: throw ArgumentParseException(PunishmentMissingException(punId.toString()).asTextComponent().content())
+            val punishment: Punishment? = PunishmentFeature.get(punId).get()
+            punishment ?: throw ArgumentParseException(
+                PunishmentMissingException(punId.toString()).asTextComponent().content()
+            )
 
-        return@runBlocking punishment
-    }
-
+            return@runBlocking punishment
+        }
 }

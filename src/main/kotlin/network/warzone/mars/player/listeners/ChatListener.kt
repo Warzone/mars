@@ -32,7 +32,6 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.Component.space
 import java.util.*
 
 class ChatListener : Listener {
-
     class MatchPlayerChatEvent(
         val matchPlayer: MatchPlayer,
         val channel: ChatChannel,
@@ -163,5 +162,4 @@ class ChatListener : Listener {
             .filter { it.hasPermission(Permissions.ADMINCHAT) }
             .forEach { it.sendMessage("$DARK_RED[STAFF] $RESET$coloredPrefix$magicSpace$GRAY$username$server: $GREEN$message") }
     }
-
 }

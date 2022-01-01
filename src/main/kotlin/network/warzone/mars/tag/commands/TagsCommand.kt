@@ -17,7 +17,6 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 
 class TagsCommand {
-
     @Command(aliases = ["tags"], desc = "View and manage your tags.")
     fun onTags(@Sender player: Player, context: PlayerContext, audience: Audience) = runBlocking {
         val tags = context.getPlayerProfile().tags()
@@ -59,5 +58,4 @@ class TagsCommand {
             }
         }
     }
-
 }

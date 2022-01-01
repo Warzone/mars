@@ -14,7 +14,6 @@ import network.warzone.mars.utils.FeatureException
 import java.util.*
 
 object TagFeature : NamedCacheFeature<Tag, TagService>() {
-
     override val service = TagService
 
     override suspend fun init() {

@@ -14,7 +14,6 @@ import java.util.function.Supplier
 import kotlin.reflect.KClass
 
 object CommandModule : AbstractModule() {
-
     override fun configure() {
         bind(Audience::class, AudienceProvider())
         bind(Rank::class, RankProvider())
@@ -34,7 +33,6 @@ object CommandModule : AbstractModule() {
 
     @FunctionalInterface
     private interface Singleton<T> : Provider<T>, Supplier<T> {
-
         override fun get(args: CommandArgs, list: MutableList<out Annotation>): T {
             return get()
         }
@@ -42,6 +40,5 @@ object CommandModule : AbstractModule() {
         override fun isProvided(): Boolean {
             return true
         }
-
     }
 }

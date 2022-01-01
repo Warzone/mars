@@ -10,7 +10,6 @@ import network.warzone.mars.rank.models.Rank
 import org.bukkit.command.CommandSender
 
 class RankProvider : BukkitProvider<Rank> {
-
     override fun getName(): String {
         return "rank"
     }
@@ -36,5 +35,4 @@ class RankProvider : BukkitProvider<Rank> {
             .map { it.nameLower }
             .filter { it.startsWith(query) }
     }
-
 }

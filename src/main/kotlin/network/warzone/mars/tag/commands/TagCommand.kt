@@ -16,7 +16,6 @@ import org.bukkit.command.CommandSender
 import javax.annotation.Nullable
 
 class TagCommand {
-
     @Command( aliases = ["create", "new"], desc = "Creates a new tag")
     fun onTagCreate(sender: CommandSender, audience: Audience, name: String, display: String) = runBlocking {
         TagFeature.createTag(name, display)
@@ -103,5 +102,4 @@ class TagCommand {
             else -> throw CommandException("Invalid operation $operation.")
         }
     }
-
 }

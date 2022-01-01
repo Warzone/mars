@@ -8,7 +8,6 @@ import org.bukkit.event.Listener
 import tc.oc.pgm.controlpoint.events.ControllerChangeEvent
 
 class ControlPointTracker : Listener {
-
     @EventHandler
     fun onHillCapture(event: ControllerChangeEvent) {
         val team = event.newController ?: return
@@ -23,5 +22,4 @@ class ControlPointTracker : Listener {
             PointCaptureData(event.controlPoint.id, event.newController!!.nameLegacy, thieves)
         )
     }
-
 }

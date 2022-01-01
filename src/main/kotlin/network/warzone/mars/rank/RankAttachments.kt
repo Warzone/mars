@@ -6,7 +6,6 @@ import org.bukkit.permissions.PermissionAttachment
 import java.util.*
 
 object RankAttachments {
-
     private val permissionAttachments: MutableMap<UUID, PermissionAttachment> = HashMap()
 
     suspend fun refresh(context: PlayerContext) {
@@ -50,5 +49,4 @@ object RankAttachments {
             it.permissions.keys.forEach(it::unsetPermission)
         }
     }
-
 }

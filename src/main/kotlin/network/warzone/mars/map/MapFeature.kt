@@ -63,7 +63,12 @@ object MapFeature : NamedCacheFeature<GameMap, MapService>() {
                 }
 
                 // Load the map if the existing version is older than the new version.
-                if (existingVersion.isOlderThan(map.version)) mapLoadRequests.add(toMapLoadRequest(map, existingMap._id))
+                if (existingVersion.isOlderThan(map.version)) mapLoadRequests.add(
+                    toMapLoadRequest(
+                        map,
+                        existingMap._id
+                    )
+                )
             } else {
                 // Else, convert the map into a map load request and add it the list.
                 mapLoadRequests.add(toMapLoadRequest(map, null))

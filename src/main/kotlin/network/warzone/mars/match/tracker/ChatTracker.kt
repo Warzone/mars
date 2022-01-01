@@ -12,19 +12,19 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 class ChatTracker : Listener {
-
     @EventHandler
     fun onPlayerChat(event: ChatListener.MatchPlayerChatEvent) = runBlocking {
         val context: PlayerContext = PlayerManager.getPlayer(event.matchPlayer.id)!!
 
-        ApiClient.emit(OutboundEvent.PlayerChat, PlayerChatData(
-            event.matchPlayer.id,
-            event.matchPlayer.nameLegacy,
-            context.getPrefix() ?: "",
-            event.channel,
-            event.message,
-            Mars.instance.serverId
-        ))
+        ApiClient.emit(
+            OutboundEvent.PlayerChat, PlayerChatData(
+                event.matchPlayer.id,
+                event.matchPlayer.nameLegacy,
+                context.getPrefix() ?: "",
+                event.channel,
+                event.message,
+                Mars.instance.serverId
+            )
+        )
     }
-
 }

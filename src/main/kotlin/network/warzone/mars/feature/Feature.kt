@@ -7,7 +7,6 @@ import network.warzone.mars.utils.FeatureException
 import java.util.*
 
 abstract class Feature<T : Resource, U : Service<T>> {
-
     abstract val service: U
 
     abstract suspend fun get(uuid: UUID): Result<T, FeatureException>
@@ -29,5 +28,4 @@ abstract class Feature<T : Resource, U : Service<T>> {
     open fun getCommands(): List<Any> {
         return ArrayList()
     }
-
 }

@@ -29,7 +29,6 @@ import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 
 class Mars : JavaPlugin() {
-
     companion object {
         lateinit var instance: Mars
 
@@ -63,6 +62,5 @@ class Mars : JavaPlugin() {
     override fun onDisable() {
         println("hello!")
     }
-
 }
 

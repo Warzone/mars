@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Predicate
 
 abstract class CachedFeature<T : Resource, U : Service<T>> : Feature<T, U>() {
-
     internal val cache: ConcurrentHashMap<UUID, T> = ConcurrentHashMap()
 
     fun sync(resources: List<T>): ConcurrentHashMap<UUID, T> {
@@ -67,5 +66,4 @@ abstract class CachedFeature<T : Resource, U : Service<T>> : Feature<T, U>() {
             .get(target = uuid.toString())
             .map { add(it) }
     }
-
 }

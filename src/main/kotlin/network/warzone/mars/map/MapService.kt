@@ -12,7 +12,6 @@ import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
 object MapService : Service<GameMap>() {
-
     suspend fun create(
         maps: List<MapLoadOneRequest>
     ): List<GameMap> {
@@ -42,5 +41,4 @@ object MapService : Service<GameMap>() {
         val authors: List<MapContributor>,
         val contributors: List<MapContributor>
     )
-
 }

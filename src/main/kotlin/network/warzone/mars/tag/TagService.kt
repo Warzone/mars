@@ -12,7 +12,6 @@ import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
 object TagService : Service<Tag>() {
-
     suspend fun create(name: String, display: String): Result<Tag, TagConflictException> {
         return parseHttpException<Tag> {
             apiClient.post("/mc/tags", TagDataRequest(name, display))
@@ -70,5 +69,4 @@ object TagService : Service<Tag>() {
     }
 
     data class TagDataRequest(val name: String, val display: String)
-
 }

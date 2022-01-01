@@ -6,11 +6,9 @@ import io.reactivex.Flowable
 import network.warzone.mars.api.Packet
 
 interface WarzoneService {
-
     @Send
     fun send(packet: Packet<out Any>)
 
     @Receive
     fun receive(): Flowable<Packet<Any>>
-
 }

@@ -23,7 +23,6 @@ import tc.oc.pgm.flag.state.Dropped
 import java.util.*
 
 class FlagTracker : Listener {
-
     private val heldFlagCache = mutableMapOf<UUID, Flag>()
     private val heldTimeCache = mutableMapOf<UUID, Long>()
     private val lifeLockCache = mutableListOf<UUID>()
@@ -106,5 +105,4 @@ class FlagTracker : Listener {
         heldTimeCache.remove(playerId)
         heldFlagCache.remove(playerId)
     }
-
 }

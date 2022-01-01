@@ -10,11 +10,9 @@ data class Tag(
     var display: String,
     val createdAt: Date
 ) : NamedResource {
-
     val nameLower: String get() = name.toLowerCase(Locale.ROOT)
 
     override fun generate(): Resource {
         return this
     }
-
 }

@@ -27,7 +27,6 @@ import java.time.Duration
 import javax.annotation.Nullable
 
 class PlayerCommands {
-
     @Command(aliases = ["lookup", "alts", "lu"], desc = "Lookup player information & alts")
     fun onPlayerLookup(@Sender sender: CommandSender, audience: Audience, context: PlayerContext, target: String) =
         runBlocking {
@@ -115,4 +114,3 @@ class PlayerCommands {
         }
     }
 }
-

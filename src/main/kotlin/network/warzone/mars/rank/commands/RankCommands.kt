@@ -19,7 +19,6 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import javax.annotation.Nullable
 
 class RankCommands {
-
     @Command(aliases = ["create", "new"], desc = "Creates a rank")
     fun onRankCreate(
         sender: CommandSender,
@@ -169,5 +168,4 @@ class RankCommands {
             else -> throw CommandException("Invalid operation $operation.")
         }
     }
-
 }

@@ -8,7 +8,6 @@ import org.bukkit.entity.Player
 import java.util.*
 
 object PlayerManager {
-
     private val players: MutableMap<UUID, PlayerContext> = HashMap()
 
     init {
@@ -39,5 +38,4 @@ object PlayerManager {
     fun removePlayer(uuid: UUID): PlayerContext? {
         return players.remove(uuid)
     }
-
 }

@@ -10,7 +10,6 @@ import network.warzone.mars.tag.models.Tag
 import org.bukkit.command.CommandSender
 
 class TagProvider : BukkitProvider<Tag> {
-
     override fun getName(): String {
         return "tag"
     }
@@ -36,5 +35,4 @@ class TagProvider : BukkitProvider<Tag> {
             .map { it.nameLower }
             .filter { it.startsWith(query) }
     }
-
 }

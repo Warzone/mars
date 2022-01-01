@@ -8,9 +8,7 @@ import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.FeatureException
 
 data class TagAlreadyPresentException(val player: PlayerContext, val tag: Tag) : FeatureException() {
-
     override fun asTextComponent(): TextComponent {
         return Component.text("${player.player.name} already has ${tag.name}", NamedTextColor.RED)
     }
-
 }

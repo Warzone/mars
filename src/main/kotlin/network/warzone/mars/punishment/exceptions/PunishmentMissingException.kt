@@ -6,9 +6,7 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.utils.FeatureException
 
 data class PunishmentMissingException(val id: String) : FeatureException() {
-
     override fun asTextComponent(): TextComponent {
         return Component.text("The punishment $id does not exist.", NamedTextColor.RED)
     }
-
 }

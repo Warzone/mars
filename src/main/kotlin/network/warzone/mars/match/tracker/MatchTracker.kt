@@ -29,7 +29,6 @@ import tc.oc.pgm.wool.WoolMatchModule
 import java.util.*
 
 class MatchTracker : Listener {
-
     @EventHandler
     fun onMatchLoad(event: MatchLoadEvent) = runBlocking {
         val parties: List<PartyData> = event.match.parties

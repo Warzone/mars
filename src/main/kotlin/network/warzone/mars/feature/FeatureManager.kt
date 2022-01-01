@@ -14,7 +14,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 object FeatureManager : Listener {
-
     private val features: MutableMap<ResourceType<*>, Feature<*, *>> = mutableMapOf(
         ResourceType.Player to PlayerFeature,
         ResourceType.Rank to RankFeature,
@@ -51,5 +50,4 @@ object FeatureManager : Listener {
             it.init()
         }
     }
-
 }

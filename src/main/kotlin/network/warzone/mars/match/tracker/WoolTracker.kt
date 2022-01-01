@@ -18,7 +18,6 @@ import tc.oc.pgm.wool.WoolMatchModule
 import java.util.*
 
 class WoolTracker : Listener {
-
     val holdingCache = mutableMapOf<MonumentWool, MutableList<UUID>>()
 
     @EventHandler
@@ -84,5 +83,4 @@ class WoolTracker : Listener {
 
         holdingCache[event.wool]?.clear()
     }
-
 }

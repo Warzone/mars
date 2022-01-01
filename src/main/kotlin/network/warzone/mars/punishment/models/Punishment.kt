@@ -33,9 +33,9 @@ data class Punishment(
         }
 
     val isReverted: Boolean
-    get() {
-        return reversion != null
-    }
+        get() {
+            return reversion != null
+        }
 }
 
 data class PunishmentReason(val name: String, val message: String, val short: String)

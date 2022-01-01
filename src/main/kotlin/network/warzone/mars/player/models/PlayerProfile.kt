@@ -1,6 +1,5 @@
 package network.warzone.mars.player.models
 
-import kotlinx.serialization.Serializable
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.named.NamedResource
 import network.warzone.mars.feature.relations.Relation

@@ -8,7 +8,6 @@ import network.warzone.mars.feature.Service
 import network.warzone.mars.utils.FeatureException
 
 abstract class NamedCacheFeature<T : NamedResource, U : Service<T>> : CachedFeature<T, U>() {
-
     fun has(name: String): Boolean {
         return cache.values.any { it.name.equals(name, ignoreCase = true) }
     }
@@ -30,5 +29,4 @@ abstract class NamedCacheFeature<T : NamedResource, U : Service<T>> : CachedFeat
                 add(it)
             }
     }
-
 }

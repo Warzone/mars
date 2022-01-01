@@ -38,7 +38,6 @@ import java.util.*
 import javax.annotation.Nullable
 
 class PunishCommands {
-
     @Command(aliases = ["punish", "p", "pun"], desc = "Punish a player")
     fun onPunish(
         @Sender player: Player,
