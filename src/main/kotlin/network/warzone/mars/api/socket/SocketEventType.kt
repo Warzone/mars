@@ -5,8 +5,6 @@ enum class SocketEventType {
     MATCH_START,
     MATCH_END,
     CORE_LEAK,
-    CORE_DAMAGE,
-    DESTROYABLE_DAMAGE,
     DESTROYABLE_DESTROY,
     FLAG_CAPTURE,
     FLAG_PICKUP,
@@ -17,7 +15,6 @@ enum class SocketEventType {
     WOOL_DROP,
     WOOL_DEFEND,
     CONTROL_POINT_CAPTURE,
-    PLAYER_RECORD_BREAK,
     PLAYER_DEATH,
     KILLSTREAK,
     PLAYER_CHAT,
@@ -25,5 +22,4 @@ enum class SocketEventType {
     PARTY_LEAVE,
     MESSAGE,
     PLAYER_LEVEL_UP,
-    PROJECTILE_HIT
 }
