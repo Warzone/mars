@@ -14,11 +14,6 @@ import kotlin.math.floor
 class CoreTracker : Listener {
 
     @EventHandler
-    fun onCoreDamage(event: CoreBlockBreakEvent) {
-//        ApiClient.emit(OutboundEvent.CoreDamage, CoreDamageData(event.core.id, event.player.id))
-    }
-
-    @EventHandler
     fun onCoreLeak(event: CoreLeakEvent) {
         val totalBrokenBlocks = event.core.casingRegion.blocks.filter { !event.core.isObjectiveMaterial(it) }.size
 

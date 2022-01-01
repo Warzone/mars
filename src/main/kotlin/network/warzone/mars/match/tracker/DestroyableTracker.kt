@@ -16,8 +16,6 @@ class DestroyableTracker : Listener {
         val change = event.change ?: return
         val player = change.playerCause ?: return
 
-//        ApiClient.emit(OutboundEvent.DestroyableDamage, DestroyableDamageData(event.destroyable.id, player.id))
-
         if (event.destroyable.isDestroyed) {
             ApiClient.emit(
                 OutboundEvent.DestroyableDestroy,
