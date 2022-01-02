@@ -1,37 +1,21 @@
 package network.warzone.mars.punishment
 
-import com.github.kittinunf.result.Result
-import kotlinx.serialization.Serializable
-import network.warzone.mars.api.exceptions.ApiException
+import com.github.kittinunf.result.getOrNull
+import com.github.kittinunf.result.onFailure
+import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.api.socket.models.SimplePlayer
-import network.warzone.mars.feature.Service
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
-import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.exceptions.PunishmentAlreadyRevertedException
 import network.warzone.mars.punishment.exceptions.PunishmentMissingException
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.punishment.models.PunishmentAction
 import network.warzone.mars.punishment.models.PunishmentReason
 import network.warzone.mars.punishment.models.PunishmentType
-import network.warzone.mars.rank.models.Rank
-import network.warzone.mars.utils.FeatureException
-import network.warzone.mars.utils.mapErrorSmart
 import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
-object PunishmentService : Service<Punishment>() {
-    override suspend fun get(target: String): Result<Punishment, PunishmentMissingException> {
-        return parseHttpException {
-            apiClient.get<Punishment>("/mc/punishments/$target")
-        }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.PUNISHMENT_MISSING -> PunishmentMissingException(target)
-                else -> TODO()
-            }
-        }
-    }
-
+object PunishmentService {
     suspend fun create(
         reason: PunishmentReason,
         offence: Int,
@@ -41,10 +25,10 @@ object PunishmentService : Service<Punishment>() {
         targetName: String,
         targetIps: List<String>,
         silent: Boolean
-    ): Result<Punishment, PlayerMissingException> {
-        return parseHttpException<Punishment> {
-            apiClient.post(
-                "/mc/players/${targetName}/punishments", PunishmentIssueRequest(
+    ): Punishment {
+        val request = parseHttpException {
+            ApiClient.post<Punishment, PunishmentIssueRequest>(
+                "/mc/players/$targetName/punishments", PunishmentIssueRequest(
                     reason,
                     offence,
                     action,
@@ -55,34 +39,47 @@ object PunishmentService : Service<Punishment>() {
                     silent
                 )
             )
-        }.mapErrorSmart {
+        }
+        val punishment = request.getOrNull()
+        if (punishment != null) return punishment
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(targetName)
-                else -> TODO()
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(targetName)
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
+
+        throw RuntimeException("Unreachable")
     }
 
     suspend fun revert(
-        punishment: UUID,
+        id: UUID,
         reason: String,
         reverter: SimplePlayer
-    ): Result<Punishment, FeatureException> {
-        return parseHttpException<Punishment> {
-            apiClient.post(
-                "/mc/punishments/${punishment}/revert", PunishmentRevertRequest(reason, reverter)
+    ): Punishment {
+        val request = parseHttpException {
+            ApiClient.post<Punishment, PunishmentRevertRequest>(
+                "/mc/punishments/$id/revert",
+                PunishmentRevertRequest(reason, reverter)
             )
-        }.mapErrorSmart {
+        }
+        val punishment = request.getOrNull()
+        if (punishment != null) return punishment
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.PUNISHMENT_MISSING -> PunishmentMissingException(punishment.toString())
-                ApiExceptionType.PUNISHMENT_ALREADY_REVERTED -> PunishmentAlreadyRevertedException(punishment.toString())
-                else -> TODO()
+                ApiExceptionType.PUNISHMENT_MISSING -> throw PunishmentMissingException(id.toString())
+                ApiExceptionType.PUNISHMENT_ALREADY_REVERTED -> throw PunishmentAlreadyRevertedException(id.toString())
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
+
+        throw RuntimeException("Unreachable")
     }
 
     suspend fun listTypes(): List<PunishmentType> {
-        return apiClient.get("/mc/punishments/types")
+        return ApiClient.get("/mc/punishments/types")
     }
 
     data class PunishmentIssueRequest(

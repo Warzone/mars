@@ -1,7 +1,6 @@
 package network.warzone.mars.map.models
 
-import network.warzone.mars.feature.named.NamedResource
-import network.warzone.mars.feature.resource.Resource
+import network.warzone.mars.feature.NamedResource
 import java.util.*
 
 data class GameMap (
@@ -14,12 +13,6 @@ data class GameMap (
     val updatedAt: Date,
     var authors: List<MapContributor>,
     var contributors: List<MapContributor>
-) : NamedResource {
-
-    override fun generate(): Resource {
-        return this
-    }
-
-}
+) : NamedResource
 
 data class MapContributor(val uuid: UUID, val contribution: String?)

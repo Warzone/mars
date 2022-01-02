@@ -11,9 +11,7 @@ object RankAttachments {
     suspend fun refresh(context: PlayerContext) {
         purgePermissions(context)
 
-        context.getPlayerProfile().ranks
-            .map { it.get() }
-            .forEach { addPermissions(context, it.permissions) }
+        context.getPlayerProfile().ranks().forEach { addPermissions(context, it.permissions) }
     }
 
     fun createAttachment(context: PlayerContext) {
@@ -24,11 +22,11 @@ object RankAttachments {
         return permissionAttachments[context.uuid]
     }
 
-    fun addPermissions(context: PlayerContext, permissions: List<String>) {
+    private fun addPermissions(context: PlayerContext, permissions: List<String>) {
         permissions.forEach { addPermission(context, it) }
     }
 
-    fun addPermission(context: PlayerContext, permission: String) {
+    private fun addPermission(context: PlayerContext, permission: String) {
         permissionAttachments[context.uuid]?.setPermission(permission, true)
     }
 
@@ -36,7 +34,7 @@ object RankAttachments {
         permissions.forEach { removePermission(context, it) }
     }
 
-    fun removePermission(context: PlayerContext, permission: String) {
+    private fun removePermission(context: PlayerContext, permission: String) {
         permissionAttachments[context.uuid]?.unsetPermission(permission)
     }
 
@@ -44,7 +42,7 @@ object RankAttachments {
         permissionAttachments.remove(context.uuid)?.remove()
     }
 
-    fun purgePermissions(context: PlayerContext) {
+    private fun purgePermissions(context: PlayerContext) {
         permissionAttachments[context.uuid]?.let {
             it.permissions.keys.forEach(it::unsetPermission)
         }

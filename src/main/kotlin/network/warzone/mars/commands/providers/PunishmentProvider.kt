@@ -19,7 +19,7 @@ class PunishmentProvider : BukkitProvider<Punishment> {
         runBlocking {
             val punId = UUID.fromString(args.next())
 
-            val punishment: Punishment? = PunishmentFeature.get(punId).get()
+            val punishment: Punishment? = PunishmentFeature.get(punId)
             punishment ?: throw ArgumentParseException(
                 PunishmentMissingException(punId.toString()).asTextComponent().content()
             )

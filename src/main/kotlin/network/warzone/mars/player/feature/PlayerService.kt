@@ -1,32 +1,29 @@
 package network.warzone.mars.player.feature
 
-import com.github.kittinunf.result.Result
-import kotlinx.serialization.Serializable
-import network.warzone.mars.api.exceptions.ApiException
+import com.github.kittinunf.result.getOrNull
+import com.github.kittinunf.result.onFailure
+import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionResponse
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.api.socket.models.SimplePlayer
-import network.warzone.mars.feature.Service
-import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.exceptions.NoteMissingException
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.Session
 import network.warzone.mars.punishment.models.Punishment
-import network.warzone.mars.rank.RankFeature
 import network.warzone.mars.rank.exceptions.RankAlreadyPresentException
-import network.warzone.mars.rank.exceptions.RankNotPresentException
-import network.warzone.mars.tag.TagFeature
+import network.warzone.mars.rank.exceptions.RankMissingException
+import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.exceptions.TagAlreadyPresentException
+import network.warzone.mars.tag.exceptions.TagMissingException
 import network.warzone.mars.tag.exceptions.TagNotPresentException
-import network.warzone.mars.utils.FeatureException
 import network.warzone.mars.utils.mapErrorSmart
 import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
-object PlayerService : Service<PlayerProfile>() {
+object PlayerService {
     suspend fun login(playerId: UUID, playerName: String, ip: String): PlayerLoginResponse {
-        return apiClient.post(
+        return ApiClient.post(
             "/mc/players/login", PlayerLoginRequest(
                 playerId,
                 playerName,
@@ -36,7 +33,7 @@ object PlayerService : Service<PlayerProfile>() {
     }
 
     suspend fun logout(playerId: UUID, playtime: Long) {
-        apiClient.post<ApiExceptionResponse, PlayerLogoutRequest>(
+        ApiClient.post<ApiExceptionResponse, PlayerLogoutRequest>(
             "/mc/players/logout", PlayerLogoutRequest(
                 playerId,
                 playtime
@@ -44,138 +41,181 @@ object PlayerService : Service<PlayerProfile>() {
         )
     }
 
-    suspend fun lookupPlayer(
-        target: String,
-        includeAlts: Boolean = false
-    ): Result<PlayerLookupResponse, PlayerMissingException> {
-        return parseHttpException<PlayerLookupResponse> { apiClient.get("/mc/players/$target/lookup?alts=${includeAlts}") }.mapErrorSmart {
+    suspend fun getPunishmentHistory(player: String): List<Punishment> {
+        val request = parseHttpException { ApiClient.get<List<Punishment>>("/mc/players/$player/punishments") }
+        val punishments = request.getOrNull()
+        if (punishments != null) return punishments
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
-                else -> TODO()
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
+
+        throw RuntimeException("Unreachable")
     }
 
-    suspend fun addNote(
-        target: String,
-        content: String,
-        author: SimplePlayer
-    ): Result<PlayerProfile, PlayerMissingException> {
-        return parseHttpException {
-            apiClient.post<PlayerProfile, PlayerAddNoteRequest>(
-                "/mc/players/$target/notes",
+    suspend fun lookup(player: String, includeAlts: Boolean): PlayerLookupResponse {
+        val request =
+            parseHttpException { ApiClient.get<PlayerLookupResponse>("/mc/players/$player/lookup?alts=$includeAlts") }
+        val lookup = request.getOrNull()
+        if (lookup != null) return lookup
+
+        request.onFailure {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
+                else -> TODO("Unexpected API exception: ${it.code}")
+            }
+        }
+
+        throw RuntimeException("Unreachable")
+    }
+
+    suspend fun addRank(player: String, rank: Rank): PlayerProfile {
+        val request = parseHttpException { ApiClient.put<PlayerProfile>("/mc/players/$player/ranks/${rank._id}") }
+        val profile = request.getOrNull()
+        if (profile != null) return profile
+
+        request.onFailure {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
+                ApiExceptionType.RANK_MISSING -> throw RankMissingException(rank.name)
+                ApiExceptionType.RANK_ALREADY_PRESENT -> throw RankAlreadyPresentException(
+                    player,
+                    rank.name
+                )
+                else -> TODO("Unexpected API exception: ${it.code}")
+            }
+        }
+
+        throw RuntimeException("Unreachable")
+    }
+
+    suspend fun removeRank(player: String, rank: Rank): PlayerProfile {
+        val request = parseHttpException { ApiClient.delete<PlayerProfile>("/mc/players/$player/ranks/${rank._id}") }
+        val profile = request.getOrNull()
+        if (profile != null) return profile
+
+        request.onFailure {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
+                ApiExceptionType.RANK_MISSING -> throw RankMissingException(rank.name)
+                ApiExceptionType.RANK_NOT_PRESENT -> throw RankAlreadyPresentException(
+                    player,
+                    rank.name
+                )
+                else -> TODO("Unexpected API exception: ${it.code}")
+            }
+        }
+
+        throw RuntimeException("Unreachable")
+    }
+
+    suspend fun addTag(player: String, tag: String): PlayerProfile {
+        val request = parseHttpException { ApiClient.put<PlayerProfile>("/mc/players/$player/tags/${tag}") }
+        val profile = request.getOrNull()
+        if (profile != null) return profile
+
+        request.onFailure {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
+                ApiExceptionType.TAG_MISSING -> throw TagMissingException(tag)
+                ApiExceptionType.TAG_ALREADY_PRESENT -> throw TagAlreadyPresentException(
+                    player,
+                    tag
+                )
+                else -> TODO("Unexpected API exception: ${it.code}")
+            }
+        }
+
+        throw RuntimeException("Unreachable")
+    }
+
+    suspend fun removeTag(player: String, tag: String): PlayerProfile {
+        val request = parseHttpException { ApiClient.delete<PlayerProfile>("/mc/players/$player/tags/$tag") }
+        val profile = request.getOrNull()
+        if (profile != null) return profile
+
+        request.onFailure {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
+                ApiExceptionType.TAG_MISSING -> throw TagMissingException(tag)
+                ApiExceptionType.TAG_NOT_PRESENT -> throw TagNotPresentException(
+                    player,
+                    tag
+                )
+                else -> TODO("Unexpected API exception: ${it.code}")
+            }
+        }
+
+        throw RuntimeException("Unreachable")
+    }
+
+    suspend fun setActiveTag(player: String, tag: UUID?): PlayerProfile {
+        val request = parseHttpException {
+            ApiClient.put<PlayerProfile, PlayerActiveTagRequest>(
+                "/mc/players/$player/active_tag",
+                PlayerActiveTagRequest(tag)
+            )
+        }
+        val profile = request.getOrNull()
+        if (profile != null) return profile
+
+        request.onFailure {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
+                ApiExceptionType.TAG_MISSING -> throw TagMissingException(tag!!.toString())
+                ApiExceptionType.TAG_NOT_PRESENT -> throw TagNotPresentException(
+                    player,
+                    tag!!.toString()
+                )
+                else -> TODO("Unexpected API exception: ${it.code}")
+            }
+        }
+
+        throw RuntimeException("Unreachable")
+    }
+
+    suspend fun addNote(player: String, content: String, author: SimplePlayer): PlayerProfile {
+        val request = parseHttpException {
+            ApiClient.put<PlayerProfile, PlayerAddNoteRequest>(
+                "/mc/players/$player/notes",
                 PlayerAddNoteRequest(author, content)
             )
-        }.mapErrorSmart {
+        }
+        val profile = request.getOrNull()
+        if (profile != null) return profile
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
-                else -> TODO()
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
+
+        throw RuntimeException("Unreachable")
     }
 
-    suspend fun deleteNote(target: String, noteId: Int): Result<PlayerProfile, FeatureException> {
-        return parseHttpException {
-            apiClient.delete<PlayerProfile>("/mc/players/$target/notes/$noteId")
-        }.mapErrorSmart {
+    suspend fun removeNote(player: String, id: Int): PlayerProfile {
+        val request = parseHttpException { ApiClient.delete<PlayerProfile>("/mc/players/$player/notes/$id") }
+        val profile = request.getOrNull()
+        if (profile != null) return profile
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
-                ApiExceptionType.NOTE_MISSING -> NoteMissingException(noteId)
-                else -> TODO()
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
+                ApiExceptionType.NOTE_MISSING -> throw NoteMissingException(id)
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
+
+        throw RuntimeException("Unreachable")
     }
 
-    suspend fun addRankToPlayer(playerId: UUID, rankId: UUID): Result<Unit, RankAlreadyPresentException> {
-        return parseHttpException {
-            apiClient.put<Unit>("/mc/players/$playerId/ranks/$rankId")
-        }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.RANK_ALREADY_PRESENT -> RankAlreadyPresentException(
-                    PlayerManager.getPlayer(playerId)!!,
-                    RankFeature.getKnown(rankId)
-                )
-                else -> TODO()
-            }
-        }
-    }
+    data class PlayerActiveTagRequest(val activeTagId: UUID?)
 
-    suspend fun removeRankFromPlayer(playerId: UUID, rankId: UUID): Result<Unit, RankNotPresentException> {
-        return parseHttpException {
-            apiClient.delete<Unit>("/mc/players/$playerId/ranks/$rankId")
-        }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.RANK_NOT_PRESENT -> RankNotPresentException(
-                    PlayerManager.getPlayer(playerId)!!,
-                    RankFeature.getKnown(rankId)
-                )
-                else -> TODO()
-            }
-        }
-    }
-
-    suspend fun addTagToPlayer(playerId: UUID, tagId: UUID): Result<Unit, TagAlreadyPresentException> {
-        return parseHttpException {
-            apiClient.put<Unit>("/mc/players/$playerId/tags/$tagId")
-        }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.TAG_ALREADY_PRESENT -> TagAlreadyPresentException(
-                    PlayerManager.getPlayer(playerId)!!,
-                    TagFeature.getKnown(tagId)
-                )
-                else -> TODO()
-            }
-        }
-    }
-
-    suspend fun removeTagFromPlayer(playerId: UUID, tagId: UUID): Result<Unit, TagNotPresentException> {
-        return parseHttpException {
-            apiClient.delete<Unit>("/mc/players/$playerId/tags/$tagId")
-        }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.TAG_NOT_PRESENT -> TagNotPresentException(
-                    PlayerManager.getPlayer(playerId)!!,
-                    TagFeature.getKnown(tagId)
-                )
-                else -> TODO()
-            }
-        }
-    }
-
-    suspend fun setActiveTag(playerId: UUID, tagId: UUID?): Result<Unit, FeatureException> {
-        return parseHttpException<Unit> {
-            apiClient.put("/mc/players/$playerId/active_tag", PlayerActiveTagRequest(tagId))
-        }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(playerId.toString())
-                ApiExceptionType.TAG_NOT_PRESENT -> TagNotPresentException(
-                    PlayerManager.getPlayer(playerId)!!,
-                    TagFeature.getKnown(tagId!!)
-                )
-                else -> TODO()
-            }
-        }
-    }
-
-    suspend fun getPunishments(target: String): Result<List<Punishment>, PlayerMissingException> {
-        return parseHttpException<List<Punishment>> { apiClient.get("/mc/players/$target/punishments") }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
-                else -> TODO()
-            }
-        }
-    }
-
-    override suspend fun get(target: String): Result<PlayerProfile, PlayerMissingException> {
-        return parseHttpException {
-            apiClient.get<PlayerProfile>("/mc/players/$target")
-        }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.PLAYER_MISSING -> PlayerMissingException(target)
-                else -> TODO()
-            }
-        }
-    }
+    data class PlayerAddNoteRequest(val author: SimplePlayer, val content: String)
 
     data class PlayerLoginRequest(val playerId: UUID, val playerName: String, val ip: String)
 
@@ -187,11 +227,7 @@ object PlayerService : Service<PlayerProfile>() {
 
     data class PlayerLogoutRequest(val playerId: UUID, val playtime: Long)
 
-    data class PlayerActiveTagRequest(val activeTagId: UUID?)
-
-    data class PlayerLookupResponse(val player: PlayerProfile, val alts: List<PlayerAltResponse>)
-
     data class PlayerAltResponse(val player: PlayerProfile, val punishments: List<Punishment>)
 
-    data class PlayerAddNoteRequest(val author: SimplePlayer, val content: String)
+    data class PlayerLookupResponse(val player: PlayerProfile, val alts: List<PlayerAltResponse>)
 }

@@ -22,7 +22,7 @@ class PlayerProfileProvider : BukkitProvider<PlayerProfile> {
     ): PlayerProfile = runBlocking {
         val name = args.next()
 
-        val profile = PlayerFeature.get(name).getOrNull()
+        val profile = PlayerFeature.get(name)
         println("profile ${profile?.name}")
         profile ?: throw ArgumentParseException(PlayerMissingException(name).asTextComponent().content())
 

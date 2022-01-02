@@ -1,35 +1,40 @@
 package network.warzone.mars.tag
 
-import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.getOrNull
+import com.github.kittinunf.result.isFailure
+import com.github.kittinunf.result.onFailure
+import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionType
-import network.warzone.mars.feature.Service
 import network.warzone.mars.tag.exceptions.TagConflictException
 import network.warzone.mars.tag.exceptions.TagMissingException
 import network.warzone.mars.tag.models.Tag
-import network.warzone.mars.utils.FeatureException
-import network.warzone.mars.utils.mapErrorSmart
 import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
-object TagService : Service<Tag>() {
-    suspend fun create(name: String, display: String): Result<Tag, TagConflictException> {
-        return parseHttpException<Tag> {
-            apiClient.post("/mc/tags", TagDataRequest(name, display))
-        }.mapErrorSmart {
+object TagService {
+    suspend fun create(name: String, display: String): Tag {
+        val request =
+            parseHttpException { ApiClient.post<Tag, TagDataRequest>("/mc/tags", TagDataRequest(name, display)) }
+        val tag = request.getOrNull()
+        if (tag != null) return tag
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.TAG_ALREADY_PRESENT -> TagConflictException(name)
-                else -> TODO()
+                ApiExceptionType.TAG_CONFLICT -> throw TagConflictException(name)
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
+
+        throw RuntimeException("Unreachable")
     }
 
-    suspend fun delete(uuid: UUID): Result<Unit, TagMissingException> {
-        return parseHttpException {
-            apiClient.delete<Unit>("/mc/tags/$uuid")
-        }.mapErrorSmart {
+    suspend fun delete(id: UUID) {
+        val request = parseHttpException { ApiClient.delete<Unit>("/mc/tags/$id") }
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.TAG_MISSING -> TagMissingException(uuid.toString())
-                else -> TODO()
+                ApiExceptionType.TAG_MISSING -> throw TagMissingException(id.toString())
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
     }
@@ -38,34 +43,25 @@ object TagService : Service<Tag>() {
         id: UUID,
         name: String,
         display: String
-    ): Result<Unit, FeatureException> {
-        return parseHttpException {
-            apiClient.put<Unit, TagDataRequest>("/mc/tags/${id}", TagDataRequest(
-                name,
-                display
-            ))
-        }.mapErrorSmart {
+    ): Tag {
+        val request =
+            parseHttpException { ApiClient.put<Tag, TagDataRequest>("/mc/tags/$id", TagDataRequest(name, display)) }
+        val tag = request.getOrNull()
+        if (tag != null) return tag
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.TAG_MISSING -> TagMissingException(name)
-                ApiExceptionType.TAG_CONFLICT -> TagConflictException(name)
-                else -> TODO()
+                ApiExceptionType.TAG_MISSING -> throw TagMissingException(name)
+                ApiExceptionType.TAG_CONFLICT -> throw TagConflictException(name)
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
+
+        throw RuntimeException("Unreachable")
     }
 
     suspend fun list(): List<Tag> {
-        return apiClient.get("/mc/tags")
-    }
-
-    override suspend fun get(target: String): Result<Tag, TagMissingException> {
-        return parseHttpException<Tag> {
-            apiClient.get("mc/tags/$target")
-        }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.TAG_MISSING -> TagMissingException(target)
-                else -> TODO()
-            }
-        }
+        return ApiClient.get("/mc/tags")
     }
 
     data class TagDataRequest(val name: String, val display: String)

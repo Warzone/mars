@@ -1,34 +1,32 @@
 package network.warzone.mars.punishment
 
 import com.github.kittinunf.result.Result
+import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.models.SimplePlayer
-import network.warzone.mars.feature.Feature
-import network.warzone.mars.player.feature.exceptions.PlayerMissingException
+import network.warzone.mars.feature.CachedFeature
 import network.warzone.mars.punishment.commands.PunishCommands
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.punishment.models.PunishmentAction
 import network.warzone.mars.punishment.models.PunishmentReason
 import network.warzone.mars.punishment.models.PunishmentType
-import network.warzone.mars.utils.FeatureException
 import java.util.*
 
-object PunishmentFeature : Feature<Punishment, PunishmentService>() {
-    override val service = PunishmentService
-    override suspend fun get(uuid: UUID): Result<Punishment, FeatureException> {
-        return service.get(uuid.toString())
-    }
-
-    override fun getCached(uuid: UUID): Punishment? {
-        throw NotImplementedError("PunishmentFeature has no cache")
-    }
-
+object PunishmentFeature : CachedFeature<Punishment>() {
     val punishmentTypes: MutableList<PunishmentType> = mutableListOf()
 
     override suspend fun init() {
-        service.listTypes().forEach { punishmentTypes.add(it) }
+        PunishmentService.listTypes().forEach { punishmentTypes.add(it) }
     }
 
-    suspend fun issuePunishment(
+    override suspend fun fetch(target: String): Punishment? {
+        return try {
+            ApiClient.get<Punishment>("/mc/punishments/$target")
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun issue(
         reason: PunishmentReason,
         offence: Int,
         action: PunishmentAction,
@@ -37,8 +35,8 @@ object PunishmentFeature : Feature<Punishment, PunishmentService>() {
         targetName: String,
         targetIps: List<String>,
         silent: Boolean
-    ): Result<Punishment, PlayerMissingException> {
-        return service.create(
+    ): Punishment {
+        return PunishmentService.create(
             reason,
             offence,
             action,
@@ -50,12 +48,12 @@ object PunishmentFeature : Feature<Punishment, PunishmentService>() {
         )
     }
 
-    suspend fun revertPunishment(
-        punishment: UUID,
+    suspend fun revert(
+        id: UUID,
         reason: String,
         reverter: SimplePlayer
-    ): Result<Punishment, FeatureException> {
-        return service.revert(punishment, reason, reverter)
+    ): Punishment {
+        return PunishmentService.revert(id, reason, reverter)
     }
 
     override fun getCommands(): List<Any> {

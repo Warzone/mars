@@ -5,7 +5,6 @@ import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
-import com.github.kittinunf.result.getOrNull
 import kotlinx.coroutines.runBlocking
 import net.wesjd.anvilgui.AnvilGUI
 import network.warzone.mars.Mars
@@ -28,7 +27,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
-import tc.oc.pgm.lib.net.kyori.adventure.platform.bukkit.BukkitAudiences
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component.*
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
@@ -41,6 +39,7 @@ class PunishCommands {
     @Command(aliases = ["punish", "p", "pun"], desc = "Punish a player")
     fun onPunish(
         @Sender player: Player,
+        audience: Audience,
         context: PlayerContext,
         target: PlayerProfile,
         @Nullable @Text reason: String?,
@@ -48,82 +47,96 @@ class PunishCommands {
     ) = runBlocking {
         val types = PunishmentFeature.punishmentTypes.filter { player.hasPermission(it.requiredPermission) }
 
-        val history = PlayerService.getPunishments(target._id.toString()).get() ?: throw CommandException("Could not load punishment history")
+        try {
+            val history = PlayerFeature.getPunishmentHistory(target._id.toString())
 
-        if (reason != null) {
-            val searchResults = types.filter {
-                it.name.toLowerCase().contains(reason.toLowerCase()) || it.short.equals(
-                    reason,
-                    ignoreCase = true
+            if (reason != null) {
+                val searchResults = types.filter {
+                    it.name.toLowerCase().contains(reason.toLowerCase()) || it.short.equals(
+                        reason,
+                        ignoreCase = true
+                    )
+                }
+                if (searchResults.size == 1) player.open(
+                    createPunishConfirmGUI(
+                        context,
+                        target,
+                        target.getDisplayName(ChatColor.GRAY),
+                        searchResults.last(),
+                        history,
+                        null,
+                        isSilent
+                    )
                 )
+                else if (searchResults.isEmpty()) player.sendMessage("${ChatColor.RED}Could not find punishment types for query '${reason}'")
+                else player.open(createPunishGUI(context, target, history, searchResults, isSilent))
+                return@runBlocking
             }
-            if (searchResults.size == 1) player.open(
-                createPunishConfirmGUI(
-                    context,
-                    target,
-                    target.getDisplayName(ChatColor.GRAY),
-                    searchResults.last(),
-                    history,
-                    null,
-                    isSilent
-                )
-            )
-            else if (searchResults.isEmpty()) player.sendMessage("${ChatColor.RED}Could not find punishment types for query '${reason}'")
-            else player.open(createPunishGUI(context, target, history, searchResults, isSilent))
-            return@runBlocking
-        }
 
-        player.open(createPunishGUI(context, target, history, types, isSilent))
+            player.open(createPunishGUI(context, target, history, types, isSilent))
+        } catch (e: FeatureException) {
+            audience.sendMessage(e.asTextComponent())
+        }
     }
 
     @Command(aliases = ["revertp"], desc = "Revert a punishment by ID")
     fun onRevert(
         @Sender player: Player,
+        audience: Audience,
         punishment: Punishment,
         @Nullable @Text reason: String?
     ) = runBlocking {
         if (punishment.reversion != null) throw CommandException("This punishment was already reverted ${Date(punishment.reversion.revertedAt).getTimeAgo()} by ${punishment.reversion.reverter.name} for ${ChatColor.WHITE}${punishment.reversion.reason}${ChatColor.RED}.")
 
-        if (reason == null) {
-            val anvil =
-                AnvilGUI.Builder().text("Reversion reason").plugin(Mars.get())
-            anvil.onComplete { player, reason ->
-                player.performCommand("mars:revertp ${punishment._id} $reason")
-                return@onComplete AnvilGUI.Response.close()
-            }
-            anvil.open(player)
-        } else {
-            val pun = PunishmentFeature.revertPunishment(
-                punishment._id,
-                reason,
-                SimplePlayer(id = player.uniqueId, name = player.name)
-            ).get() ?: throw CommandException("Returned punishment is null?")
+        try {
+            if (reason == null) {
+                val anvil =
+                    AnvilGUI.Builder().text("Reversion reason").plugin(Mars.get())
+                anvil.onComplete { player, reason ->
+                    player.performCommand("mars:revertp ${punishment._id} $reason")
+                    return@onComplete AnvilGUI.Response.close()
+                }
+                anvil.open(player)
+            } else {
+                val pun = PunishmentFeature.revert(
+                    punishment._id,
+                    reason,
+                    SimplePlayer(id = player.uniqueId, name = player.name)
+                )
 
-            val target = PlayerManager.getPlayer(pun.target.id)
-            if (target != null) { // Target is online
-                target.activePunishments = target.activePunishments.filterNot { it._id == pun._id }
-            }
+                val target = PlayerManager.getPlayer(pun.target.id)
+                if (target != null) { // Target is online
+                    target.activePunishments = target.activePunishments.filterNot { it._id == pun._id }
+                }
 
-            sendModeratorBroadcast(
-                text(player.name, NamedTextColor.YELLOW).append(space()).append(text("reverted", NamedTextColor.YELLOW))
-                    .append(
-                        space()
-                    ).append(pun.asTextComponent(false))
-            )
+                sendModeratorBroadcast(
+                    text(player.name, NamedTextColor.YELLOW).append(space())
+                        .append(text("reverted", NamedTextColor.YELLOW))
+                        .append(
+                            space()
+                        ).append(pun.asTextComponent(false))
+                )
+            }
+        } catch (e: FeatureException) {
+            audience.sendMessage(e.asTextComponent())
         }
     }
 
     @Command(aliases = ["punishments", "puns"], desc = "View a player's punishment history")
-    fun onPunishmentHistory(@Sender sender: CommandSender, audience: Audience, context: PlayerContext, target: String) =
+    fun onPunishmentHistory(@Sender sender: CommandSender, audience: Audience, target: String) =
         runBlocking {
-            val history = PlayerService.getPunishments(target).getOrNull() ?: throw CommandException("Invalid player")
-            if (history.isEmpty()) return@runBlocking sender.sendMessage("${ChatColor.YELLOW}${target} has no punishment history")
+            try {
+                val history = PlayerService.getPunishmentHistory(target)
+                if (history.isEmpty()) return@runBlocking sender.sendMessage("${ChatColor.YELLOW}${target} has no punishment history")
 
-            sender.sendMessage("${ChatColor.RED}Punishments for ${target}:")
-            history
-                .map(Punishment::asTextComponent)
-                .map { text("- ", NamedTextColor.GRAY).append(it) }
-                .forEach(audience::sendMessage)
+                sender.sendMessage("${ChatColor.RED}Punishments for ${target}:")
+                history
+                    .map(Punishment::asTextComponent)
+                    .map { text("- ", NamedTextColor.GRAY).append(it) }
+                    .forEach(audience::sendMessage)
+            } catch (e: FeatureException) {
+                audience.sendMessage(e.asTextComponent())
+            }
         }
 
     private suspend fun createPunishGUI(
@@ -147,7 +160,8 @@ class PunishCommands {
                 val chunkedMessage = type.message.chunkedWords(6)
 
                 slot(currentSlot++) {
-                    val material = Material.matchMaterial(type.material) ?: throw RuntimeException("Material not found: ${type.material}")
+                    val material = Material.matchMaterial(type.material)
+                        ?: throw RuntimeException("Material not found: ${type.material}")
 
                     item = item(material) {
                         name = "${ChatColor.YELLOW}${type.name}"
@@ -366,54 +380,59 @@ class PunishCommands {
         silent: Boolean,
         note: String?
     ) {
-        val targetContext = PlayerManager.getPlayer(target._id)
+        try {
+            val targetContext = PlayerManager.getPlayer(target._id)
 
-        val result = PunishmentFeature.issuePunishment(
-            reason = reason,
-            offence = offence,
-            action = action,
-            note = note,
-            punisher = SimplePlayer(staff.getPlayerProfile()._id, staff.getPlayerProfile().name),
-            targetName = target.name,
-            targetIps = targetIps,
-            silent = silent
-        )
-        val punishment = result.get() ?: throw RuntimeException("Cannot get punishment from issuePunishment result")
+            val punishment = PunishmentFeature.issue(
+                reason = reason,
+                offence = offence,
+                action = action,
+                note = note,
+                punisher = SimplePlayer(staff.getPlayerProfile()._id, staff.getPlayerProfile().name),
+                targetName = target.name,
+                targetIps = targetIps,
+                silent = silent
+            )
 
-        if (targetContext == null && action.kind == PunishmentKind.KICK) staff.player.sendMessage("${ChatColor.RED}The player could not be kicked as they are not online, but the punishment has been recorded.")
+            if (targetContext == null && action.kind == PunishmentKind.KICK) staff.player.sendMessage("${ChatColor.RED}The player could not be kicked as they are not online, but the punishment has been recorded.")
 
-        if (targetContext != null) { // Target is playing
-            when (action.kind) {
-                PunishmentKind.WARN -> {
-                    targetContext.matchPlayer.sendMessage(
-                        newline().append(text("» You have been warned for", NamedTextColor.GRAY)).append(space())
-                            .append(text(reason.name, NamedTextColor.RED, TextDecoration.BOLD)).append(newline())
-                            .append(
-                                text("»", NamedTextColor.GRAY)
-                            ).append(space()).append(text(reason.message, NamedTextColor.RED)).append(newline()).append(
-                                text("» Further offences may result in harsher punishments", NamedTextColor.GRAY)
-                            ).append(newline())
-                    )
-                }
-                PunishmentKind.KICK -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been kicked from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Further offences may result in harsher punishments.")
-                PunishmentKind.BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}https://warzone.network/appeal")
-                PunishmentKind.IP_BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been IP banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}https://warzone.network/appeal")
-                PunishmentKind.MUTE -> {
-                    targetContext.activePunishments = targetContext.activePunishments + punishment
-                    targetContext.matchPlayer.sendMessage(
-                        newline().append(text("» You have been muted for", NamedTextColor.GRAY)).append(space())
-                            .append(text(reason.name, NamedTextColor.RED, TextDecoration.BOLD)).append(newline())
-                            .append(
-                                text("»", NamedTextColor.GRAY)
-                            ).append(space()).append(text(reason.message, NamedTextColor.RED)).append(newline()).append(
-                                text("» Further offences may result in harsher punishments", NamedTextColor.GRAY)
-                            ).append(newline())
-                    )
+            if (targetContext != null) { // Target is playing
+                when (action.kind) {
+                    PunishmentKind.WARN -> {
+                        targetContext.matchPlayer.sendMessage(
+                            newline().append(text("» You have been warned for", NamedTextColor.GRAY)).append(space())
+                                .append(text(reason.name, NamedTextColor.RED, TextDecoration.BOLD)).append(newline())
+                                .append(
+                                    text("»", NamedTextColor.GRAY)
+                                ).append(space()).append(text(reason.message, NamedTextColor.RED)).append(newline())
+                                .append(
+                                    text("» Further offences may result in harsher punishments", NamedTextColor.GRAY)
+                                ).append(newline())
+                        )
+                    }
+                    PunishmentKind.KICK -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been kicked from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Further offences may result in harsher punishments.")
+                    PunishmentKind.BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}https://warzone.network/appeal")
+                    PunishmentKind.IP_BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been IP banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}https://warzone.network/appeal")
+                    PunishmentKind.MUTE -> {
+                        targetContext.activePunishments = targetContext.activePunishments + punishment
+                        targetContext.matchPlayer.sendMessage(
+                            newline().append(text("» You have been muted for", NamedTextColor.GRAY)).append(space())
+                                .append(text(reason.name, NamedTextColor.RED, TextDecoration.BOLD)).append(newline())
+                                .append(
+                                    text("»", NamedTextColor.GRAY)
+                                ).append(space()).append(text(reason.message, NamedTextColor.RED)).append(newline())
+                                .append(
+                                    text("» Further offences may result in harsher punishments", NamedTextColor.GRAY)
+                                ).append(newline())
+                        )
+                    }
                 }
             }
-        }
 
-        broadcastPunishment(target, staff, punishment)
+            broadcastPunishment(target, staff, punishment)
+        } catch (e: FeatureException) {
+            throw e
+        }
     }
 
     private fun broadcastPunishment(

@@ -1,7 +1,6 @@
 package network.warzone.mars.rank.models
 
-import network.warzone.mars.feature.named.NamedResource
-import network.warzone.mars.feature.resource.Resource
+import network.warzone.mars.feature.NamedResource
 import java.util.*
 
 data class Rank (
@@ -16,9 +15,4 @@ data class Rank (
     var permissions: MutableList<String>
 ) : NamedResource {
     val nameLower: String get() = name.toLowerCase(Locale.ROOT)
-
-    override fun generate(): Resource {
-        // no relations?
-        return this
-    }
 }

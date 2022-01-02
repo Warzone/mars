@@ -1,7 +1,6 @@
 package network.warzone.mars.tag.models
 
-import network.warzone.mars.feature.named.NamedResource
-import network.warzone.mars.feature.resource.Resource
+import network.warzone.mars.feature.NamedResource
 import java.util.*
 
 data class Tag(
@@ -11,8 +10,4 @@ data class Tag(
     val createdAt: Date
 ) : NamedResource {
     val nameLower: String get() = name.toLowerCase(Locale.ROOT)
-
-    override fun generate(): Resource {
-        return this
-    }
 }

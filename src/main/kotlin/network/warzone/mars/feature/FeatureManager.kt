@@ -4,7 +4,6 @@ import app.ashcon.intake.bukkit.graph.BasicBukkitCommandGraph
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import network.warzone.mars.api.events.ApiConnectedEvent
-import network.warzone.mars.feature.resource.ResourceType
 import network.warzone.mars.map.MapFeature
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.punishment.PunishmentFeature
@@ -14,19 +13,19 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 object FeatureManager : Listener {
-    private val features: MutableMap<ResourceType<*>, Feature<*, *>> = mutableMapOf(
-        ResourceType.Player to PlayerFeature,
-        ResourceType.Rank to RankFeature,
-        ResourceType.Tag to TagFeature,
-        ResourceType.Map to MapFeature,
-        ResourceType.Punishment to PunishmentFeature
-    )
-
-    fun init() {
+    init {
         Mars.registerEvents(this)
     }
 
-    fun <T : Feature<*, *>> getFeature(type: ResourceType<T>): T {
+    private val features = mapOf<ResourceType<*>, Feature<*>>(
+        ResourceType.Tag to TagFeature,
+        ResourceType.Map to MapFeature,
+        ResourceType.Player to PlayerFeature,
+        ResourceType.Rank to RankFeature,
+        ResourceType.Punishment to PunishmentFeature
+    )
+
+    fun <T : Feature<*>> getFeature(type: ResourceType<T>): T {
         return type.cast(features[type]!!)
     }
 
@@ -45,9 +44,7 @@ object FeatureManager : Listener {
 
     @EventHandler
     fun onApiConnected(event: ApiConnectedEvent) = runBlocking {
-        println("API connected event called.")
-        features.values.forEach {
-            it.init()
-        }
+        println("Established API socket connection")
+        features.values.forEach { it.init() }
     }
 }

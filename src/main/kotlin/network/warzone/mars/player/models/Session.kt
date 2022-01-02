@@ -1,6 +1,6 @@
 package network.warzone.mars.player.models
 
-import network.warzone.mars.feature.resource.Resource
+import network.warzone.mars.feature.Resource
 import java.util.*
 
 data class Session(
@@ -10,8 +10,4 @@ data class Session(
     val endedAt: Date?,
 
     val playerId: UUID
-) : Resource {
-    override fun generate(): Session {
-        return this
-    }
-}
+) : Resource

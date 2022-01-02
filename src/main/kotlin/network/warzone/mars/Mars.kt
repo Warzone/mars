@@ -47,7 +47,6 @@ class Mars : JavaPlugin() {
 
         val commandGraph = BasicBukkitCommandGraph(CommandModule)
 
-        FeatureManager.init()
         FeatureManager.registerCommands(commandGraph)
 
         val apiConfigurationSection = config.getConfigurationSection("api")

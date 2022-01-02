@@ -31,10 +31,6 @@ import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import java.util.*
 import java.util.logging.Level
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.instanceParameter
-import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.jvm.javaType
 
 data class Packet<T>(
     @SerializedName("e") val event: SocketEventType,

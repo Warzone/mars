@@ -22,7 +22,7 @@ class TagsCommand {
         val tags = context.getPlayerProfile().tags()
 
         if (tags.isEmpty()) {
-            player.sendMessage("${RED}You do not have any tags.") //TODO: advertise
+            player.sendMessage("${RED}You do not have any tags.") //TODO: advertise store or /buy
             return@runBlocking
         }
 
@@ -31,7 +31,7 @@ class TagsCommand {
 
     private suspend fun createTagGUI(context: PlayerContext, tags: List<Tag>): GUI {
         val profile = context.getPlayerProfile()
-        // todo: show locked tags?
+        // todo: show locked tags? - have an "available" prop (-a) so custom tags don't appear? or use player count to decide? or name format?
         val rows = (if (tags.count() < 9) 1 else tags.count() / 9) + 1
         return gui("${DARK_AQUA}Tags", rows) {
             tags.forEachIndexed { index, tag ->
@@ -47,9 +47,12 @@ class TagsCommand {
 
                     onclick = {
                         if (isActive) {
-                            PlayerFeature.removeActiveTag(context)
+                            PlayerFeature.setActiveTag(context.uuid.toString(), null)
                         } else {
-                            if (profile.tagIds.contains(tag._id)) PlayerFeature.setActiveTag(context, tag)
+                            if (profile.tagIds.contains(tag._id)) PlayerFeature.setActiveTag(
+                                context.uuid.toString(),
+                                tag._id
+                            )
                         }
 
                         refresh()

@@ -1,6 +1,6 @@
 package network.warzone.mars.utils
 
-import network.warzone.mars.feature.resource.Resource
+import network.warzone.mars.feature.Resource
 import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties
 

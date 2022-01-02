@@ -1,17 +1,17 @@
 package network.warzone.mars.rank
 
-import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.getOrNull
+import com.github.kittinunf.result.isFailure
+import com.github.kittinunf.result.onFailure
+import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionType
-import network.warzone.mars.feature.Service
 import network.warzone.mars.rank.exceptions.RankConflictException
 import network.warzone.mars.rank.exceptions.RankMissingException
 import network.warzone.mars.rank.models.Rank
-import network.warzone.mars.utils.FeatureException
-import network.warzone.mars.utils.mapErrorSmart
 import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
-object RankService : Service<Rank>() {
+object RankService {
     suspend fun create(
         name: String,
         displayName: String?,
@@ -20,23 +20,25 @@ object RankService : Service<Rank>() {
         permissions: List<String>?,
         staff: Boolean?,
         applyOnJoin: Boolean?
-    ): Result<Rank, RankConflictException> {
-        return parseHttpException {
-            apiClient.post<Rank, RankDataRequest>("/mc/ranks", RankDataRequest(
-                name,
-                displayName,
-                priority,
-                prefix,
-                permissions,
-                staff,
-                applyOnJoin
-            ))
-        }.mapErrorSmart {
+    ): Rank {
+        val request =
+            parseHttpException {
+                ApiClient.post<Rank, RankDataRequest>(
+                    "/mc/ranks",
+                    RankDataRequest(name, displayName, priority, prefix, permissions, staff, applyOnJoin)
+                )
+            }
+        val rank = request.getOrNull()
+        if (rank != null) return rank
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.RANK_CONFLICT -> RankConflictException(name)
-                else -> TODO()
+                ApiExceptionType.RANK_CONFLICT -> throw RankConflictException(name)
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
+
+        throw RuntimeException("Unreachable")
     }
 
     suspend fun update(
@@ -48,50 +50,41 @@ object RankService : Service<Rank>() {
         permissions: List<String>?,
         staff: Boolean?,
         applyOnJoin: Boolean?
-    ): Result<Unit, FeatureException> {
-        return parseHttpException {
-            apiClient.put<Unit, RankDataRequest>("/mc/ranks/$id", RankDataRequest(
-                name,
-                displayName,
-                priority,
-                prefix,
-                permissions,
-                staff,
-                applyOnJoin
-            ))
-        }.mapErrorSmart {
+    ): Rank {
+        val request =
+            parseHttpException {
+                ApiClient.put<Rank, RankDataRequest>(
+                    "/mc/ranks/$id",
+                    RankDataRequest(name, displayName, priority, prefix, permissions, staff, applyOnJoin)
+                )
+            }
+        val rank = request.getOrNull()
+        if (rank != null) return rank
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.RANK_CONFLICT -> RankConflictException(name)
-                ApiExceptionType.RANK_MISSING -> RankMissingException(name)
-                else -> TODO()
+                ApiExceptionType.RANK_CONFLICT -> throw RankConflictException(name)
+                ApiExceptionType.RANK_MISSING -> throw RankMissingException(name)
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
+
+        throw RuntimeException("Unreachable")
     }
 
-    suspend fun delete(uuid: UUID): Result<Unit, RankMissingException> {
-        return parseHttpException {
-            apiClient.delete<Unit>("/mc/ranks/$uuid")
-        }.mapErrorSmart {
+    suspend fun delete(id: UUID) {
+        val request = parseHttpException { ApiClient.delete<Unit>("/mc/tags/$id") }
+
+        request.onFailure {
             when (it.code) {
-                ApiExceptionType.RANK_MISSING -> RankMissingException(uuid.toString())
-                else -> TODO()
+                ApiExceptionType.RANK_MISSING -> throw RankMissingException(id.toString())
+                else -> TODO("Unexpected API exception: ${it.code}")
             }
         }
     }
 
     suspend fun list(): List<Rank> {
-        return apiClient.get("/mc/ranks")
-    }
-
-    override suspend fun get(target: String): Result<Rank, RankMissingException> {
-        return parseHttpException {
-            apiClient.get<Rank>("/mc/ranks/$target")
-        }.mapErrorSmart {
-            when (it.code) {
-                ApiExceptionType.RANK_MISSING -> RankMissingException(target)
-                else -> TODO()
-            }
-        }
+        return ApiClient.get("/mc/ranks")
     }
 
     data class RankDataRequest(

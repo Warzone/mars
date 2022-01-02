@@ -6,6 +6,7 @@ import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import app.ashcon.intake.parametric.annotation.Text
 import com.github.kittinunf.result.getOrNull
 import com.github.kittinunf.result.isFailure
+import com.github.kittinunf.result.runCatching
 import kotlinx.coroutines.runBlocking
 import net.md_5.bungee.api.chat.BaseComponent
 import network.warzone.mars.api.socket.models.SimplePlayer
@@ -30,44 +31,48 @@ class PlayerCommands {
     @Command(aliases = ["lookup", "alts", "lu"], desc = "Lookup player information & alts")
     fun onPlayerLookup(@Sender sender: CommandSender, audience: Audience, context: PlayerContext, target: String) =
         runBlocking {
-            val lookup =
-                PlayerService.lookupPlayer(target, includeAlts = true).get() ?: throw CommandException("Invalid player")
-            val player = lookup.player
+            try {
+                val lookup =
+                    PlayerFeature.lookup(target, includeAlts = true)
+                val player = lookup.player
 
-            val isOnline = PlayerManager.getPlayer(player._id) != null
+                val isOnline = PlayerManager.getPlayer(player._id) != null
 
-            var message = text()
-                .append { createStandardLabelled("Name", player.name) }
-                .append { createUncolouredLabelled("ID", player._id.toString()) }
-                .append {
-                    createUncolouredLabelled(
-                        "First Joined",
-                        "${player.firstJoinedAt} (${player.firstJoinedAt.getTimeAgo()})"
-                    )
-                }
-                .append {
-                    createUncolouredLabelled(
-                        "Last Joined",
-                        if (isOnline) "${ChatColor.GREEN}Online" else "${player.lastJoinedAt} (${player.lastJoinedAt.getTimeAgo()}"
-                    )
-                }
-                .append {
-                    createUncolouredLabelled(
-                        "Playtime",
-                        Duration.ofMillis(player.stats.serverPlaytime).conciseFormat()
-                    )
-                }
-                .append { createUncolouredLabelled("Alts", "") }
+                var message = text()
+                    .append { createStandardLabelled("Name", player.name) }
+                    .append { createUncolouredLabelled("ID", player._id.toString()) }
+                    .append {
+                        createUncolouredLabelled(
+                            "First Joined",
+                            "${player.firstJoinedAt} (${player.firstJoinedAt.getTimeAgo()})"
+                        )
+                    }
+                    .append {
+                        createUncolouredLabelled(
+                            "Last Joined",
+                            if (isOnline) "${ChatColor.GREEN}Online" else "${player.lastJoinedAt} (${player.lastJoinedAt.getTimeAgo()}"
+                        )
+                    }
+                    .append {
+                        createUncolouredLabelled(
+                            "Playtime",
+                            Duration.ofMillis(player.stats.serverPlaytime).conciseFormat()
+                        )
+                    }
+                    .append { createUncolouredLabelled("Alts", "") }
 
-            lookup.alts.forEach {
-                message = message
-                    .append { text("-", NamedTextColor.GRAY) }
-                    .append { space() }
-                    .append { it.asTextComponent() }
-                    .append { newline() }
+                lookup.alts.forEach {
+                    message = message
+                        .append { text("-", NamedTextColor.GRAY) }
+                        .append { space() }
+                        .append { it.asTextComponent() }
+                        .append { newline() }
+                }
+
+                context.matchPlayer.sendMessage(message)
+            } catch (e: FeatureException) {
+                audience.sendMessage(e.asTextComponent())
             }
-
-            context.matchPlayer.sendMessage(message)
         }
 
 
@@ -84,16 +89,15 @@ class PlayerCommands {
             null -> {
                 var message = text("Notes for ${profile.name}", NamedTextColor.GREEN).append { newline() }
                 profile.notes.forEach {
-                    message = message.append { it.asTextComponent(profile.name, it.author.id == sender.uniqueId) }.append { newline() }
+                    message = message.append { it.asTextComponent(profile.name, it.author.id == sender.uniqueId) }
+                        .append { newline() }
                 }
                 context.matchPlayer.sendMessage(message)
             }
             "add" -> {
                 if (value == null || value.trim().isEmpty()) throw CommandException("No note content provided")
-                PlayerFeature.addNote(profile.name, value.trim(), SimplePlayer(sender.uniqueId, sender.name)).fold(
-                    { sender.sendMessage("${ChatColor.GREEN}Added note") },
-                    { audience.sendMessage(it.asTextComponent()) }
-                )
+                PlayerFeature.addNote(profile.name, value.trim(), SimplePlayer(sender.uniqueId, sender.name))
+                sender.sendMessage("${ChatColor.GREEN}Added note")
             }
             "del" -> {
                 if (value == null) throw CommandException("No note ID provided")
@@ -102,15 +106,13 @@ class PlayerCommands {
                     val note = profile.notes.find { it.id == noteId } ?: throw CommandException("Invalid note ID")
                     if (note.author.id != sender.uniqueId) throw CommandException("You cannot delete this note")
 
-                    PlayerFeature.deleteNote(profile.name, noteId).fold(
-                        { sender.sendMessage("${ChatColor.GREEN}Deleted note #$noteId") },
-                        { audience.sendMessage(it.asTextComponent()) }
-                    )
+                    PlayerFeature.removeNote(profile.name, noteId)
+                    sender.sendMessage("Deleted note #$noteId")
                 } catch (ex: Exception) {
                     throw CommandException("Invalid note ID")
                 }
             }
-            else -> sender.sendMessage("${ChatColor.RED}Available ops: add <content>, del <id>")
+            else -> sender.sendMessage("${ChatColor.RED}Available operations: add <content>, del <id>")
         }
     }
 }

@@ -1,11 +1,11 @@
 package network.warzone.mars.player.models
 
 import network.warzone.mars.api.socket.models.SimplePlayer
-import network.warzone.mars.feature.named.NamedResource
-import network.warzone.mars.feature.relations.Relation
-import network.warzone.mars.feature.resource.ResourceType
+import network.warzone.mars.feature.NamedResource
 import network.warzone.mars.punishment.models.StaffNote
+import network.warzone.mars.rank.RankFeature
 import network.warzone.mars.rank.models.Rank
+import network.warzone.mars.tag.TagFeature
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.color
 import org.bukkit.ChatColor
@@ -31,52 +31,31 @@ data class PlayerProfile(
     val gamemodeStats: HashMap<Gamemode, PlayerStats>,
 
     val rankIds: MutableList<UUID>,
-    @Transient var ranks: List<Relation<Rank>> = emptyList(),
-
-    var activeTagId: UUID?,
-    @Transient var activeTag: Relation<Tag>? = null,
 
     val tagIds: MutableList<UUID>,
-    @Transient var tags: List<Relation<Tag>> = emptyList()
+
+    var activeTagId: UUID?,
 ) : NamedResource {
-
-    suspend fun tags(): List<Tag> = tags.map { it.get() }
-    suspend fun ranks(): List<Rank> = ranks.map { it.get() }
-    suspend fun activeTag(): Tag? = activeTag?.get()
-
-    override fun generate(): PlayerProfile {
-        ranks = rankIds.map {
-            Relation(ResourceType.Rank, it)
-        }
-
-        tags = tagIds.map {
-            Relation(ResourceType.Tag, it)
-        }
-
-        activeTag = null
-        activeTagId?.let {
-            activeTag = Relation(ResourceType.Tag, it)
-        }
-
-        return this
+    suspend fun tags(): List<Tag> = tagIds.mapNotNull { TagFeature.get(it) }
+    suspend fun ranks(): List<Rank> = rankIds.mapNotNull { RankFeature.get(it) }
+    suspend fun activeTag(): Tag? {
+        if (activeTagId == null) return null
+        return TagFeature.get(activeTagId!!)
     }
 
-    suspend fun getRankPrefix(): String? {
-        val rank: Rank? = ranks()
-            .filter { it.prefix != null }
-            .maxByOrNull { it.priority }
-
+    private suspend fun getRankDisplay(): String? {
+        val rank = ranks().filter { it.prefix != null }.maxByOrNull { it.priority }
         return rank?.prefix?.color()
     }
 
-    suspend fun getSuffix(): String? {
+    private suspend fun getTagDisplay(): String? {
         val tagDisplay = activeTag()?.display?.color() ?: return null
         return "${ChatColor.GRAY}[${tagDisplay}${ChatColor.GRAY}]"
     }
 
-    suspend fun getDisplayName(nameColour: ChatColor): String {
-        return "${getRankPrefix() ?: ""} ${nameColour}${name} ${getSuffix() ?: ""}".trim()
-    }
+    suspend fun getDisplayName(nameColor: ChatColor) =
+        "${getRankDisplay() ?: ""} ${nameColor}$name ${getTagDisplay() ?: ""}".trim()
+
 }
 
 data class PlayerStats(

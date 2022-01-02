@@ -1,6 +1,7 @@
 package network.warzone.mars.map
 
-import network.warzone.mars.feature.named.NamedCacheFeature
+import network.warzone.mars.api.ApiClient
+import network.warzone.mars.feature.NamedCachedFeature
 import network.warzone.mars.map.models.GameMap
 import network.warzone.mars.map.models.MapContributor
 import tc.oc.pgm.api.PGM
@@ -10,29 +11,35 @@ import tc.oc.pgm.map.contrib.PlayerContributor
 import tc.oc.pgm.util.Version
 import java.util.*
 
-object MapFeature : NamedCacheFeature<GameMap, MapService>() {
-    override val service = MapService
-
+object MapFeature : NamedCachedFeature<GameMap>() {
     override suspend fun init() {
         findNewMaps()
     }
 
-    suspend fun create(maps: List<MapService.MapLoadOneRequest>): List<GameMap> {
-        return service
-            .create(maps)
-            .also(::sync)
+    override suspend fun fetch(target: String): GameMap? {
+        return try {
+            ApiClient.get("/mc/maps/$target")
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun create(maps: List<MapLoadOneRequest>): List<GameMap> {
+        val created = ApiClient.post<List<GameMap>, List<MapLoadOneRequest>>("/mc/maps", maps)
+
+        return created.onEach { add(it) }
     }
 
     suspend fun list(): List<GameMap> {
-        return service
-            .list()
-            .also(::sync)
+        val maps = ApiClient.get<List<GameMap>>("/mc/maps")
+
+        return maps.onEach { add(it) }
     }
 
     /**
      * Find and load all new maps.
      */
-    suspend fun findNewMaps() {
+    private suspend fun findNewMaps() {
         // Get the currently loaded maps.
         val currentMaps: List<GameMap> = list()
 
@@ -40,7 +47,7 @@ object MapFeature : NamedCacheFeature<GameMap, MapService>() {
         val pgmMaps = PGM.get().mapLibrary.maps
 
         // Initialize an empty array of map load requests.
-        val mapLoadRequests = mutableListOf<MapService.MapLoadOneRequest>()
+        val mapLoadRequests = mutableListOf<MapLoadOneRequest>()
 
         // Loop over the iterator of maps.
         while (pgmMaps.hasNext()) {
@@ -79,8 +86,8 @@ object MapFeature : NamedCacheFeature<GameMap, MapService>() {
         create(maps = mapLoadRequests)
     }
 
-    private fun toMapLoadRequest(map: MapInfo, id: UUID?): MapService.MapLoadOneRequest {
-        return MapService.MapLoadOneRequest(
+    private fun toMapLoadRequest(map: MapInfo, id: UUID?): MapLoadOneRequest {
+        return MapLoadOneRequest(
             _id = id ?: UUID.randomUUID(),
             name = map.name,
             version = map.version.toString(),
@@ -96,4 +103,13 @@ object MapFeature : NamedCacheFeature<GameMap, MapService>() {
             else -> null
         }
     }
+
+    data class MapLoadOneRequest(
+        val _id: UUID,
+        val name: String,
+        val version: String,
+        val gamemodes: List<String>,
+        val authors: List<MapContributor>,
+        val contributors: List<MapContributor>
+    )
 }

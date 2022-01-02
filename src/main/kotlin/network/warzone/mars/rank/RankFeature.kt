@@ -1,23 +1,26 @@
 package network.warzone.mars.rank
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.failure
-import com.github.kittinunf.result.map
-import network.warzone.mars.feature.named.NamedCacheFeature
+import network.warzone.mars.api.ApiClient
+import network.warzone.mars.feature.NamedCachedFeature
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.rank.commands.RankCommands
 import network.warzone.mars.rank.exceptions.RankConflictException
 import network.warzone.mars.rank.exceptions.RankMissingException
 import network.warzone.mars.rank.models.Rank
-import network.warzone.mars.utils.FeatureException
 import java.util.*
 
-object RankFeature : NamedCacheFeature<Rank, RankService>() {
-    override val service = RankService
-
+object RankFeature : NamedCachedFeature<Rank>() {
     override suspend fun init() {
         list()
+    }
+
+    override suspend fun fetch(target: String): Rank? {
+        return try {
+            ApiClient.get<Rank>("/mc/ranks/$target")
+        } catch (e: Exception) {
+            null
+        }
     }
 
     /**
@@ -30,21 +33,21 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
      * @param staff If the [Rank] is a staff [Rank].
      * @param applyOnJoin If the [Rank] is a default [Rank].
      *
-     * @return A [Result] monad containing the new [Rank] and a [RankConflictException] if a rank by the same name alreay exists.
+     * @return The new [Rank] if the operation was successful. Will otherwise throw a `FeatureException`.
      */
-    suspend fun createRank(
+    suspend fun create(
         name: String,
         displayName: String?,
         priority: Int?,
         prefix: String?,
         staff: Boolean?,
         applyOnJoin: Boolean?
-    ): Result<Rank, RankConflictException> {
-        // If a rank by the name already exists, returns an exception.
-        if (has(name)) return Result.failure(RankConflictException(name))
+    ): Rank {
+        // If a rank by the name already exists, throws an exception.
+        if (has(name)) throw RankConflictException(name)
 
         // Requests the creation of a new rank. Adds the created rank to the cache.
-        return service.create(
+        return RankService.create(
            name = name,
             displayName = displayName ?: name,
             priority = priority ?: 0,
@@ -52,7 +55,7 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
             permissions = emptyList(),
             staff = staff ?: false,
             applyOnJoin = applyOnJoin ?: false
-        ).map { add(it) }
+        ).also { add(it) }
     }
 
     /**
@@ -61,21 +64,19 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
      * @param id The UUID of the target [Rank] to be updated.
      * @param newRank The new [Rank] to apply to the target.
      *
-     * @return A [Result] monad containing the updated [Rank] and
-     * - a [RankConflictException] if a [Rank] already exists by the name of the new [Rank].
-     * - a [RankMissingException] if the [Rank] does not exist.
+     * @return The updated [Rank] if the operation was successful. Will otherwise throw a `FeatureException`.
      */
-    suspend fun updateRank(id: UUID, newRank: Rank): Result<Rank, FeatureException> {
-        // Checks if a rank exists by the name of the new rank, if so returns an exception.
-        if (has(newRank.name) && getKnown(newRank.name)._id != id) return Result.failure(RankConflictException(newRank.name))
-        // Checks if the target rank exists, if not returns an exception.
-        if (!has(id)) return Result.failure(RankMissingException(id.toString()))
+    suspend fun update(id: UUID, newRank: Rank): Rank {
+        // Checks if a rank exists by the name of the new rank, if so throws an exception.
+        if (has(newRank.name) && getKnown(newRank.name)._id != id) throw RankConflictException(newRank.name)
+        // Checks if the target rank exists, if not throws an exception.
+        if (!has(id)) throw RankMissingException(id.toString())
 
         // Sets the existing resource to the new resource.
-        set(id, newRank)
+        add(newRank)
 
         // Request for the rank to be updated.
-        return service.update(
+        return RankService.update(
             id = id,
             name = newRank.name,
             displayName = newRank.displayName,
@@ -84,7 +85,7 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
             permissions = newRank.permissions,
             staff = newRank.staff,
             applyOnJoin = newRank.applyOnJoin
-        ).map { newRank }
+        )
     }
 
     /**
@@ -92,13 +93,10 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
      *
      * @param uuid The [UUID] of the [Rank]
      *
-     * @return A [Result] monad with a Unit result and a [RankMissingException] if the rank doesn't exist.
      */
-    suspend fun deleteRank(uuid: UUID): Result<Unit, RankMissingException> {
-        // Request the rank to be deleted, returning an exception if it fails.
-        service
-            .delete(uuid)
-            .failure { return Result.failure(it) }
+    suspend fun delete(uuid: UUID) {
+        // Request the rank to be deleted, throwing an exception if it fails.
+        RankService.delete(uuid)
 
         // If deletion is successful, query all the players with the rank and remove it from them.
         PlayerFeature.query {
@@ -106,22 +104,16 @@ object RankFeature : NamedCacheFeature<Rank, RankService>() {
         }.forEach {
             it.rankIds.remove(uuid)
 
-            // Regenerate relation
-            it.generate()
-
             // Refresh permissions
             RankAttachments.refresh(PlayerManager.getPlayer(it._id)!!)
         }
 
         // Removes the now deleted rank from the cache.
-        invalidate(uuid)
-
-        return Result.success(Unit)
+        remove(uuid)
     }
 
     suspend fun list(): List<Rank> {
-        return service.list()
-            .also(::sync)
+        return RankService.list()
     }
 
     suspend fun updatePermissions(rank: Rank) {

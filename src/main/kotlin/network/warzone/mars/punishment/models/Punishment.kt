@@ -1,7 +1,7 @@
 package network.warzone.mars.punishment.models
 
 import network.warzone.mars.api.socket.models.SimplePlayer
-import network.warzone.mars.feature.resource.Resource
+import network.warzone.mars.feature.Resource
 import java.util.*
 
 data class Punishment(
@@ -17,10 +17,6 @@ data class Punishment(
     val targetIps: List<String>,
     val reversion: PunishmentReversion? = null
 ) : Resource {
-    override fun generate(): Resource {
-        return this
-    }
-
     val expiresAt: Date
         get() {
             return if (action.isPermanent()) Date(-1L) else Date(issuedAt.time + action.length)

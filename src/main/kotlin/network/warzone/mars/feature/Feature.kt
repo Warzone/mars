@@ -1,31 +1,39 @@
 package network.warzone.mars.feature
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.getOrNull
-import network.warzone.mars.feature.resource.Resource
-import network.warzone.mars.utils.FeatureException
 import java.util.*
 
-abstract class Feature<T : Resource, U : Service<T>> {
-    abstract val service: U
-
-    abstract suspend fun get(uuid: UUID): Result<T, FeatureException>
-    abstract fun getCached(uuid: UUID): T?
-
-    suspend fun getKnown(uuid: UUID): T = getOrNull(uuid)!!
-    suspend fun getOrNull(uuid: UUID): T? = get(uuid).getOrNull()
-    suspend fun getOrThrow(uuid: UUID): T? = get(uuid).get()
+abstract class Feature<T : Resource> {
+    /**
+     * Fetch latest resource from API, not local cache.
+     */
+    abstract suspend fun fetch(target: String): T?
 
     /**
-     * Invoked when the websocket connects, signals the feature is allowed to fetch any starting resources it needs.
+     * Get resource from cache first, and API if not in cache.
+     * Defaults to API fetch if feature has no cache.
+     */
+    open suspend fun get(id: UUID): T? {
+        return fetch(id.toString())
+    }
+
+    /**
+     * Called upon WebSocket connection so the feature can make initial requests (through HTTP or WS).
      */
     open suspend fun init() {}
 
+    /**
+     * Command labels mapped to command classes with subcommand handlers returned from this method are registered with the command framework.
+     * Example: /rank create, /rank delete - `getSubcommands()` would return "rank" mapped to `RankCommands()`.
+     */
     open fun getSubcommands(): Map<List<String>, Any> {
         return emptyMap()
     }
 
+    /**
+     * The command classes returned from this method are registered with the command framework.
+     * Example: /tags - `getSubcommands()` would return `listOf(TagsCommand())`.
+     */
     open fun getCommands(): List<Any> {
-        return ArrayList()
+        return listOf()
     }
 }

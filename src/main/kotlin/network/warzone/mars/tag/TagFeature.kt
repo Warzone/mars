@@ -1,50 +1,49 @@
 package network.warzone.mars.tag
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.failure
-import com.github.kittinunf.result.map
-import network.warzone.mars.feature.named.NamedCacheFeature
+import network.warzone.mars.api.ApiClient
+import network.warzone.mars.feature.NamedCachedFeature
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.tag.commands.TagCommand
 import network.warzone.mars.tag.commands.TagsCommand
 import network.warzone.mars.tag.exceptions.TagConflictException
 import network.warzone.mars.tag.exceptions.TagMissingException
 import network.warzone.mars.tag.models.Tag
-import network.warzone.mars.utils.FeatureException
 import java.util.*
 
-object TagFeature : NamedCacheFeature<Tag, TagService>() {
-    override val service = TagService
-
+object TagFeature : NamedCachedFeature<Tag>() {
     override suspend fun init() {
         list()
     }
 
-    suspend fun createTag(name: String, display: String): Result<Tag, TagConflictException> {
-        if (has(name)) throw TagConflictException(name)
-
-        return service
-            .create(name, display)
-            .map { add(it) }
+    override suspend fun fetch(target: String): Tag? {
+        return try {
+            ApiClient.get<Tag>("/mc/tags/$target")
+        } catch (e: Exception) {
+            null
+        }
     }
 
-    suspend fun updateTag(target: UUID, newTag: Tag): Result<Tag, FeatureException> {
-        if (has(newTag.name) && getKnown(newTag.name)._id != target) return Result.failure(TagConflictException(newTag.name))
-        if (!has(target)) return Result.failure(TagMissingException(target.toString()))
+    suspend fun create(name: String, display: String): Tag {
+        if (has(name)) throw TagConflictException(name)
 
-        set(target, newTag)
+        return TagService
+            .create(name, display)
+            .also { add(it) }
+    }
 
-        return service.update(
+    suspend fun update(target: UUID, newTag: Tag): Tag {
+        if (has(newTag.name) && getKnown(newTag.name)._id != target) throw TagConflictException(newTag.name)
+        if (!has(target)) throw TagMissingException(newTag.name)
+
+        return TagService.update(
             target,
             newTag.name,
             newTag.display
-        ).map { newTag }
+        ).also { add(it) }
     }
 
-    suspend fun deleteTag(uuid: UUID): Result<Unit, TagMissingException> {
-        service
-            .delete(uuid)
-            .failure { return Result.failure(it) }
+    suspend fun delete(uuid: UUID) {
+        TagService.delete(uuid)
 
         PlayerFeature.query {
             it.tagIds.contains(uuid)
@@ -52,18 +51,14 @@ object TagFeature : NamedCacheFeature<Tag, TagService>() {
             it.tagIds.remove(uuid)
 
             if (it.activeTagId == uuid) it.activeTagId = null
-
-            it.generate()
         }
 
-        invalidate(uuid)
-
-        return Result.success(Unit)
+        remove(uuid)
     }
 
     suspend fun list(): List<Tag> {
-        return service.list()
-            .also(::sync)
+        return TagService.list()
+            .onEach { add(it) }
     }
 
     override fun getSubcommands(): Map<List<String>, Any> {
