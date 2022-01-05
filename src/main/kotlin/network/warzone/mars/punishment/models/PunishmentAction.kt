@@ -12,7 +12,7 @@ data class PunishmentAction(val kind: PunishmentKind, val length: Long) {
     }
 
     fun isInstant(): Boolean {
-        return length == 0L;
+        return length == 0L
     }
 
     fun formatLength(): String {

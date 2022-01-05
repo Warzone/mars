@@ -14,7 +14,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 data class Coords(
     var x: Int,
     var y: Int
-) {}
+)
 
 fun toSlot(x: Int, y: Int) = x + (y * 9)
 fun fromSlot(s: Int) = Pair(s % 9, s / 9)

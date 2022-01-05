@@ -42,9 +42,9 @@ class BigStatsTracker : Listener {
     fun onBlockPlace(event: BlockPlaceEvent) {
         val blockType = event.blockPlaced.type
         val playerStats = blockCache[event.player.uniqueId] ?: PlayerBlocks()
-        var count = playerStats.blocksPlaced[blockType] ?: 0;
-        count++;
-        playerStats.blocksPlaced[blockType] = count;
+        var count = playerStats.blocksPlaced[blockType] ?: 0
+        count++
+        playerStats.blocksPlaced[blockType] = count
         blockCache[event.player.uniqueId] = playerStats
     }
 
@@ -52,9 +52,9 @@ class BigStatsTracker : Listener {
     fun onBlockBreak(event: BlockBreakEvent) {
         val blockType = event.block.type
         val playerStats = blockCache[event.player.uniqueId] ?: PlayerBlocks()
-        var count = playerStats.blocksBroken[blockType] ?: 0;
-        count++;
-        playerStats.blocksBroken[blockType] = count;
+        var count = playerStats.blocksBroken[blockType] ?: 0
+        count++
+        playerStats.blocksBroken[blockType] = count
         blockCache[event.player.uniqueId] = playerStats
     }
 
