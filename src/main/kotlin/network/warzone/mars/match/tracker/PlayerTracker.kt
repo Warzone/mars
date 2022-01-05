@@ -6,27 +6,17 @@ import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.models.PartyJoinData
 import network.warzone.mars.api.socket.models.PartyLeaveData
 import network.warzone.mars.api.socket.models.PlayerDeathData
-import network.warzone.mars.match.MatchManager
 import network.warzone.mars.match.deaths.LegacyTextDeathMessageBuilder
 import network.warzone.mars.match.models.DeathCause
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.player.models.ProjectileRecord
 import network.warzone.mars.utils.KEvent
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.Location
 import org.bukkit.Sound
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
+import org.bukkit.ChatColor.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.ProjectileHitEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.util.Vector
 import tc.oc.pgm.api.party.Competitor
 import tc.oc.pgm.api.party.Party
@@ -34,7 +24,6 @@ import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.events.PlayerJoinPartyEvent
 import tc.oc.pgm.events.PlayerLeavePartyEvent
 import java.util.*
-import kotlin.math.roundToInt
 
 class PlayerTracker : Listener {
     // entity uuid mapped to player uuid & location
@@ -86,18 +75,42 @@ class PlayerTracker : Listener {
         )
     }
 
+    // todo: set XP bar progress & level (and ensure compatibility with vanilla exp)
+    @EventHandler
+    fun onPlayerXPGain(event: PlayerXPGainEvent) = runBlocking {
+        val (id, gain, reason, notify) = event.data
+
+        val context = PlayerManager.getPlayer(id) ?: return@runBlocking
+        val player = context.player
+        val profile = context.getPlayerProfile()
+
+        val currentLevel = profile.stats.level
+
+        // Add XP
+        profile.stats.xp += gain
+        if (notify) {
+            player.playSound(player.location, Sound.ORB_PICKUP, 1000f, 1f)
+            player.sendMessage("$LIGHT_PURPLE+$gain XP ($reason)")
+        }
+
+        // Update in cache
+        PlayerFeature.add(profile)
+
+        val newLevel = profile.stats.level
+        if (newLevel > currentLevel) PlayerLevelUpEvent(player, newLevel).callEvent()
+    }
+
     @EventHandler
     fun onPlayerLevelUp(event: PlayerLevelUpEvent) = runBlocking {
-        val player = Bukkit.getPlayer(event.data.playerId) ?: return@runBlocking
-        player.sendMessage("${ChatColor.GREEN}${ChatColor.BOLD}Level up! ${ChatColor.GREEN}You are now level ${ChatColor.WHITE}${ChatColor.BOLD}${event.data.newLevel}${ChatColor.GREEN}!") // todo: make nicer message
-        player.playSound(player.location, Sound.LEVEL_UP, 1000f, 1f)
+        val (player, level) = event
 
-        val context = PlayerManager.getPlayer(event.data.playerId)!!
-        val profile = context.getPlayerProfile()
-        profile.stats.xp = event.data.xp
-        PlayerFeature.add(profile)
+        player.playSound(player.location, Sound.LEVEL_UP, 1000f, 1f)
+        player.sendMessage("$AQUA$STRIKETHROUGH----------------------------------------")
+        player.sendMessage("$GREEN$BOLD Level up!$GREEN You are now level $RED${level}")
+        player.sendMessage("$AQUA$STRIKETHROUGH----------------------------------------")
     }
 }
 
-data class PlayerLevelUpEvent(val data: PlayerLevelUpData) : KEvent()
-data class PlayerLevelUpData(val playerId: UUID, val newLevel: Int, val xp: Int)
+data class PlayerLevelUpEvent(val player: Player, val level: Int) : KEvent()
+data class PlayerXPGainEvent(val data: PlayerXPGainData) : KEvent()
+data class PlayerXPGainData(val playerId: UUID, val gain: Int, val reason: String, val notify: Boolean)

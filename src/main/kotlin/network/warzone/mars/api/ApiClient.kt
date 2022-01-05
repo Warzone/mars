@@ -4,7 +4,6 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
@@ -20,8 +19,8 @@ import network.warzone.mars.api.socket.models.MessageData
 import network.warzone.mars.api.socket.models.MessageEvent
 import network.warzone.mars.api.socket.models.PlayerChatData
 import network.warzone.mars.api.socket.models.PlayerChatEvent
-import network.warzone.mars.match.tracker.PlayerLevelUpData
-import network.warzone.mars.match.tracker.PlayerLevelUpEvent
+import network.warzone.mars.match.tracker.PlayerXPGainData
+import network.warzone.mars.match.tracker.PlayerXPGainEvent
 import network.warzone.mars.utils.GSON
 import network.warzone.mars.utils.GsonMessageAdapter
 import network.warzone.mars.utils.MissingConfigPathException
@@ -141,9 +140,9 @@ object ApiClient {
                         val data = GSON.fromJson(json, MessageData::class.java)
                         MessageEvent(data).callEvent()
                     }
-                    SocketEventType.PLAYER_LEVEL_UP -> {
-                        val data = GSON.fromJson(json, PlayerLevelUpData::class.java)
-                        PlayerLevelUpEvent(data).callEvent()
+                    SocketEventType.PLAYER_XP_GAIN -> {
+                        val data = GSON.fromJson(json, PlayerXPGainData::class.java)
+                        PlayerXPGainEvent(data).callEvent()
                     }
                 }
             }
