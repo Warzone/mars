@@ -32,10 +32,11 @@ object PlayerService {
         )
     }
 
-    suspend fun logout(playerId: UUID, playtime: Long) {
+    suspend fun logout(playerId: UUID, playerName: String, playtime: Long) {
         ApiClient.post<ApiExceptionResponse, PlayerLogoutRequest>(
             "/mc/players/logout", PlayerLogoutRequest(
                 playerId,
+                playerName,
                 playtime
             )
         )
@@ -225,7 +226,7 @@ object PlayerService {
         val activePunishments: List<Punishment>
     )
 
-    data class PlayerLogoutRequest(val playerId: UUID, val playtime: Long)
+    data class PlayerLogoutRequest(val playerId: UUID, val playerName: String, val playtime: Long)
 
     data class PlayerAltResponse(val player: PlayerProfile, val punishments: List<Punishment>)
 

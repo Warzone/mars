@@ -80,7 +80,7 @@ class MatchTracker : Listener {
                 val blocks = bigStatsTracker.blockCache[it]
                 val messages = bigStatsTracker.messageCache[it]
                 val playerBigStats = BigStats(
-                    blocks,
+                    blocks = blocks ?: PlayerBlocks(),
                     messages = messages ?: PlayerMessages(),
                     bowShotsTaken = stats.shotsTaken,
                     bowShotsHit = stats.shotsHit,

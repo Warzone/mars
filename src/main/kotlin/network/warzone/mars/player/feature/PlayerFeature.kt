@@ -150,7 +150,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
         remove(uuid)
 
         val sessionLength = Date().time - activeSession.createdAt.time
-        PlayerService.logout(uuid, sessionLength)
+        PlayerService.logout(uuid, player.name, sessionLength)
     }
 
     override fun getCommands(): List<Any> {

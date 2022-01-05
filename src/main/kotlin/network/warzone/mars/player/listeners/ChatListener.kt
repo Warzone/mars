@@ -40,22 +40,22 @@ class ChatListener : Listener {
 
     @EventHandler
     fun onMessage(event: MessageEvent) {
-        val (rawMessage, soundName, players) = event.data
+        val (rawMessage, soundName, playerIds) = event.data
         val message = translateAlternateColorCodes('&', rawMessage)
         if (soundName != null) {
             try {
                 val sound = Sound.valueOf(soundName)
-                players.mapNotNull { Bukkit.getPlayer(it) }.forEach {
+                playerIds.mapNotNull { Bukkit.getPlayer(it) }.forEach {
                     val location = it.location
                     it.playSound(location, sound, 1000f, 1f)
                     it.sendMessage(message)
                 }
             } catch (e: Exception) {
                 Bukkit.getLogger()
-                    .warning("Exception occurred receiving MESSAGE socket event - Sound: $soundName, Message: $rawMessage")
+                    .warning("Exception occurred receiving MESSAGE socket event - Sound: $soundName, Message: $rawMessage\n${e.printStackTrace()}")
             }
         } else {
-            players.mapNotNull { Bukkit.getPlayer(it) }.forEach {
+            playerIds.mapNotNull { Bukkit.getPlayer(it) }.forEach {
                 it.sendMessage(message)
             }
         }
