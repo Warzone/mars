@@ -29,7 +29,7 @@ open class OutboundEvent<T : Any>(event: SocketEventType) : SocketEvent<T>(event
     object Killstreak : OutboundEvent<KillstreakData>(SocketEventType.KILLSTREAK)
 
     object WoolPickup : OutboundEvent<WoolData>(SocketEventType.WOOL_PICKUP)
-    object WoolCapture : OutboundEvent<WoolData>(SocketEventType.WOOL_CAPTURE)
-    object WoolDrop : OutboundEvent<WoolData>(SocketEventType.WOOL_DROP)
+    object WoolCapture : OutboundEvent<WoolDropData>(SocketEventType.WOOL_CAPTURE)
+    object WoolDrop : OutboundEvent<WoolDropData>(SocketEventType.WOOL_DROP)
     object WoolDefend : OutboundEvent<WoolData>(SocketEventType.WOOL_DEFEND)
 }
