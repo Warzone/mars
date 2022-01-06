@@ -1,5 +1,6 @@
 package network.warzone.mars.player.models
 
+import kotlinx.serialization.Serializable
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.NamedResource
 import network.warzone.mars.punishment.models.StaffNote
@@ -96,22 +97,23 @@ data class PlayerStats(
 
 data class PlayerRecords(
 //    var highestKillstreak: Int = 0, -- this can be calculated from profile
-    var longestSession: Long = 0,
-    var longestProjectileHit: ProjectileRecord? = null,
+    var longestSession: Session? = null,
+//    var longestProjectileHit: ProjectileRecord? = null,
     var longestProjectileKill: ProjectileRecord? = null,
-    var fastestWoolCapture: IntRecord? = null,
+    var fastestWoolCapture: LongRecord? = null,
+    var fastestFlagCapture: LongRecord? = null,
     var fastestFirstBlood: FirstBloodRecord? = null,
-    var fastestFlagCapture: IntRecord? = null,
-    var killsPerMatch: IntRecord? = null,
+    var killsInMatch: IntRecord? = null,
     var deathsInMatch: IntRecord? = null,
-    var highestScore: IntRecord? = null
 )
 
-data class ProjectileRecord(val matchId: String, val type: EntityType, val distance: Int)
+data class ProjectileRecord(val matchId: String, val distance: Int)
 
-data class FirstBloodRecord(val matchId: String, val victim: SimplePlayer, val time: Int)
+data class FirstBloodRecord(val matchId: String, val victim: SimplePlayer, val time: Long)
 
 data class IntRecord(val matchId: String, val value: Int)
+
+data class LongRecord(val matchId: String, val value: Long)
 
 data class PlayerObjectiveStatistics(
     var coreLeaks: Int = 0,
