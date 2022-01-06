@@ -78,10 +78,8 @@ class MatchTracker : Listener {
             event.match.players.map { it.id }.plus(bigStatsTracker.offlinePlayersPendingStatSave).distinct().forEach {
                 val stats = statsModule.getPlayerStat(it)
                 val blocks = bigStatsTracker.blockCache[it]
-                val messages = bigStatsTracker.messageCache[it]
                 val playerBigStats = BigStats(
                     blocks = blocks ?: PlayerBlocks(),
-                    messages = messages ?: PlayerMessages(),
                     bowShotsTaken = stats.shotsTaken,
                     bowShotsHit = stats.shotsHit,
                     damageGiven = stats.damageDone,

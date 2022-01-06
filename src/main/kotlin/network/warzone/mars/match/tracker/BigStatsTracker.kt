@@ -21,14 +21,11 @@ data class PlayerBlocks(
     var blocksBroken: EnumMap<Material, Int> = EnumMap(Material::class.java)
 )
 
-data class PlayerMessages(var staff: Int = 0, var global: Int = 0, var team: Int = 0)
-
 /*
 * Tracker for stats that are sent at end of match (PGM tracks most of the stats itself like Bow Shots etc.)
 */
 class BigStatsTracker : Listener {
     val blockCache = HashMap<UUID, PlayerBlocks>()
-    val messageCache = HashMap<UUID, PlayerMessages>()
     val offlinePlayersPendingStatSave = mutableSetOf<UUID>()
     var matchStatsModule: StatsMatchModule? = null
 
@@ -59,19 +56,7 @@ class BigStatsTracker : Listener {
     }
 
     @EventHandler
-    fun onPlayerChat(event: ChatListener.MatchPlayerChatEvent) {
-        val messageStats = messageCache[event.matchPlayer.id] ?: PlayerMessages()
-        when (event.channel) {
-            ChatChannel.STAFF -> messageStats.staff++
-            ChatChannel.GLOBAL -> messageStats.global++
-            ChatChannel.TEAM -> messageStats.team++
-        }
-        messageCache[event.matchPlayer.id] = messageStats
-    }
-
-    @EventHandler
     fun onMatchEnd(event: MatchFinishEvent) {
-        messageCache.clear()
         blockCache.clear()
     }
 
