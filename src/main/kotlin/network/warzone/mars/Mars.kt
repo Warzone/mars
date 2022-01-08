@@ -43,6 +43,8 @@ class Mars : JavaPlugin() {
         println("enabling!")
         instance = this
 
+        this.saveDefaultConfig()
+
         serverId = config.getString("server.id")
 
         val commandGraph = BasicBukkitCommandGraph(CommandModule)
