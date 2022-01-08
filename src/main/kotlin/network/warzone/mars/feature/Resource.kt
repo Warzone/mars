@@ -1,5 +1,6 @@
 package network.warzone.mars.feature
 
+import network.warzone.mars.broadcast.BroadcastFeature
 import network.warzone.mars.map.MapFeature
 import java.util.*
 import kotlin.reflect.KClass
@@ -10,6 +11,7 @@ sealed class ResourceType<out T : Feature<*>>(type: KClass<T>) {
     object Player : ResourceType<MapFeature>(MapFeature::class)
     object Rank : ResourceType<MapFeature>(MapFeature::class)
     object Punishment : ResourceType<MapFeature>(MapFeature::class)
+    object Broadcast : ResourceType<BroadcastFeature>(BroadcastFeature::class)
 
     private val type: Class<T>
 

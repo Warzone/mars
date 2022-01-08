@@ -4,6 +4,7 @@ import app.ashcon.intake.bukkit.graph.BasicBukkitCommandGraph
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import network.warzone.mars.api.events.ApiConnectedEvent
+import network.warzone.mars.broadcast.BroadcastFeature
 import network.warzone.mars.map.MapFeature
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.punishment.PunishmentFeature
@@ -22,7 +23,8 @@ object FeatureManager : Listener {
         ResourceType.Map to MapFeature,
         ResourceType.Player to PlayerFeature,
         ResourceType.Rank to RankFeature,
-        ResourceType.Punishment to PunishmentFeature
+        ResourceType.Punishment to PunishmentFeature,
+        ResourceType.Broadcast to BroadcastFeature
     )
 
     fun <T : Feature<*>> getFeature(type: ResourceType<T>): T {
