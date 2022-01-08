@@ -111,7 +111,6 @@ class ChatListener : Listener {
         event.isCancelled = true
     }
 
-    @EventHandler
     private suspend fun sendGlobalChat(match: Match, context: PlayerContext, message: String) {
         val prefix = context.getPrefix()
         val teamColor = context.matchPlayer.party.fullColor
