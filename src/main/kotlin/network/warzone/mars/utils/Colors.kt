@@ -2,6 +2,7 @@ package network.warzone.mars.utils
 
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 
 private val dyeChatMap = mapOf(
     DyeColor.BLACK to ChatColor.DARK_GRAY,
@@ -15,3 +16,4 @@ private val dyeChatMap = mapOf(
     DyeColor.MAGENTA to ChatColor.LIGHT_PURPLE,
     DyeColor.ORANGE to ChatColor.GOLD
 )
+fun colorFromName(name: String) : NamedTextColor? = NamedTextColor.NAMES.value(name)
