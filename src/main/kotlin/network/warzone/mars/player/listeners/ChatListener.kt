@@ -1,7 +1,6 @@
 package network.warzone.mars.player.listeners
 
 import kotlinx.coroutines.runBlocking
-import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.ChatChannel
 import network.warzone.mars.api.socket.models.MessageEvent
 import network.warzone.mars.api.socket.models.PlayerChatEvent
@@ -12,7 +11,8 @@ import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
 import network.warzone.mars.utils.getMatch
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
+import org.bukkit.ChatColor.*
+import org.bukkit.Sound
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -23,13 +23,10 @@ import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.space
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextColor
-import org.bukkit.ChatColor.*
-import org.bukkit.Sound
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component.space
-import java.util.*
 
 class ChatListener : Listener {
     class MatchPlayerChatEvent(
@@ -37,6 +34,10 @@ class ChatListener : Listener {
         val channel: ChatChannel,
         val message: String
     ) : KEvent()
+
+    init {
+        LevelColorService
+    }
 
     @EventHandler
     fun onMessage(event: MessageEvent) {
@@ -121,8 +122,7 @@ class ChatListener : Listener {
 
         val messageBuilder = text()
 
-        // todo: level colours
-        messageBuilder.append { text("[${profile.stats.level}]", NamedTextColor.GRAY) }.append(space())
+        messageBuilder.append { text("[${profile.stats.level}]", LevelColorService.chatColorFromLevel(profile.stats.level)) }.append(space())
 
         if (prefix != null) messageBuilder.append { text("$prefix ") }
 
