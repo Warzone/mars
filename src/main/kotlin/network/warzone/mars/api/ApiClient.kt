@@ -13,6 +13,7 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import network.warzone.mars.Mars
 import network.warzone.mars.api.events.ApiConnectedEvent
 import network.warzone.mars.api.socket.*
 import network.warzone.mars.api.socket.models.MessageData
@@ -53,11 +54,14 @@ object ApiClient {
 
         defaultRequest {
             contentType(ContentType.Application.Json)
+            header("Authorization", "API-Token $apiToken")
+            header("Mars-Server-ID", Mars.get().serverId)
         }
     }
 
     lateinit var socket: WarzoneService
     lateinit var baseUrl: String
+    private lateinit var apiToken: String
 
     init {
         logger.level = Level.ALL
@@ -67,16 +71,15 @@ object ApiClient {
         val httpConfig = config.getConfigurationSection("http") ?: throw MissingConfigPathException("api.http")
 
         baseUrl = httpConfig.getString("url") ?: throw MissingConfigPathException("api.http.url")
-        //TODO: auth -> set default header.
+        apiToken = config.getString("secret") ?: throw MissingConfigPathException("api.secret")
     }
 
     fun loadSocket(serverId: String, config: ConfigurationSection) {
         val socketConfig = config.getConfigurationSection("socket") ?: throw MissingConfigPathException("api.socket")
 
         val socketUrl = socketConfig.getString("url") ?: throw MissingConfigPathException("api.socket.url")
-        val socketSecret = socketConfig.getString("secret") ?: throw MissingConfigPathException("api.socket.secret")
 
-        createSocket(socketUrl, serverId, socketSecret)
+        createSocket(socketUrl, serverId, apiToken)
     }
 
     suspend inline fun <reified T> get(url: String): T {
