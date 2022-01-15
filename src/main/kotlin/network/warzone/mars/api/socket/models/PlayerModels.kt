@@ -5,9 +5,9 @@ import java.util.*
 
 data class SimplePlayer(val id: UUID, val name: String)
 
-data class PartyJoinData(val playerId: UUID, val playerName: String, val partyName: String)
+data class PartyJoinData(val player: SimplePlayer, val partyName: String)
 
-data class PartyLeaveData(val playerId: UUID, val playerName: String)
+data class PartyLeaveData(val player: SimplePlayer)
 
 data class PlayerDeathData(
     val victim: SimplePlayer,

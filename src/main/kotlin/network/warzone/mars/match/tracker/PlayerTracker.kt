@@ -39,7 +39,7 @@ class PlayerTracker : Listener {
 
         ApiClient.emit(
             OutboundEvent.PartyJoin,
-            PartyJoinData(event.player.id, event.player.nameLegacy, party.defaultName)
+            PartyJoinData(event.player.simple, party.defaultName)
         )
     }
 
@@ -49,7 +49,7 @@ class PlayerTracker : Listener {
 
         ApiClient.emit(
             OutboundEvent.PartyLeave,
-            PartyLeaveData(event.player.id, event.player.nameLegacy)
+            PartyLeaveData(event.player.simple)
         )
     }
 
