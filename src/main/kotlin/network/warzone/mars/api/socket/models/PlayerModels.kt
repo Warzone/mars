@@ -10,10 +10,8 @@ data class PartyJoinData(val playerId: UUID, val playerName: String, val partyNa
 data class PartyLeaveData(val playerId: UUID, val playerName: String)
 
 data class PlayerDeathData(
-    val victimId: UUID,
-    val victimName: String,
-    val attackerId: UUID?,
-    val attackerName: String?,
+    val victim: SimplePlayer,
+    val attacker: SimplePlayer?,
     val weapon: String?,
     val entity: String?,
     val distance: Long?,

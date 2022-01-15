@@ -6,11 +6,13 @@ import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.models.PartyJoinData
 import network.warzone.mars.api.socket.models.PartyLeaveData
 import network.warzone.mars.api.socket.models.PlayerDeathData
+import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.match.deaths.LegacyTextDeathMessageBuilder
 import network.warzone.mars.match.models.DeathCause
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.utils.KEvent
+import network.warzone.mars.utils.simple
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.ChatColor.*
@@ -62,10 +64,8 @@ class PlayerTracker : Listener {
         ApiClient.emit(
             OutboundEvent.PlayerDeath,
             PlayerDeathData(
-                victimId = event.victim.id,
-                victimName = event.victim.nameLegacy,
-                attackerId = event.killer?.id,
-                attackerName = event.killer?.nameLegacy,
+                victim = event.victim.simple,
+                attacker = event.killer?.simple,
                 weapon = weapon,
                 entity = mob,
                 distance = distance,
