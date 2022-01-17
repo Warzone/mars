@@ -25,8 +25,7 @@ object PlayerService {
     suspend fun login(playerId: UUID, playerName: String, ip: String): PlayerLoginResponse {
         return ApiClient.post(
             "/mc/players/login", PlayerLoginRequest(
-                playerId,
-                playerName,
+                SimplePlayer(playerId, playerName),
                 ip
             )
         )
@@ -35,8 +34,7 @@ object PlayerService {
     suspend fun logout(playerId: UUID, playerName: String, playtime: Long) {
         ApiClient.post<ApiExceptionResponse, PlayerLogoutRequest>(
             "/mc/players/logout", PlayerLogoutRequest(
-                playerId,
-                playerName,
+                SimplePlayer(playerId, playerName),
                 playtime
             )
         )
@@ -218,7 +216,7 @@ object PlayerService {
 
     data class PlayerAddNoteRequest(val author: SimplePlayer, val content: String)
 
-    data class PlayerLoginRequest(val playerId: UUID, val playerName: String, val ip: String)
+    data class PlayerLoginRequest(val player: SimplePlayer, val ip: String)
 
     data class PlayerLoginResponse(
         val player: PlayerProfile,
@@ -226,7 +224,7 @@ object PlayerService {
         val activePunishments: List<Punishment>
     )
 
-    data class PlayerLogoutRequest(val playerId: UUID, val playerName: String, val playtime: Long)
+    data class PlayerLogoutRequest(val player: SimplePlayer, val playtime: Long)
 
     data class PlayerAltResponse(val player: PlayerProfile, val punishments: List<Punishment>)
 
