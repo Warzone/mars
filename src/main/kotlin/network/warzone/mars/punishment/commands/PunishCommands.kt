@@ -36,7 +36,12 @@ import java.util.*
 import javax.annotation.Nullable
 
 class PunishCommands {
-    @Command(aliases = ["punish", "p", "pun"], desc = "Punish a player", perms = ["mars.punish"])
+    @Command(
+        aliases = ["punish", "p", "pun"],
+        desc = "Punish a player",
+        usage = "<player> [reason] [-s (silent?)]",
+        perms = ["mars.punish"]
+    )
     fun onPunish(
         @Sender player: Player,
         audience: Audience,
@@ -79,7 +84,12 @@ class PunishCommands {
         }
     }
 
-    @Command(aliases = ["revertp"], desc = "Revert a punishment by ID", perms = ["mars.punish"])
+    @Command(
+        aliases = ["revertp"],
+        desc = "Revert a punishment by ID",
+        usage = "<punishment> [reason]",
+        perms = ["mars.punish"]
+    )
     fun onRevert(
         @Sender player: Player,
         audience: Audience,

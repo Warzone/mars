@@ -20,7 +20,12 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import javax.annotation.Nullable
 
 class RankCommands {
-    @Command(aliases = ["create", "new"], desc = "Creates a rank", perms = ["mars.ranks.manage"])
+    @Command(
+        aliases = ["create", "new"],
+        desc = "Create a rank",
+        usage = "<name> [priority] [display] [prefix] [-s (staff?)] [-d (default?)]",
+        perms = ["mars.ranks.manage"]
+    )
     fun onRankCreate(
         sender: CommandSender,
         audience: Audience,
@@ -46,7 +51,7 @@ class RankCommands {
         }
     }
 
-    @Command(aliases = ["delete", "rm"], desc = "Deletes a rank", perms = ["mars.ranks.manage"])
+    @Command(aliases = ["delete", "rm"], desc = "Delete a rank", usage = "<rank>", perms = ["mars.ranks.manage"])
     fun onRankDelete(sender: CommandSender, audience: Audience, targetRank: Rank) = runBlocking {
         try {
             RankFeature.delete(targetRank._id)
@@ -56,7 +61,7 @@ class RankCommands {
         }
     }
 
-    @Command(aliases = ["list", "ls"], desc = "Lists the ranks", perms = ["mars.ranks.manage"])
+    @Command(aliases = ["list", "ls"], desc = "List all ranks", perms = ["mars.ranks.manage"])
     fun onRankList(sender: CommandSender, audience: Audience) = runBlocking {
         val ranks = RankFeature.list()
 
@@ -72,7 +77,12 @@ class RankCommands {
             .forEach(audience::sendMessage)
     }
 
-    @Command(aliases = ["update", "edit", "modify"], desc = "Edits a rank", perms = ["mars.ranks.manage"])
+    @Command(
+        aliases = ["update", "edit", "modify"],
+        desc = "Update a rank",
+        usage = "<rank> <'name'|'display'|'priority'|'prefix'|'staff'|'default'|'permissions'> <new value|'add'|'remove'> [permission]",
+        perms = ["mars.ranks.manage"]
+    )
     fun onRankUpdate(
         sender: CommandSender,
         audience: Audience,
@@ -123,7 +133,7 @@ class RankCommands {
                 "prefix" -> mutableRank.prefix = if (value == "clear") null else value
                 "staff" -> mutableRank.staff = value.toBoolean()
                 "default" -> mutableRank.applyOnJoin = value.toBoolean()
-                else -> throw CommandException("Invalid property $targetProperty.")
+                else -> throw CommandException("Invalid property $targetProperty")
             }
 
             try {
@@ -135,7 +145,7 @@ class RankCommands {
         }
     }
 
-    @Command(aliases = ["player", "p"], desc = "Operations on a players ranks.", perms = ["mars.ranks.manage"])
+    @Command(aliases = ["player", "p"], desc = "Manage a player's ranks", usage = "<player> <'add'|'remove'|'list'> [rank]", perms = ["mars.ranks.manage"])
     fun onRankPlayer(
         sender: CommandSender,
         audience: Audience,

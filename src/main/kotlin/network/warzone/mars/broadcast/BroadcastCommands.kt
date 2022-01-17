@@ -7,7 +7,7 @@ import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 
 class BroadcastCommands {
-    @Command(aliases = ["raw"], desc = "Broadcast a custom message", perms = ["mars.broadcast"])
+    @Command(aliases = ["raw"], desc = "Broadcast a custom message", usage = "<message>", perms = ["mars.broadcast"])
     fun onRawBroadcast(sender: CommandSender, @Text message: String) {
         BroadcastFeature.broadcast(message, true, null)
     }
