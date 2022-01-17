@@ -48,11 +48,13 @@ class TagsCommand {
                     onclick = {
                         if (isActive) {
                             PlayerFeature.setActiveTag(context.uuid.toString(), null)
-                        } else {
-                            if (profile.tagIds.contains(tag._id)) PlayerFeature.setActiveTag(
+                            profile.activeTagId = null
+                        } else if (profile.tagIds.contains(tag._id)) {
+                            PlayerFeature.setActiveTag(
                                 context.uuid.toString(),
                                 tag._id
                             )
+                            profile.activeTagId = tag._id
                         }
 
                         refresh()
