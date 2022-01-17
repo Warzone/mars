@@ -78,7 +78,7 @@ class KillstreakTracker : Listener {
         val killerComp = killer.getName(NameStyle.COLOR)
         val countComp =
             Component.text(count, trackedKillstreaks[count]).decorate(TextDecoration.BOLD)
-        return killerComp.append(Component.text(" is on a kill streak of ", NamedTextColor.GRAY)).append(countComp)
+        return killerComp.append(Component.text(" is on a killstreak of ", NamedTextColor.GRAY)).append(countComp)
             .append(Component.text("!", NamedTextColor.GRAY))
     }
 
