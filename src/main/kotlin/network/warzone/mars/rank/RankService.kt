@@ -73,7 +73,7 @@ object RankService {
     }
 
     suspend fun delete(id: UUID) {
-        val request = parseHttpException { ApiClient.delete<Unit>("/mc/tags/$id") }
+        val request = parseHttpException { ApiClient.delete<Unit>("/mc/ranks/$id") }
 
         request.onFailure {
             when (it.code) {
