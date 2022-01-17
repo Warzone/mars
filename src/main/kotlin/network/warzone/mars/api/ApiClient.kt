@@ -20,6 +20,7 @@ import network.warzone.mars.api.socket.models.MessageData
 import network.warzone.mars.api.socket.models.MessageEvent
 import network.warzone.mars.api.socket.models.PlayerChatData
 import network.warzone.mars.api.socket.models.PlayerChatEvent
+import network.warzone.mars.match.tracker.ForceMatchEndEvent
 import network.warzone.mars.match.tracker.PlayerXPGainData
 import network.warzone.mars.match.tracker.PlayerXPGainEvent
 import network.warzone.mars.utils.*
@@ -143,6 +144,9 @@ object ApiClient {
                     SocketEventType.PLAYER_XP_GAIN -> {
                         val data = GSON.fromJson(json, PlayerXPGainData::class.java)
                         PlayerXPGainEvent(data).callEvent()
+                    }
+                    SocketEventType.FORCE_MATCH_END -> {
+                        ForceMatchEndEvent().callEvent()
                     }
                 }
             }
