@@ -8,6 +8,7 @@ import network.warzone.mars.feature.NamedCachedFeature
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.commands.ChatCommands
 import network.warzone.mars.player.commands.PlayerCommands
+import network.warzone.mars.player.commands.UtilCommands
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.Session
 import network.warzone.mars.punishment.models.Punishment
@@ -193,7 +194,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     }
 
     override fun getCommands(): List<Any> {
-        return listOf(PlayerCommands())
+        return listOf(PlayerCommands(), UtilCommands())
     }
 
     override fun getSubcommands(): Map<List<String>, Any> {
