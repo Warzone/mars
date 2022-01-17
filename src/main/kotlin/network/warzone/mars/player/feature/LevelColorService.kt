@@ -1,4 +1,4 @@
-package network.warzone.mars.player.listeners
+package network.warzone.mars.player.feature
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable

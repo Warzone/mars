@@ -7,6 +7,7 @@ import network.warzone.mars.api.socket.models.MessageEvent
 import network.warzone.mars.api.socket.models.PlayerChatEvent
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.punishment.models.PunishmentKind
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
