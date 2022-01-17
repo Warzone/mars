@@ -1,5 +1,9 @@
 server:
   id: 'main'
+  links:
+    appeal: 'https://warz.one/discord'
+    store: 'https://warz.one/store'
+    discord: 'https://warz.one/discord'
 
 api:
   secret: 'authtoken'

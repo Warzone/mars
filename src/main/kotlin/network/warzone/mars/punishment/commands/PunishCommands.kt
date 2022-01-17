@@ -394,6 +394,9 @@ class PunishCommands {
                 silent = silent
             )
 
+            val appealLink = Mars.get().config.getString("server.links.appeal")
+                ?: throw RuntimeException("No appeal link set in config")
+
             if (targetContext == null && action.kind == PunishmentKind.KICK) staff.player.sendMessage("${ChatColor.RED}The player could not be kicked as they are not online, but the punishment has been recorded.")
 
             if (targetContext != null) { // Target is playing
@@ -411,8 +414,8 @@ class PunishCommands {
                         )
                     }
                     PunishmentKind.KICK -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been kicked from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Further offences may result in harsher punishments.")
-                    PunishmentKind.BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}https://warzone.network/appeal")
-                    PunishmentKind.IP_BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been IP banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}https://warzone.network/appeal")
+                    PunishmentKind.BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}$appealLink")
+                    PunishmentKind.IP_BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been IP banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}$appealLink")
                     PunishmentKind.MUTE -> {
                         targetContext.activePunishments = targetContext.activePunishments + punishment
                         targetContext.matchPlayer.sendMessage(

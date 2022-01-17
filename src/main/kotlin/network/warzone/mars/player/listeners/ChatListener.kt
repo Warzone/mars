@@ -1,6 +1,7 @@
 package network.warzone.mars.player.listeners
 
 import kotlinx.coroutines.runBlocking
+import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.ChatChannel
 import network.warzone.mars.api.socket.models.MessageEvent
 import network.warzone.mars.api.socket.models.PlayerChatEvent
@@ -87,8 +88,10 @@ class ChatListener : Listener {
 
         if (activeMute != null) {
             event.isCancelled = true
-            if (activeMute.action.isPermanent()) player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}https://warzone.network/appeal")
-            else player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name} ${GRAY}until ${WHITE}${activeMute.expiresAt}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}https://warzone.network/appeal")
+            val appealLink = Mars.get().config.getString("server.links.appeal")
+                ?: throw RuntimeException("No appeal link set in config")
+            if (activeMute.action.isPermanent()) player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
+            else player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name} ${GRAY}until ${WHITE}${activeMute.expiresAt}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
             return@runBlocking
         }
 
@@ -122,7 +125,12 @@ class ChatListener : Listener {
 
         val messageBuilder = text()
 
-        messageBuilder.append { text("[${profile.stats.level}]", LevelColorService.chatColorFromLevel(profile.stats.level)) }.append(space())
+        messageBuilder.append {
+            text(
+                "[${profile.stats.level}]",
+                LevelColorService.chatColorFromLevel(profile.stats.level)
+            )
+        }.append(space())
 
         if (prefix != null) messageBuilder.append { text("$prefix ") }
 
