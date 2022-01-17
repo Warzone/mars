@@ -246,17 +246,17 @@ class PunishCommands {
                     item = item(Material.STAINED_GLASS_PANE) {
                         stack = ItemStack(Material.STAINED_GLASS_PANE, 1, dye.data.toShort())
 
-                        val fmtNoun = "${action.kind.colour}${action.kind.noun}"
+                        val fmtNoun = "${action.kind.color}${action.kind.noun}"
                         val fmtVerb = "${ChatColor.GRAY}${action.kind.verb}"
                         val fmtReason = "${ChatColor.RED}${type.name}"
                         val fmtTarget = "${ChatColor.AQUA}${target.name}"
 
                         if (action.length > 0L) {
-                            name = "$fmtNoun ${action.kind.colour}($length)"
+                            name = "$fmtNoun ${action.kind.color}($length)"
                             lore =
                                 listOf("$fmtVerb $fmtTarget ${ChatColor.GRAY}for ${ChatColor.WHITE}$length ${ChatColor.GRAY}for $fmtReason")
                         } else if (action.isPermanent()) {
-                            name = "$fmtNoun ${action.kind.colour}(forever)"
+                            name = "$fmtNoun ${action.kind.color}(forever)"
                             lore =
                                 listOf("$fmtVerb $fmtTarget ${ChatColor.WHITE}forever ${ChatColor.GRAY}for $fmtReason")
                         } else if (action.isInstant()) {
@@ -329,7 +329,7 @@ class PunishCommands {
             punHistory.forEach {
                 val time =
                     "${ChatColor.WHITE}${ChatColor.BOLD}${it.issuedAt.getTimeAgo()}${if (it.isReverted) " ${ChatColor.RED}${ChatColor.BOLD}✗" else ""}"
-                val kind = "${if (!it.isReverted) it.action.kind.colour else ChatColor.GRAY}${it.action.kind.noun}"
+                val kind = "${if (!it.isReverted) it.action.kind.color else ChatColor.GRAY}${it.action.kind.noun}"
                 val bullet = "${ChatColor.GRAY}•"
                 val reason = "${if (!it.isReverted) ChatColor.RED else ChatColor.GRAY}${it.reason.name} (${it.offence})"
                 val length = it.action.formatLength()

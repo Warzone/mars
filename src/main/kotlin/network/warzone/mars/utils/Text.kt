@@ -33,7 +33,7 @@ fun Rank.asTextComponent(editable: Boolean = true): TextComponent {
             text("\n\n")
         )
         .append { createStandardLabelled("Display Name", this.displayName ?: "None") }
-        .append { createUncolouredLabelled("Prefix", translatedPrefix) }
+        .append { createUncoloredLabelled("Prefix", translatedPrefix) }
         .append { createNumberedLabelled("Priority", this.priority) }
         .append { createBooleanLabelled("Staff", this.staff) }
         .append { createBooleanLabelled("Default", this.applyOnJoin) }
@@ -62,13 +62,13 @@ fun Rank.asTextComponent(editable: Boolean = true): TextComponent {
 fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
     var hover = text()
         .append(
-            text("${this.action.kind.colour}${this.reason.name} (${this.offence}) – ${this.action.kind.noun} (${this.action.formatLength()})"),
+            text("${this.action.kind.color}${this.reason.name} (${this.offence}) – ${this.action.kind.noun} (${this.action.formatLength()})"),
             newline(),
             newline()
         )
-        .append { createUncolouredLabelled("Issued by", this.punisher.name) }
-        .append { createUncolouredLabelled("Issued at", "${this.issuedAt} (${this.issuedAt.getTimeAgo()})") }
-        .append { createUncolouredLabelled("Expires at", this.expiresAt.toString()) }
+        .append { createUncoloredLabelled("Issued by", this.punisher.name) }
+        .append { createUncoloredLabelled("Issued at", "${this.issuedAt} (${this.issuedAt.getTimeAgo()})") }
+        .append { createUncoloredLabelled("Expires at", this.expiresAt.toString()) }
 //        .append { createNumberedLabelled("Known IPs", this.targetIps.size) }
 
     if (this.note != null) hover = hover.append { createStandardLabelled("Note", this.note) }
@@ -79,14 +79,14 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
         .append { createBooleanLabelled("Reverted", this.reversion != null) }
 
     if (this.reversion != null) hover = hover.append { newline() }
-        .append { createUncolouredLabelled("Reverted by", this.reversion.reverter.name) }
+        .append { createUncoloredLabelled("Reverted by", this.reversion.reverter.name) }
         .append {
-            createUncolouredLabelled(
+            createUncoloredLabelled(
                 "Reverted at",
                 "${Date(this.reversion.revertedAt)} (${Date(this.reversion.revertedAt).getTimeAgo()})"
             )
         }
-        .append { createUncolouredLabelled("Reversion reason", this.reversion.reason) }
+        .append { createUncoloredLabelled("Reversion reason", this.reversion.reason) }
 
     if (revertable) hover.append(newline(), text("Click to revert", NamedTextColor.LIGHT_PURPLE, TextDecoration.ITALIC))
 
@@ -95,7 +95,7 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
             .append(text(this.issuedAt.getTimeAgo().toUpperCase(), NamedTextColor.GRAY))
             .append(text("]", NamedTextColor.GRAY))
             .append(space())
-            .append(text("${if (this.isActive) this.action.kind.colour else ChatColor.GRAY}${if (this.isReverted) ChatColor.STRIKETHROUGH else ""}${this.action.kind.verb.toUpperCase()}"))
+            .append(text("${if (this.isActive) this.action.kind.color else ChatColor.GRAY}${if (this.isReverted) ChatColor.STRIKETHROUGH else ""}${this.action.kind.verb.toUpperCase()}"))
             .append(space())
             .append(text(this.target.name, NamedTextColor.WHITE))
 
@@ -109,10 +109,10 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
 fun PlayerService.PlayerAltResponse.asTextComponent(): TextComponent {
     val isMuted = this.punishments.find { it.action.kind == PunishmentKind.MUTE && it.isActive } != null
     val isBanned = this.punishments.find { it.action.isBan() && it.isActive } != null
-    val colour = if (isBanned) NamedTextColor.RED else if (isMuted) NamedTextColor.YELLOW else NamedTextColor.GRAY
+    val color = if (isBanned) NamedTextColor.RED else if (isMuted) NamedTextColor.YELLOW else NamedTextColor.GRAY
 
     val hover = PunishCommands.createPlayerLore(player, this.punishments)
-    val component = text(this.player.name, colour).hoverEvent(
+    val component = text(this.player.name, color).hoverEvent(
         HoverEvent.showText(
             PlainTextComponentSerializer.plainText().deserialize(hover.joinToString("\n"))
         )
@@ -123,7 +123,7 @@ fun PlayerService.PlayerAltResponse.asTextComponent(): TextComponent {
 fun StaffNote.asTextComponent(player: String, deletable: Boolean): TextComponent {
     var hover = text()
         .append { createNumberedLabelled("ID", this.id) }
-        .append { createUncolouredLabelled("Added at", "${this.createdAt} (${this.createdAt.getTimeAgo()})") }
+        .append { createUncoloredLabelled("Added at", "${this.createdAt} (${this.createdAt.getTimeAgo()})") }
         .append { createStandardLabelled("Author", this.author.name) }
 
     if (deletable) hover = hover.append { newline() }.append { text("Click to delete", NamedTextColor.LIGHT_PURPLE) }
@@ -203,7 +203,7 @@ fun createBooleanLabelled(label: String, value: Boolean): Component {
     )
 }
 
-fun createUncolouredLabelled(label: String, value: String): Component {
+fun createUncoloredLabelled(label: String, value: String): Component {
     return Component.join(
         text(""),
         text("$label: ", NamedTextColor.GRAY),

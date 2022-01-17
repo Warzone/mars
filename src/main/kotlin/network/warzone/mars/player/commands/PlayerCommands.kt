@@ -40,26 +40,26 @@ class PlayerCommands {
 
                 var message = text()
                     .append { createStandardLabelled("Name", player.name) }
-                    .append { createUncolouredLabelled("ID", player._id.toString()) }
+                    .append { createUncoloredLabelled("ID", player._id.toString()) }
                     .append {
-                        createUncolouredLabelled(
+                        createUncoloredLabelled(
                             "First Joined",
                             "${player.firstJoinedAt} (${player.firstJoinedAt.getTimeAgo()})"
                         )
                     }
                     .append {
-                        createUncolouredLabelled(
+                        createUncoloredLabelled(
                             "Last Joined",
                             if (isOnline) "${ChatColor.GREEN}Online" else "${player.lastJoinedAt} (${player.lastJoinedAt.getTimeAgo()}"
                         )
                     }
                     .append {
-                        createUncolouredLabelled(
+                        createUncoloredLabelled(
                             "Playtime",
                             Duration.ofMillis(player.stats.serverPlaytime).conciseFormat()
                         )
                     }
-                    .append { createUncolouredLabelled("Alts", "") }
+                    .append { createUncoloredLabelled("Alts", "") }
 
                 lookup.alts.forEach {
                     message = message
