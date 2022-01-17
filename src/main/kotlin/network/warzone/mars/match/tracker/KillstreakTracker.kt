@@ -75,7 +75,7 @@ class KillstreakTracker : Listener {
     }
 
     private fun createKillstreakMessage(killer: ParticipantState, count: Int): Component {
-        val killerComp = killer.getName(NameStyle.COLOR).decorate(TextDecoration.BOLD)
+        val killerComp = killer.getName(NameStyle.COLOR)
         val countComp =
             Component.text(count, trackedKillstreaks[count]).decorate(TextDecoration.BOLD)
         return killerComp.append(Component.text(" is on a kill streak of ", NamedTextColor.GRAY)).append(countComp)
@@ -83,8 +83,8 @@ class KillstreakTracker : Listener {
     }
 
     private fun createKillstreakEndMessage(ender: ParticipantState, ended: ParticipantState, count: Int): Component {
-        val enderComp = ender.getName(NameStyle.COLOR).decorate(TextDecoration.BOLD)
-        val endedComp = ended.getName(NameStyle.COLOR).decorate(TextDecoration.BOLD)
+        val enderComp = ender.getName(NameStyle.COLOR)
+        val endedComp = ended.getName(NameStyle.COLOR)
         val nearestColor = getNearestTrackedKillstreak(count).second
         val countComp =
             Component.text(count, nearestColor).decorate(TextDecoration.BOLD)
