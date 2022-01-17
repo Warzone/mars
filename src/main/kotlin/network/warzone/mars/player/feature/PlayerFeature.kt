@@ -13,15 +13,28 @@ import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.RankAttachments
 import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.utils.color
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import tc.oc.pgm.api.PGM
+import tc.oc.pgm.api.setting.SettingKey
+import tc.oc.pgm.api.setting.SettingValue
 import java.util.*
 
+data class QueuedJoin(
+    val isNew: Boolean,
+    val profile: PlayerProfile,
+    val activeSession: Session,
+    val activePunishments: List<Punishment>
+)
+
 object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
-    private val queuedJoins = hashMapOf<UUID, Triple<PlayerProfile, Session, List<Punishment>>>()
+    private val queuedJoins = hashMapOf<UUID, QueuedJoin>()
 
     init {
         Mars.registerEvents(this)
@@ -108,7 +121,11 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     @EventHandler
     fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) = runBlocking {
         val ip = event.address.hostAddress
-        val (isNew, playerProfile, activeSession, activePunishments) = PlayerService.login(event.uniqueId, event.name, ip)
+        val (isNew, playerProfile, activeSession, activePunishments) = PlayerService.login(
+            event.uniqueId,
+            event.name,
+            ip
+        )
         if (activeSession == null) { // Player is not allowed to join (banned)
             val ban = activePunishments.find { it.action.isBan() }!!
             val expiryString =
@@ -119,7 +136,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
                 "&7You have been ${ban.action.kind.pastTense} from the server for &c${ban.reason.name}&7.\n\n&c${ban.reason.message}\n\n$expiryString\n&7Appeal at &b$appealLink".color()
             event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
         } else {
-            queuedJoins[event.uniqueId] = Triple(playerProfile, activeSession, activePunishments)
+            queuedJoins[event.uniqueId] = QueuedJoin(isNew, playerProfile, activeSession, activePunishments)
         }
     }
 
@@ -128,7 +145,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
         val player = event.player
         val ip = event.address.hostAddress
 
-        val (profile, session, activePuns) = queuedJoins[player.uniqueId]
+        val (isNew, profile, session, activePuns) = queuedJoins[player.uniqueId]
             ?: throw RuntimeException("Queued join unavailable: ${player.name}")
 
         val context = PlayerManager.createPlayer(player, session, activePuns)
@@ -137,6 +154,25 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
 
         RankAttachments.createAttachment(context)
         RankAttachments.refresh(context)
+    }
+
+    @EventHandler
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        val player = PGM.get().matchManager.getPlayer(event.player)!!
+        val join = queuedJoins[player.id] ?: return
+
+        // No one is able to see PGM's Join & Leave messages
+        player.settings.setValue(SettingKey.JOIN, SettingValue.JOIN_OFF)
+
+        Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} joined. ${if (join.isNew) "${ChatColor.LIGHT_PURPLE}[NEW]" else ""}")
+
+        // Join process has finished, we don't need the queued join anymore
+        queuedJoins.remove(player.id)
+    }
+
+    @EventHandler
+    fun onPlayerLeave(event: PlayerQuitEvent) {
+        Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} left.")
     }
 
     @EventHandler
