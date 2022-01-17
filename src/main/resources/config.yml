@@ -11,3 +11,6 @@ api:
     url: 'wss://api.warzone.network'
   http:
     url: 'https://api.warzone.network'
+
+chat:
+  enabled: true

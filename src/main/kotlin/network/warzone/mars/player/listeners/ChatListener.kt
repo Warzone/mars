@@ -80,8 +80,6 @@ class ChatListener : Listener {
 
         val match = context.matchPlayer.match
 
-        println(context.activePunishments)
-
         context.activePunishments = context.activePunishments.filter { it.isActive }
 
         val activeMute =
@@ -97,6 +95,14 @@ class ChatListener : Listener {
         }
 
         val chatChannel = context.matchPlayer.settings.getValue(SettingKey.CHAT)
+
+        val isChatEnabled = Mars.get().config.getBoolean("chat.enabled")
+        if (chatChannel == SettingValue.CHAT_GLOBAL && !isChatEnabled && !player.hasPermission("mars.chat.mute.bypass")) {
+            player.sendMessage("${RED}Global chat is currently disabled.")
+            event.isCancelled = true
+            return@runBlocking
+        }
+
         when (chatChannel) {
             SettingValue.CHAT_ADMIN -> sendAdminChat(match, context.getPrefix() ?: "", player.name, event.message, null)
             SettingValue.CHAT_TEAM -> sendTeamChat(context.matchPlayer.party, context, event.message)
