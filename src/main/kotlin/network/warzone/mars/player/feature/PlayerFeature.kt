@@ -108,7 +108,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     @EventHandler
     fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) = runBlocking {
         val ip = event.address.hostAddress
-        val (playerProfile, activeSession, activePunishments) = PlayerService.login(event.uniqueId, event.name, ip)
+        val (isNew, playerProfile, activeSession, activePunishments) = PlayerService.login(event.uniqueId, event.name, ip)
         if (activeSession == null) { // Player is not allowed to join (banned)
             val ban = activePunishments.find { it.action.isBan() }!!
             val expiryString =
