@@ -7,12 +7,12 @@ import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 
 class BroadcastCommands {
-    @Command(aliases = ["raw"], desc = "Broadcast a custom message")
+    @Command(aliases = ["raw"], desc = "Broadcast a custom message", perms = ["mars.broadcast"])
     fun onRawBroadcast(sender: CommandSender, @Text message: String) {
         BroadcastFeature.broadcast(message, true, null)
     }
 
-    @Command(aliases = ["auto", "toggle"], desc = "Toggle auto broadcasts")
+    @Command(aliases = ["auto", "toggle"], desc = "Toggle auto broadcasts", perms = ["mars.broadcast"])
     fun onToggleBroadcast(sender: CommandSender) {
         val auto = BroadcastFeature.autoBroadcast
         if (auto) sender.sendMessage("${ChatColor.GREEN}Disabled auto broadcasting")
@@ -20,7 +20,7 @@ class BroadcastCommands {
         BroadcastFeature.autoBroadcast = !auto
     }
 
-    @Command(aliases = ["reload"], desc = "Reload the broadcast list")
+    @Command(aliases = ["reload"], desc = "Reload the broadcast list", perms = ["mars.broadcast"])
     fun onReloadBroadcast(sender: CommandSender) = runBlocking {
         BroadcastFeature.reload()
         sender.sendMessage("${ChatColor.GREEN}Reloaded broadcasts")

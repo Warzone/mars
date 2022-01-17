@@ -20,7 +20,7 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import javax.annotation.Nullable
 
 class RankCommands {
-    @Command(aliases = ["create", "new"], desc = "Creates a rank")
+    @Command(aliases = ["create", "new"], desc = "Creates a rank", perms = ["mars.ranks.manage"])
     fun onRankCreate(
         sender: CommandSender,
         audience: Audience,
@@ -46,7 +46,7 @@ class RankCommands {
         }
     }
 
-    @Command(aliases = ["delete", "rm"], desc = "Deletes a rank")
+    @Command(aliases = ["delete", "rm"], desc = "Deletes a rank", perms = ["mars.ranks.manage"])
     fun onRankDelete(sender: CommandSender, audience: Audience, targetRank: Rank) = runBlocking {
         try {
             RankFeature.delete(targetRank._id)
@@ -56,7 +56,7 @@ class RankCommands {
         }
     }
 
-    @Command(aliases = ["list", "ls"], desc = "Lists the ranks")
+    @Command(aliases = ["list", "ls"], desc = "Lists the ranks", perms = ["mars.ranks.manage"])
     fun onRankList(sender: CommandSender, audience: Audience) = runBlocking {
         val ranks = RankFeature.list()
 
@@ -72,7 +72,7 @@ class RankCommands {
             .forEach(audience::sendMessage)
     }
 
-    @Command(aliases = ["update", "edit", "modify"], desc = "Edits a rank")
+    @Command(aliases = ["update", "edit", "modify"], desc = "Edits a rank", perms = ["mars.ranks.manage"])
     fun onRankUpdate(
         sender: CommandSender,
         audience: Audience,
@@ -135,7 +135,7 @@ class RankCommands {
         }
     }
 
-    @Command(aliases = ["player", "p"], desc = "Operations on a players ranks.")
+    @Command(aliases = ["player", "p"], desc = "Operations on a players ranks.", perms = ["mars.ranks.manage"])
     fun onRankPlayer(
         sender: CommandSender,
         audience: Audience,

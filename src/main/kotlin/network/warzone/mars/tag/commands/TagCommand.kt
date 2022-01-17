@@ -17,7 +17,7 @@ import org.bukkit.command.CommandSender
 import javax.annotation.Nullable
 
 class TagCommand {
-    @Command(aliases = ["create", "new"], desc = "Creates a new tag")
+    @Command(aliases = ["create", "new"], desc = "Creates a new tag", perms = ["mars.tags.manage"])
     fun onTagCreate(sender: CommandSender, audience: Audience, name: String, display: String) = runBlocking {
         try {
             TagFeature.create(name, display)
@@ -27,7 +27,7 @@ class TagCommand {
         }
     }
 
-    @Command(aliases = ["delete", "rm"], desc = "Deletes a rank.")
+    @Command(aliases = ["delete", "rm"], desc = "Deletes a rank.", perms = ["mars.tags.manage"])
     fun onTagDelete(sender: CommandSender, audience: Audience, tag: Tag) = runBlocking {
         try {
             TagFeature.delete(tag._id)
@@ -37,7 +37,7 @@ class TagCommand {
         }
     }
 
-    @Command(aliases = ["update", "edit", "modify"], desc = "Updates a rank.")
+    @Command(aliases = ["update", "edit", "modify"], desc = "Updates a rank.", perms = ["mars.tags.manage"])
     fun onTagUpdate(sender: CommandSender, audience: Audience, tag: Tag, targetProperty: String, value: String) =
         runBlocking {
             // Create temporary copy for unchecked modifications.
@@ -58,7 +58,7 @@ class TagCommand {
 
         }
 
-    @Command(aliases = ["list"], desc = "Lists all the rank.")
+    @Command(aliases = ["list"], desc = "Lists all the rank.", perms = ["mars.tags.manage"])
     fun onTagList(sender: CommandSender, audience: Audience) = runBlocking {
         val tags = TagFeature.list()
 
@@ -69,7 +69,7 @@ class TagCommand {
             .forEach { audience.sendMessage(it) }
     }
 
-    @Command(aliases = ["player"], desc = "Manages a player's tags")
+    @Command(aliases = ["player"], desc = "Manages a player's tags", perms = ["mars.tags.manage"])
     fun onTagPlayer(
         sender: CommandSender,
         audience: Audience,
