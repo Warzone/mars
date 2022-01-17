@@ -64,11 +64,11 @@ class ChatListener : Listener {
 
     @EventHandler
     fun onPlayerChatApi(event: PlayerChatEvent) {
-        val (_, playerName, playerPrefix, channel, message, serverId) = event.data
+        val (player, prefix, channel, message, serverId) = event.data
 
         if (channel != ChatChannel.STAFF) return
 
-        sendAdminChat(PGM.get().matchManager.getMatch(), playerPrefix, playerName, message, serverId)
+        sendAdminChat(PGM.get().matchManager.getMatch(), prefix, player.name, message, serverId)
     }
 
     @EventHandler

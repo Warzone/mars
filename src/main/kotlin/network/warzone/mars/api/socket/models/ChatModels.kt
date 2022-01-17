@@ -10,8 +10,7 @@ enum class ChatChannel {
 }
 
 data class PlayerChatData(
-    val playerId: UUID,
-    val playerName: String,
+    val player: SimplePlayer,
     val playerPrefix: String,
     val channel: ChatChannel,
     val message: String,
