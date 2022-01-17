@@ -219,6 +219,7 @@ object PlayerService {
     data class PlayerLoginRequest(val player: SimplePlayer, val ip: String)
 
     data class PlayerLoginResponse(
+        val new: Boolean,
         val player: PlayerProfile,
         val activeSession: Session?,
         val activePunishments: List<Punishment>
