@@ -133,9 +133,7 @@ class ChatListener : Listener {
 
         val messageBuilder = text()
 
-        messageBuilder.append (
-            getPlayerLevelAsComponent(profile)
-        ).append(space())
+        messageBuilder.append { getPlayerLevelAsComponent(profile) }.append(space())
 
         if (prefix != null) messageBuilder.append { text("$prefix ") }
 
