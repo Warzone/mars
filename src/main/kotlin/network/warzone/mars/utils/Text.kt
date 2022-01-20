@@ -1,8 +1,12 @@
 package network.warzone.mars.utils
 
+import kotlinx.coroutines.runBlocking
 import net.time4j.ClockUnit
 import network.warzone.mars.Mars
+import network.warzone.mars.player.PlayerContext
+import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.player.feature.PlayerService
+import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.commands.PunishCommands
 import network.warzone.mars.punishment.models.*
 import network.warzone.mars.rank.models.Rank
@@ -276,4 +280,11 @@ fun String.chunkedWords(size: Int): List<String> {
     val words = this.split(' ')
     val chunked = words.chunked(size)
     return chunked.map { it.joinToString(" ") }
+}
+
+fun getPlayerLevelAsComponent(profile: PlayerProfile): Component {
+    return text(
+        "[${profile.stats.level}]",
+        LevelColorService.chatColorFromLevel(profile.stats.level)
+    )
 }

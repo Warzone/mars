@@ -1,6 +1,12 @@
 package network.warzone.mars.player.tablist
 
+import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
+import network.warzone.mars.player.PlayerContext
+import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.feature.LevelColorService
+import network.warzone.mars.player.models.PlayerProfile
+import network.warzone.mars.utils.getPlayerLevelAsComponent
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.PGM
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
@@ -32,22 +38,21 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
     }
 
     private fun tabPlayer(
-        player: Player?, viewer: Player?
-    ): Component {
-        val isOffline = player == null || !player.isOnline
+        player: Player, viewer: Player?
+    ): Component = runBlocking {
+        val isOffline = !player.isOnline
         var provider = NameDecorationProvider.DEFAULT
-        if (player != null) {
-            val metadata = player.getMetadata(NameDecorationProvider.METADATA_KEY, PGM.get())
-            if (metadata != null) provider = metadata.value() as NameDecorationProvider
-        }
-        val uuid = if (!isOffline) player!!.uniqueId else null
+        val metadata = player.getMetadata(NameDecorationProvider.METADATA_KEY, PGM.get())
+        if (metadata != null) provider = metadata.value() as NameDecorationProvider
+        val uuid = if (!isOffline) player.uniqueId else null
         val builder = Component.text()
         if (!isOffline) { // Add levels
-            // TODO: Display real level
-            builder.color(NamedTextColor.GRAY).append(Component.text("[1] "))
+            val context = PlayerManager.getPlayer(player.uniqueId)!!
+            val profile = context.getPlayerProfile()
+            builder.append(getPlayerLevelAsComponent(profile)).append(Component.space())
         }
         val name = Component.text().content(
-            (if (player != null) player.name else "Unknown")!!
+            (player.name)!!
         )
         if (!isOffline && style.contains(NameStyle.Flag.DEATH) && PlayerComponent.isDead(
                 player
@@ -70,7 +75,7 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
         if (style.contains(NameStyle.Flag.FLAIR) && !isOffline) {
             builder.append(provider.getSuffixComponent(uuid))
         }
-        return builder.build()
+        return@runBlocking builder.build()
     }
 
 }
