@@ -2,6 +2,7 @@ package network.warzone.mars.player
 
 import network.warzone.mars.Mars
 import network.warzone.mars.player.listeners.ChatListener
+import network.warzone.mars.player.listeners.InventoryListener
 import network.warzone.mars.player.models.Session
 import network.warzone.mars.punishment.models.Punishment
 import org.bukkit.entity.Player
@@ -12,6 +13,7 @@ object PlayerManager {
 
     init {
         Mars.registerEvents(ChatListener())
+        Mars.registerEvents(InventoryListener())
     }
 
     fun createPlayer(player: Player, session: Session, activePunishments: List<Punishment>): PlayerContext {

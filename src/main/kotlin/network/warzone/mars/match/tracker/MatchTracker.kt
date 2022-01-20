@@ -9,6 +9,7 @@ import network.warzone.mars.map.models.GameMap
 import network.warzone.mars.match.MatchManager
 import network.warzone.mars.match.models.ParticipantData
 import network.warzone.mars.match.models.PartyData
+import network.warzone.mars.utils.KEvent
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -96,9 +97,13 @@ class MatchTracker : Listener {
         )
     }
 
+    /**
+     * This handles the FORCE_MATCH_END packet type which can be sent from the API instructing Mars to end the current match
+     */
     @EventHandler
-    fun onWoolDrop(event: MatchPlayerDeathEvent) {
-        val tracker = MatchManager.getTracker(WoolTracker::class) ?: return
+    fun onForceMatchEnd(event: ForceMatchEndEvent) {
+        val match = MatchManager.match
+        if (!match.isFinished) match.finish()
     }
 
     private fun getFlagPartials(match: Match): List<FlagPartial> {
@@ -156,3 +161,5 @@ class MatchTracker : Listener {
             ?.map { ControlPointPartial(it.id, it.name) }?.distinctBy { it.id } ?: listOf()
     }
 }
+
+class ForceMatchEndEvent : KEvent()

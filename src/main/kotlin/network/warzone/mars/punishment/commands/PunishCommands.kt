@@ -36,7 +36,12 @@ import java.util.*
 import javax.annotation.Nullable
 
 class PunishCommands {
-    @Command(aliases = ["punish", "p", "pun"], desc = "Punish a player")
+    @Command(
+        aliases = ["punish", "p", "pun"],
+        desc = "Punish a player",
+        usage = "<player> [reason] [-s (silent?)]",
+        perms = ["mars.punish"]
+    )
     fun onPunish(
         @Sender player: Player,
         audience: Audience,
@@ -79,7 +84,12 @@ class PunishCommands {
         }
     }
 
-    @Command(aliases = ["revertp"], desc = "Revert a punishment by ID")
+    @Command(
+        aliases = ["revertp"],
+        desc = "Revert a punishment by ID",
+        usage = "<punishment> [reason]",
+        perms = ["mars.punish"]
+    )
     fun onRevert(
         @Sender player: Player,
         audience: Audience,
@@ -122,7 +132,7 @@ class PunishCommands {
         }
     }
 
-    @Command(aliases = ["punishments", "puns"], desc = "View a player's punishment history")
+    @Command(aliases = ["punishments", "puns"], desc = "View a player's punishment history", perms = ["mars.punish"])
     fun onPunishmentHistory(@Sender sender: CommandSender, audience: Audience, target: String) =
         runBlocking {
             try {
@@ -246,17 +256,17 @@ class PunishCommands {
                     item = item(Material.STAINED_GLASS_PANE) {
                         stack = ItemStack(Material.STAINED_GLASS_PANE, 1, dye.data.toShort())
 
-                        val fmtNoun = "${action.kind.colour}${action.kind.noun}"
+                        val fmtNoun = "${action.kind.color}${action.kind.noun}"
                         val fmtVerb = "${ChatColor.GRAY}${action.kind.verb}"
                         val fmtReason = "${ChatColor.RED}${type.name}"
                         val fmtTarget = "${ChatColor.AQUA}${target.name}"
 
                         if (action.length > 0L) {
-                            name = "$fmtNoun ${action.kind.colour}($length)"
+                            name = "$fmtNoun ${action.kind.color}($length)"
                             lore =
                                 listOf("$fmtVerb $fmtTarget ${ChatColor.GRAY}for ${ChatColor.WHITE}$length ${ChatColor.GRAY}for $fmtReason")
                         } else if (action.isPermanent()) {
-                            name = "$fmtNoun ${action.kind.colour}(forever)"
+                            name = "$fmtNoun ${action.kind.color}(forever)"
                             lore =
                                 listOf("$fmtVerb $fmtTarget ${ChatColor.WHITE}forever ${ChatColor.GRAY}for $fmtReason")
                         } else if (action.isInstant()) {
@@ -329,7 +339,7 @@ class PunishCommands {
             punHistory.forEach {
                 val time =
                     "${ChatColor.WHITE}${ChatColor.BOLD}${it.issuedAt.getTimeAgo()}${if (it.isReverted) " ${ChatColor.RED}${ChatColor.BOLD}✗" else ""}"
-                val kind = "${if (!it.isReverted) it.action.kind.colour else ChatColor.GRAY}${it.action.kind.noun}"
+                val kind = "${if (!it.isReverted) it.action.kind.color else ChatColor.GRAY}${it.action.kind.noun}"
                 val bullet = "${ChatColor.GRAY}•"
                 val reason = "${if (!it.isReverted) ChatColor.RED else ChatColor.GRAY}${it.reason.name} (${it.offence})"
                 val length = it.action.formatLength()
@@ -394,6 +404,9 @@ class PunishCommands {
                 silent = silent
             )
 
+            val appealLink = Mars.get().config.getString("server.links.appeal")
+                ?: throw RuntimeException("No appeal link set in config")
+
             if (targetContext == null && action.kind == PunishmentKind.KICK) staff.player.sendMessage("${ChatColor.RED}The player could not be kicked as they are not online, but the punishment has been recorded.")
 
             if (targetContext != null) { // Target is playing
@@ -411,8 +424,8 @@ class PunishCommands {
                         )
                     }
                     PunishmentKind.KICK -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been kicked from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Further offences may result in harsher punishments.")
-                    PunishmentKind.BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}https://warzone.network/appeal")
-                    PunishmentKind.IP_BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been IP banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}https://warzone.network/appeal")
+                    PunishmentKind.BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}$appealLink")
+                    PunishmentKind.IP_BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been IP banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}$appealLink")
                     PunishmentKind.MUTE -> {
                         targetContext.activePunishments = targetContext.activePunishments + punishment
                         targetContext.matchPlayer.sendMessage(

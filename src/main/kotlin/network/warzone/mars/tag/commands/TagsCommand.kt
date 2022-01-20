@@ -17,12 +17,16 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 
 class TagsCommand {
-    @Command(aliases = ["tags"], desc = "View and manage your tags.")
+    @Command(
+        aliases = ["tags"],
+        desc = "View and manage your tags",
+        perms = ["mars.tags"]
+    )
     fun onTags(@Sender player: Player, context: PlayerContext, audience: Audience) = runBlocking {
         val tags = context.getPlayerProfile().tags()
 
         if (tags.isEmpty()) {
-            player.sendMessage("${RED}You do not have any tags.") //TODO: advertise store or /buy
+            player.sendMessage("${RED}You do not have any tags. Purchase some with /buy!")
             return@runBlocking
         }
 
@@ -48,11 +52,13 @@ class TagsCommand {
                     onclick = {
                         if (isActive) {
                             PlayerFeature.setActiveTag(context.uuid.toString(), null)
-                        } else {
-                            if (profile.tagIds.contains(tag._id)) PlayerFeature.setActiveTag(
+                            profile.activeTagId = null
+                        } else if (profile.tagIds.contains(tag._id)) {
+                            PlayerFeature.setActiveTag(
                                 context.uuid.toString(),
                                 tag._id
                             )
+                            profile.activeTagId = tag._id
                         }
 
                         refresh()

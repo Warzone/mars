@@ -113,7 +113,7 @@ object RankFeature : NamedCachedFeature<Rank>() {
     }
 
     suspend fun list(): List<Rank> {
-        return RankService.list()
+        return RankService.list().onEach { add(it) }
     }
 
     suspend fun updatePermissions(rank: Rank) {

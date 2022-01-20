@@ -4,6 +4,7 @@ enum class SocketEventType {
     MATCH_LOAD,
     MATCH_START,
     MATCH_END,
+    FORCE_MATCH_END, // plugin bound
     CORE_LEAK,
     DESTROYABLE_DESTROY,
     FLAG_CAPTURE,

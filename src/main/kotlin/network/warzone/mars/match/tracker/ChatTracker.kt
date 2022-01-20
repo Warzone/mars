@@ -8,6 +8,7 @@ import network.warzone.mars.api.socket.models.PlayerChatData
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.listeners.ChatListener
+import network.warzone.mars.utils.simple
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -18,12 +19,11 @@ class ChatTracker : Listener {
 
         ApiClient.emit(
             OutboundEvent.PlayerChat, PlayerChatData(
-                event.matchPlayer.id,
-                event.matchPlayer.nameLegacy,
+                event.matchPlayer.simple,
                 context.getPrefix() ?: "",
                 event.channel,
                 event.message,
-                Mars.instance.serverId
+                Mars.get().serverId
             )
         )
     }

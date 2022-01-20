@@ -7,12 +7,14 @@ import network.warzone.mars.api.socket.models.MessageEvent
 import network.warzone.mars.api.socket.models.PlayerChatEvent
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.punishment.models.PunishmentKind
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
 import network.warzone.mars.utils.getMatch
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
+import org.bukkit.ChatColor.*
+import org.bukkit.Sound
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -23,13 +25,10 @@ import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.space
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextColor
-import org.bukkit.ChatColor.*
-import org.bukkit.Sound
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component.space
-import java.util.*
 
 class ChatListener : Listener {
     class MatchPlayerChatEvent(
@@ -37,6 +36,10 @@ class ChatListener : Listener {
         val channel: ChatChannel,
         val message: String
     ) : KEvent()
+
+    init {
+        LevelColorService
+    }
 
     @EventHandler
     fun onMessage(event: MessageEvent) {
@@ -63,11 +66,11 @@ class ChatListener : Listener {
 
     @EventHandler
     fun onPlayerChatApi(event: PlayerChatEvent) {
-        val (_, playerName, playerPrefix, channel, message, serverId) = event.data
+        val (player, prefix, channel, message, serverId) = event.data
 
         if (channel != ChatChannel.STAFF) return
 
-        sendAdminChat(PGM.get().matchManager.getMatch(), playerPrefix, playerName, message, serverId)
+        sendAdminChat(PGM.get().matchManager.getMatch(), prefix, player.name, message, serverId)
     }
 
     @EventHandler
@@ -77,8 +80,6 @@ class ChatListener : Listener {
 
         val match = context.matchPlayer.match
 
-        println(context.activePunishments)
-
         context.activePunishments = context.activePunishments.filter { it.isActive }
 
         val activeMute =
@@ -86,12 +87,22 @@ class ChatListener : Listener {
 
         if (activeMute != null) {
             event.isCancelled = true
-            if (activeMute.action.isPermanent()) player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}https://warzone.network/appeal")
-            else player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name} ${GRAY}until ${WHITE}${activeMute.expiresAt}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}https://warzone.network/appeal")
+            val appealLink = Mars.get().config.getString("server.links.appeal")
+                ?: throw RuntimeException("No appeal link set in config")
+            if (activeMute.action.isPermanent()) player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
+            else player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name} ${GRAY}until ${WHITE}${activeMute.expiresAt}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
             return@runBlocking
         }
 
         val chatChannel = context.matchPlayer.settings.getValue(SettingKey.CHAT)
+
+        val isChatEnabled = Mars.get().config.getBoolean("chat.enabled")
+        if (chatChannel == SettingValue.CHAT_GLOBAL && !isChatEnabled && !player.hasPermission("mars.chat.mute.bypass")) {
+            player.sendMessage("${RED}Global chat is currently disabled.")
+            event.isCancelled = true
+            return@runBlocking
+        }
+
         when (chatChannel) {
             SettingValue.CHAT_ADMIN -> sendAdminChat(match, context.getPrefix() ?: "", player.name, event.message, null)
             SettingValue.CHAT_TEAM -> sendTeamChat(context.matchPlayer.party, context, event.message)
@@ -121,8 +132,12 @@ class ChatListener : Listener {
 
         val messageBuilder = text()
 
-        // todo: level colours
-        messageBuilder.append { text("[${profile.stats.level}]", NamedTextColor.GRAY) }.append(space())
+        messageBuilder.append {
+            text(
+                "[${profile.stats.level}]",
+                LevelColorService.chatColorFromLevel(profile.stats.level)
+            )
+        }.append(space())
 
         if (prefix != null) messageBuilder.append { text("$prefix ") }
 

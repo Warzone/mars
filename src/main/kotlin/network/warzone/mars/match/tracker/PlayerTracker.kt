@@ -6,11 +6,14 @@ import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.models.PartyJoinData
 import network.warzone.mars.api.socket.models.PartyLeaveData
 import network.warzone.mars.api.socket.models.PlayerDeathData
+import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.match.deaths.LegacyTextDeathMessageBuilder
 import network.warzone.mars.match.models.DeathCause
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.utils.KEvent
+import network.warzone.mars.utils.simple
+import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.ChatColor.*
@@ -18,16 +21,27 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.util.Vector
+import tc.oc.pgm.api.match.event.MatchLoadEvent
 import tc.oc.pgm.api.party.Competitor
 import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.events.PlayerJoinPartyEvent
 import tc.oc.pgm.events.PlayerLeavePartyEvent
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import tc.oc.pgm.util.named.NameStyle
 import java.util.*
 
 class PlayerTracker : Listener {
     // entity uuid mapped to player uuid & location
     val projectileCache = hashMapOf<UUID, Pair<UUID, Vector>>()
+
+    private var pendingFirstBlood = true
+
+    @EventHandler
+    fun onMatchStart(event: MatchLoadEvent) {
+        pendingFirstBlood = true
+    }
 
     @EventHandler
     fun onPartyJoin(event: PlayerJoinPartyEvent) {
@@ -37,7 +51,7 @@ class PlayerTracker : Listener {
 
         ApiClient.emit(
             OutboundEvent.PartyJoin,
-            PartyJoinData(event.player.id, event.player.nameLegacy, party.defaultName)
+            PartyJoinData(event.player.simple, party.defaultName)
         )
     }
 
@@ -47,7 +61,7 @@ class PlayerTracker : Listener {
 
         ApiClient.emit(
             OutboundEvent.PartyLeave,
-            PartyLeaveData(event.player.id, event.player.nameLegacy)
+            PartyLeaveData(event.player.simple)
         )
     }
 
@@ -62,10 +76,8 @@ class PlayerTracker : Listener {
         ApiClient.emit(
             OutboundEvent.PlayerDeath,
             PlayerDeathData(
-                victimId = event.victim.id,
-                victimName = event.victim.nameLegacy,
-                attackerId = event.killer?.id,
-                attackerName = event.killer?.nameLegacy,
+                victim = event.victim.simple,
+                attacker = event.killer?.simple,
                 weapon = weapon,
                 entity = mob,
                 distance = distance,
@@ -73,6 +85,19 @@ class PlayerTracker : Listener {
                 cause = DeathCause.fromDamageInfo(event.damageInfo)
             )
         )
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onFirstBlood(event: MatchPlayerDeathEvent) {
+        if (!pendingFirstBlood) return
+
+        val killer = event.killer ?: return
+        if (!event.isSuicide) {
+            pendingFirstBlood = false
+            event.match.sendMessage(
+                killer.getName(NameStyle.COLOR).append(Component.text(" drew first blood!", NamedTextColor.RED))
+            )
+        }
     }
 
     // todo: set XP bar progress & level (and ensure compatibility with vanilla exp)

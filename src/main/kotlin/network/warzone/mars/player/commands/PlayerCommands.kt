@@ -28,7 +28,7 @@ import java.time.Duration
 import javax.annotation.Nullable
 
 class PlayerCommands {
-    @Command(aliases = ["lookup", "alts", "lu"], desc = "Lookup player information & alts")
+    @Command(aliases = ["lookup", "alts", "lu"], desc = "Lookup player information & alts", usage = "<player>", perms = ["mars.lookup"])
     fun onPlayerLookup(@Sender sender: CommandSender, audience: Audience, context: PlayerContext, target: String) =
         runBlocking {
             try {
@@ -40,26 +40,26 @@ class PlayerCommands {
 
                 var message = text()
                     .append { createStandardLabelled("Name", player.name) }
-                    .append { createUncolouredLabelled("ID", player._id.toString()) }
+                    .append { createUncoloredLabelled("ID", player._id.toString()) }
                     .append {
-                        createUncolouredLabelled(
+                        createUncoloredLabelled(
                             "First Joined",
                             "${player.firstJoinedAt} (${player.firstJoinedAt.getTimeAgo()})"
                         )
                     }
                     .append {
-                        createUncolouredLabelled(
+                        createUncoloredLabelled(
                             "Last Joined",
                             if (isOnline) "${ChatColor.GREEN}Online" else "${player.lastJoinedAt} (${player.lastJoinedAt.getTimeAgo()}"
                         )
                     }
                     .append {
-                        createUncolouredLabelled(
+                        createUncoloredLabelled(
                             "Playtime",
                             Duration.ofMillis(player.stats.serverPlaytime).conciseFormat()
                         )
                     }
-                    .append { createUncolouredLabelled("Alts", "") }
+                    .append { createUncoloredLabelled("Alts", "") }
 
                 lookup.alts.forEach {
                     message = message
@@ -76,7 +76,12 @@ class PlayerCommands {
         }
 
 
-    @Command(aliases = ["notes", "note"], desc = "Record staff notes on players")
+    @Command(
+        aliases = ["notes", "note"],
+        desc = "Manage a player's staff notes",
+        usage = "<player> ['add'|'del'] [content|id]",
+        perms = ["mars.notes"]
+    )
     fun onNotes(
         @Sender sender: Player,
         audience: Audience,

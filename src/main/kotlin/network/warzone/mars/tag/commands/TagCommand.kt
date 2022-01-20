@@ -17,7 +17,12 @@ import org.bukkit.command.CommandSender
 import javax.annotation.Nullable
 
 class TagCommand {
-    @Command(aliases = ["create", "new"], desc = "Creates a new tag")
+    @Command(
+        aliases = ["create", "new"],
+        desc = "Create a new tag",
+        usage = "<name> <display>",
+        perms = ["mars.tags.manage"]
+    )
     fun onTagCreate(sender: CommandSender, audience: Audience, name: String, display: String) = runBlocking {
         try {
             TagFeature.create(name, display)
@@ -27,7 +32,7 @@ class TagCommand {
         }
     }
 
-    @Command(aliases = ["delete", "rm"], desc = "Deletes a rank.")
+    @Command(aliases = ["delete", "rm"], desc = "Delete a tag", usage = "<tag>", perms = ["mars.tags.manage"])
     fun onTagDelete(sender: CommandSender, audience: Audience, tag: Tag) = runBlocking {
         try {
             TagFeature.delete(tag._id)
@@ -37,7 +42,12 @@ class TagCommand {
         }
     }
 
-    @Command(aliases = ["update", "edit", "modify"], desc = "Updates a rank.")
+    @Command(
+        aliases = ["update", "edit", "modify"],
+        desc = "Update a tag",
+        usage = "<tag> <'name'|'display'> <new value>",
+        perms = ["mars.tags.manage"]
+    )
     fun onTagUpdate(sender: CommandSender, audience: Audience, tag: Tag, targetProperty: String, value: String) =
         runBlocking {
             // Create temporary copy for unchecked modifications.
@@ -58,7 +68,7 @@ class TagCommand {
 
         }
 
-    @Command(aliases = ["list"], desc = "Lists all the rank.")
+    @Command(aliases = ["list"], desc = "List all tags", perms = ["mars.tags.manage"])
     fun onTagList(sender: CommandSender, audience: Audience) = runBlocking {
         val tags = TagFeature.list()
 
@@ -69,7 +79,12 @@ class TagCommand {
             .forEach { audience.sendMessage(it) }
     }
 
-    @Command(aliases = ["player"], desc = "Manages a player's tags")
+    @Command(
+        aliases = ["player"],
+        desc = "Manage a player's tags",
+        usage = "<player> <'add'|'remove'|'list'> [tag]",
+        perms = ["mars.tags.manage"]
+    )
     fun onTagPlayer(
         sender: CommandSender,
         audience: Audience,

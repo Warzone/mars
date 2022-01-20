@@ -3,6 +3,7 @@ package network.warzone.mars.utils.menu
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import org.bukkit.Bukkit
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -56,7 +57,11 @@ class GUI(
         val player = e.whoClicked as? Player ?: return@runBlocking
         val slot = slots.getOrNull(e.slot) ?: return@runBlocking
 
-        slot.onclick(e, player)
+        // Play a sound if the slot has a click handler
+        if (slot.onclick != null) {
+            player.playSound(player.location, Sound.ORB_PICKUP, .05f, 1f)
+            slot.onclick!!(e, player)
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -68,7 +73,7 @@ class GUI(
 
     inner class Slot {
         var item: Item? = null
-        var onclick: suspend InventoryClickEvent.(Player) -> Unit = {}
+        var onclick: (suspend InventoryClickEvent.(Player) -> Unit)? = null
     }
 
     fun slot(
