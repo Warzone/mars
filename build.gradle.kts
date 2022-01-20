@@ -34,10 +34,10 @@ dependencies {
     implementation("net.time4j:time4j-sqlxml:5.8")
     implementation("net.time4j:time4j-tzdata:5.0-2020a")
 
-    implementation("app.ashcon:sportpaper:1.8.8-R0.1-SNAPSHOT")
+    compileOnly("app.ashcon:sportpaper:1.8.8-R0.1-SNAPSHOT")
     implementation("app.ashcon.intake:intake-bukkit:1.2-SNAPSHOT")
 
-    implementation("tc.oc.pgm:core:0.12-SNAPSHOT") {
+    compileOnly("tc.oc.pgm:core:0.12-SNAPSHOT") {
         exclude(group = "fr.mrmicky", module = "FastBoard")
     }
     compileOnly("fr.mrmicky:fastboard:1.2.0")
