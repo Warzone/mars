@@ -17,7 +17,7 @@ class PrefixDecorationProvider : NameDecorationProvider {
         val player = PlayerManager.getPlayer(uuid)
         val prefix: String = player?.getPrefix() ?: return@runBlocking ""
         // Add a space after the prefix
-        return@runBlocking prefix.color() + " "
+        return@runBlocking "$prefix "
     }
 
     override fun getSuffix(uuid: UUID?): String = ""
