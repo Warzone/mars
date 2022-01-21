@@ -26,10 +26,15 @@ import network.warzone.mars.commands.CommandModule
 import network.warzone.mars.feature.FeatureManager
 import network.warzone.mars.match.MatchManager
 import network.warzone.mars.player.PlayerManager
-import network.warzone.mars.player.feature.PlayerService
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
+
+import network.warzone.mars.player.decoration.PrefixDecorationProvider
+import network.warzone.mars.player.feature.PlayerService
+import network.warzone.mars.player.tablist.overrideTabManager
+import tc.oc.pgm.api.PGM
+import tc.oc.pgm.tablist.*
 import java.util.*
 
 class Mars : JavaPlugin() {
@@ -42,6 +47,8 @@ class Mars : JavaPlugin() {
     }
 
     lateinit var serverId: String
+
+    lateinit var matchTabManager: MatchTabManager
 
     override fun onEnable() = runBlocking {
         println("enabling!")
@@ -62,6 +69,8 @@ class Mars : JavaPlugin() {
         MatchManager.init()
 
         BukkitIntake(this@Mars, commandGraph).register()
+
+        overrideDefaultProviders()
     }
 
     override fun onDisable() = runBlocking {
@@ -70,6 +79,14 @@ class Mars : JavaPlugin() {
             val sessionLength = Date().time - activeSession.createdAt.time
             PlayerService.logout(it.uniqueId, it.name, sessionLength)
         }
+
+        this@Mars.matchTabManager.disable()
     }
+
+    private fun overrideDefaultProviders() {
+        PGM.get().nameDecorationRegistry.setProvider(PrefixDecorationProvider())
+        this.overrideTabManager()
+    }
+
 }
 

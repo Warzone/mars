@@ -12,6 +12,7 @@ import network.warzone.mars.punishment.models.PunishmentKind
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
 import network.warzone.mars.utils.getMatch
+import network.warzone.mars.utils.getPlayerLevelAsComponent
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor.*
 import org.bukkit.Sound
@@ -132,12 +133,7 @@ class ChatListener : Listener {
 
         val messageBuilder = text()
 
-        messageBuilder.append {
-            text(
-                "[${profile.stats.level}]",
-                LevelColorService.chatColorFromLevel(profile.stats.level)
-            )
-        }.append(space())
+        messageBuilder.append { getPlayerLevelAsComponent(profile) }.append(space())
 
         if (prefix != null) messageBuilder.append { text("$prefix ") }
 
