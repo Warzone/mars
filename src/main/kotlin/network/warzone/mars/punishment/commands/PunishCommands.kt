@@ -16,6 +16,7 @@ import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.feature.PlayerService
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.PunishmentFeature
+import network.warzone.mars.punishment.PunishmentService
 import network.warzone.mars.punishment.models.*
 import network.warzone.mars.utils.*
 import network.warzone.mars.utils.menu.*
@@ -162,19 +163,24 @@ class PunishCommands {
         @Switch('s') isSilent: Boolean = false
     ) = runBlocking {
         if (sender is Player) throw CommandException("This command cannot be used by players. Please see /punish ${target.name}.")
+        val history = PlayerService.getPunishmentHistory(target._id.toString())
+        val previous =
+            history.filter { it.reason.short == "cheating" && it.reversion == null }
+        val offence = previous.count() + 1
         issuePunishment(
             target,
-            1,
+            offence,
             null,
             PunishmentReason(
                 "Cheating",
                 "Using client modifications to gain unfair advantages is not allowed.",
-                short = "cheatingac"
+                short = "cheating"
             ),
             PunishmentAction(PunishmentKind.BAN, -1),
             isSilent,
             "AC: $reason"
         )
+        sender.sendMessage("${ChatColor.GREEN}Manual ban successful")
     }
 
     private suspend fun createPunishGUI(
