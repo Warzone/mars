@@ -63,7 +63,7 @@ fun Rank.asTextComponent(editable: Boolean = true): TextComponent {
     return finalComponent.build()
 }
 
-fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
+fun Punishment.asHoverComponent(revertable: Boolean = true): TextComponent {
     var hover = text()
         .append(
             text("${this.action.kind.color}${this.reason.name} (${this.offence}) – ${this.action.kind.noun} (${this.action.formatLength()})"),
@@ -94,6 +94,11 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
 
     if (revertable && this.reversion == null) hover.append(newline(), text("Click to revert", NamedTextColor.LIGHT_PURPLE, TextDecoration.ITALIC))
 
+    return hover.build()
+}
+
+fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
+
     var finalComponent =
         text("[", NamedTextColor.GRAY)
             .append(text(this.issuedAt.getTimeAgo().toUpperCase(), NamedTextColor.GRAY))
@@ -103,7 +108,7 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
             .append(space())
             .append(text(this.target.name, NamedTextColor.WHITE))
 
-    finalComponent = finalComponent.hoverEvent(HoverEvent.showText(hover.build()))
+    finalComponent = finalComponent.hoverEvent(HoverEvent.showText(this.asHoverComponent(revertable)))
 
     if (revertable && this.reversion == null) finalComponent = finalComponent.clickEvent(ClickEvent.runCommand("/revertp ${this._id}"))
 

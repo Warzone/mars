@@ -1,6 +1,8 @@
 package network.warzone.mars.utils
 
 import network.warzone.mars.api.socket.models.SimplePlayer
+import network.warzone.mars.match.MatchManager as MarsMatchManager
+import org.bukkit.entity.Player
 import tc.oc.pgm.api.map.Gamemode
 import tc.oc.pgm.api.match.Match
 import tc.oc.pgm.api.match.MatchManager
@@ -22,3 +24,6 @@ val MatchPlayer.simple: SimplePlayer
 
 val ParticipantState.simple: SimplePlayer
     get() = SimplePlayer(this.id, this.nameLegacy)
+
+val Player.matchPlayer: MatchPlayer
+    get() = MarsMatchManager.match.getPlayer(this) ?: throw RuntimeException("Player has no MatchPlayer? ${this.name}")

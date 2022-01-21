@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack
 import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component.*
+import tc.oc.pgm.lib.net.kyori.adventure.text.event.ClickEvent
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
 import java.time.Duration
@@ -149,7 +150,11 @@ class PunishCommands {
             }
         }
 
-    @Command(aliases = ["acban"], desc = "Manually perm ban a player for an arbitrary reason", perms = ["mars.punish.manual"])
+    @Command(
+        aliases = ["acban"],
+        desc = "Manually perm ban a player for an arbitrary reason",
+        perms = ["mars.punish.manual"]
+    )
     fun onManualBan(
         @Sender sender: CommandSender,
         target: PlayerProfile,
@@ -168,7 +173,7 @@ class PunishCommands {
             ),
             PunishmentAction(PunishmentKind.BAN, -1),
             isSilent,
-            "AC Detected: $reason"
+            "AC: $reason"
         )
     }
 
@@ -480,14 +485,26 @@ class PunishCommands {
         val action = punishment.action
         val lengthString =
             if (action.isInstant()) "" else if (action.isPermanent()) "${ChatColor.RED}forever " else "${ChatColor.GRAY}for ${ChatColor.RED}${action.formatLength()} "
-        val staffBroadcast =
-            "${if (punishment.silent) "${ChatColor.GRAY}(Silent) " else ""}${ChatColor.LIGHT_PURPLE}${target.name} ${ChatColor.GRAY}has been ${ChatColor.RED}${action.kind.pastTense} ${ChatColor.GRAY}by ${ChatColor.DARK_PURPLE}$staffName $lengthString${ChatColor.GRAY}for ${ChatColor.RESET}${punishment.reason.name}"
+
         val publicBroadcast =
             "${ChatColor.LIGHT_PURPLE}${target.name} ${ChatColor.GRAY}has been ${ChatColor.RED}${action.kind.pastTense} ${ChatColor.GRAY}for ${ChatColor.RESET}${punishment.reason.name}"
 
+        var staffBroadcast =
+            "${if (punishment.silent) "${ChatColor.GRAY}(Silent) " else ""}${ChatColor.LIGHT_PURPLE}${target.name} ${ChatColor.GRAY}has been ${ChatColor.RED}${action.kind.pastTense} ${ChatColor.GRAY}by ${ChatColor.DARK_PURPLE}$staffName $lengthString${ChatColor.GRAY}for ${ChatColor.RESET}${punishment.reason.name}"
+
+        if (punishment.note != null) {
+            val coloredNote = punishment.note.split(" ").joinToString(" ") { "${ChatColor.YELLOW}$it" }
+            staffBroadcast += " ${ChatColor.YELLOW}($coloredNote)"
+        }
+
+
+        val staffComponent = text().content(staffBroadcast).hoverEvent(punishment.asHoverComponent(true)).clickEvent(
+            ClickEvent.runCommand("/revertp ${punishment._id}")
+        )
+
         Bukkit.getOnlinePlayers().forEach {
             if (it.uniqueId != target._id) {
-                if (it.hasPermission("mars.punish")) it.sendMessage(staffBroadcast)
+                if (it.hasPermission("mars.punish")) it.matchPlayer.sendMessage(staffComponent)
                 if (!punishment.silent && !it.hasPermission("mars.punish")) it.sendMessage(publicBroadcast)
             }
         }
