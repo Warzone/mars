@@ -20,13 +20,17 @@ package network.warzone.mars
 
 import app.ashcon.intake.bukkit.BukkitIntake
 import app.ashcon.intake.bukkit.graph.BasicBukkitCommandGraph
+import kotlinx.coroutines.runBlocking
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.commands.CommandModule
 import network.warzone.mars.feature.FeatureManager
 import network.warzone.mars.match.MatchManager
+import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.feature.PlayerService
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.*
 
 class Mars : JavaPlugin() {
     companion object {
@@ -39,11 +43,11 @@ class Mars : JavaPlugin() {
 
     lateinit var serverId: String
 
-    override fun onEnable() {
+    override fun onEnable() = runBlocking {
         println("enabling!")
-        instance = this
+        instance = this@Mars
 
-        this.saveDefaultConfig()
+        this@Mars.saveDefaultConfig()
 
         serverId = config.getString("server.id")
 
@@ -57,11 +61,15 @@ class Mars : JavaPlugin() {
 
         MatchManager.init()
 
-        BukkitIntake(this, commandGraph).register()
+        BukkitIntake(this@Mars, commandGraph).register()
     }
 
-    override fun onDisable() {
-        println("hello!")
+    override fun onDisable() = runBlocking {
+        Bukkit.getOnlinePlayers().forEach {
+            val activeSession = PlayerManager.getPlayer(it.uniqueId)?.activeSession!!
+            val sessionLength = Date().time - activeSession.createdAt.time
+            PlayerService.logout(it.uniqueId, it.name, sessionLength)
+        }
     }
 }
 

@@ -122,23 +122,28 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
 
     @EventHandler
     fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) = runBlocking {
-        val ip = event.address.hostAddress
-        val (isNew, playerProfile, activeSession, activePunishments) = PlayerService.login(
-            event.uniqueId,
-            event.name,
-            ip
-        )
-        if (activeSession == null) { // Player is not allowed to join (banned)
-            val ban = activePunishments.find { it.action.isBan() }!!
-            val expiryString =
-                if (ban.action.isPermanent()) "&7This ban is permanent." else "&7This ban will expire on &f${ban.expiresAt}&7."
-            val appealLink = Mars.get().config.getString("server.links.appeal")
-                ?: throw RuntimeException("No appeal link set in config")
-            event.kickMessage =
-                "&7You have been ${ban.action.kind.pastTense} from the server for &c${ban.reason.name}&7.\n\n&c${ban.reason.message}\n\n$expiryString\n&7Appeal at &b$appealLink".color()
+        try {
+            val ip = event.address.hostAddress
+            val (isNew, playerProfile, activeSession, activePunishments) = PlayerService.login(
+                event.uniqueId,
+                event.name,
+                ip
+            )
+            if (activeSession == null) { // Player is not allowed to join (banned)
+                val ban = activePunishments.find { it.action.isBan() }!!
+                val expiryString =
+                    if (ban.action.isPermanent()) "&7This ban is permanent." else "&7This ban will expire on &f${ban.expiresAt}&7."
+                val appealLink = Mars.get().config.getString("server.links.appeal")
+                    ?: throw RuntimeException("No appeal link set in config")
+                event.kickMessage =
+                    "&7You have been ${ban.action.kind.pastTense} from the server for &c${ban.reason.name}&7.\n\n&c${ban.reason.message}\n\n$expiryString\n&7Appeal at &b$appealLink".color()
+                event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
+            } else {
+                queuedJoins[event.uniqueId] = QueuedJoin(isNew, playerProfile, activeSession, activePunishments)
+            }
+        } catch (e: Exception) {
+            event.kickMessage = "&cUnable to load player profile. Please try again later or contact staff.".color()
             event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
-        } else {
-            queuedJoins[event.uniqueId] = QueuedJoin(isNew, playerProfile, activeSession, activePunishments)
         }
     }
 

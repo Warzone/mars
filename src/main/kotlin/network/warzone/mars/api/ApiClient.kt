@@ -41,11 +41,11 @@ object ApiClient {
     val client: HttpClient = HttpClient(CIO) {
         install(JsonFeature) {
             serializer = GsonSerializer {
-                registerTypeAdapter(Date::class.java, JsonDeserializer {
-                    json, _, _ -> Date(json.asJsonPrimitive.asLong)
+                registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
+                    Date(json.asJsonPrimitive.asLong)
                 })
-                registerTypeAdapter(Date::class.java, JsonSerializer<Date> {
-                        date, _, _ -> JsonPrimitive(date.time)
+                registerTypeAdapter(Date::class.java, JsonSerializer<Date> { date, _, _ ->
+                    JsonPrimitive(date.time)
                 })
             }
         }
@@ -65,11 +65,14 @@ object ApiClient {
         logger.level = Level.ALL
     }
 
-    fun loadHttp(config: ConfigurationSection) {
+    suspend fun loadHttp(config: ConfigurationSection) {
         val httpConfig = config.getConfigurationSection("http") ?: throw MissingConfigPathException("api.http")
 
         baseUrl = httpConfig.getString("url") ?: throw MissingConfigPathException("api.http.url")
         apiToken = config.getString("secret") ?: throw MissingConfigPathException("api.secret")
+
+        // Send startup request
+        post<Unit>("/mc/servers/${Mars.get().serverId}/startup")
     }
 
     fun loadSocket(serverId: String, config: ConfigurationSection) {
