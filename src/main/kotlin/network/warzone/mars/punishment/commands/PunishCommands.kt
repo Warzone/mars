@@ -149,6 +149,29 @@ class PunishCommands {
             }
         }
 
+    @Command(aliases = ["acban"], desc = "Manually perm ban a player for an arbitrary reason")
+    fun onManualBan(
+        @Sender sender: CommandSender,
+        target: PlayerProfile,
+        reason: String,
+        @Switch('s') isSilent: Boolean = false
+    ) = runBlocking {
+        if (sender is Player) throw CommandException("This command cannot be used by players. Please see /punish ${target.name}.")
+        issuePunishment(
+            target,
+            1,
+            null,
+            PunishmentReason(
+                "Cheating",
+                "Using client modifications to gain unfair advantages is not allowed.",
+                short = "cheatingac"
+            ),
+            PunishmentAction(PunishmentKind.BAN, -1),
+            isSilent,
+            "AC Detected: $reason"
+        )
+    }
+
     private suspend fun createPunishGUI(
         context: PlayerContext,
         target: PlayerProfile,
@@ -318,7 +341,6 @@ class PunishCommands {
                 onclick = {
                     issuePunishment(
                         target,
-                        target.ips,
                         offence,
                         context,
                         type.toReason(),
@@ -343,7 +365,7 @@ class PunishCommands {
                 val bullet = "${ChatColor.GRAY}•"
                 val reason = "${if (!it.isReverted) ChatColor.RED else ChatColor.GRAY}${it.reason.name} (${it.offence})"
                 val length = it.action.formatLength()
-                val staff = "${ChatColor.AQUA}${it.punisher.name}"
+                val staff = "${ChatColor.AQUA}${it.punisher?.name ?: "CONSOLE"}"
                 val note = if (it.note != null) "${ChatColor.GRAY}[${it.note}]" else ""
 
                 historyLore.addAll(
@@ -382,9 +404,8 @@ class PunishCommands {
 
     private suspend fun issuePunishment(
         target: PlayerProfile,
-        targetIps: List<String>,
         offence: Int,
-        staff: PlayerContext,
+        staff: PlayerContext?,
         reason: PunishmentReason,
         action: PunishmentAction,
         silent: Boolean,
@@ -398,16 +419,19 @@ class PunishCommands {
                 offence = offence,
                 action = action,
                 note = note,
-                punisher = SimplePlayer(staff.getPlayerProfile()._id, staff.getPlayerProfile().name),
+                punisher = if (staff == null) null else SimplePlayer(
+                    staff.getPlayerProfile()._id,
+                    staff.getPlayerProfile().name
+                ),
                 targetName = target.name,
-                targetIps = targetIps,
+                targetIps = target.ips,
                 silent = silent
             )
 
             val appealLink = Mars.get().config.getString("server.links.appeal")
                 ?: throw RuntimeException("No appeal link set in config")
 
-            if (targetContext == null && action.kind == PunishmentKind.KICK) staff.player.sendMessage("${ChatColor.RED}The player could not be kicked as they are not online, but the punishment has been recorded.")
+            if (targetContext == null && action.kind == PunishmentKind.KICK && staff != null) staff.player.sendMessage("${ChatColor.RED}The player could not be kicked as they are not online, but the punishment has been recorded.")
 
             if (targetContext != null) { // Target is playing
                 when (action.kind) {
@@ -442,7 +466,7 @@ class PunishCommands {
                 }
             }
 
-            broadcastPunishment(target, staff, punishment)
+            broadcastPunishment(target, staff?.player?.name ?: "CONSOLE", punishment)
         } catch (e: FeatureException) {
             throw e
         }
@@ -450,14 +474,14 @@ class PunishCommands {
 
     private fun broadcastPunishment(
         target: PlayerProfile,
-        staff: PlayerContext,
+        staffName: String,
         punishment: Punishment
     ) {
         val action = punishment.action
         val lengthString =
             if (action.isInstant()) "" else if (action.isPermanent()) "${ChatColor.RED}forever " else "${ChatColor.GRAY}for ${ChatColor.RED}${action.formatLength()} "
         val staffBroadcast =
-            "${if (punishment.silent) "${ChatColor.GRAY}(Silent) " else ""}${ChatColor.LIGHT_PURPLE}${target.name} ${ChatColor.GRAY}has been ${ChatColor.RED}${action.kind.pastTense} ${ChatColor.GRAY}by ${ChatColor.DARK_PURPLE}${staff.player.name} $lengthString${ChatColor.GRAY}for ${ChatColor.RESET}${punishment.reason.name}"
+            "${if (punishment.silent) "${ChatColor.GRAY}(Silent) " else ""}${ChatColor.LIGHT_PURPLE}${target.name} ${ChatColor.GRAY}has been ${ChatColor.RED}${action.kind.pastTense} ${ChatColor.GRAY}by ${ChatColor.DARK_PURPLE}$staffName $lengthString${ChatColor.GRAY}for ${ChatColor.RESET}${punishment.reason.name}"
         val publicBroadcast =
             "${ChatColor.LIGHT_PURPLE}${target.name} ${ChatColor.GRAY}has been ${ChatColor.RED}${action.kind.pastTense} ${ChatColor.GRAY}for ${ChatColor.RESET}${punishment.reason.name}"
 

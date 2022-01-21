@@ -21,7 +21,7 @@ object PunishmentService {
         offence: Int,
         action: PunishmentAction,
         note: String?,
-        punisher: SimplePlayer,
+        punisher: SimplePlayer?,
         targetName: String,
         targetIps: List<String>,
         silent: Boolean
@@ -87,7 +87,7 @@ object PunishmentService {
         val offence: Int,
         val action: PunishmentAction,
         val note: String?,
-        val punisher: SimplePlayer,
+        val punisher: SimplePlayer?,
         val targetName: String,
         val targetIps: List<String>,
         val silent: Boolean

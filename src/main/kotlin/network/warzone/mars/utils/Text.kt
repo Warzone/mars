@@ -70,9 +70,9 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
             newline(),
             newline()
         )
-        .append { createUncoloredLabelled("Issued by", this.punisher.name) }
+        .append { createUncoloredLabelled("Issued by", this.punisher?.name ?: "CONSOLE") }
         .append { createUncoloredLabelled("Issued at", "${this.issuedAt} (${this.issuedAt.getTimeAgo()})") }
-        .append { createUncoloredLabelled("Expires at", this.expiresAt.toString()) }
+        .append { createUncoloredLabelled("Expires", if (action.isPermanent()) "Never" else expiresAt.toString()) }
 //        .append { createNumberedLabelled("Known IPs", this.targetIps.size) }
 
     if (this.note != null) hover = hover.append { createStandardLabelled("Note", this.note) }
@@ -92,7 +92,7 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
         }
         .append { createUncoloredLabelled("Reversion reason", this.reversion.reason) }
 
-    if (revertable) hover.append(newline(), text("Click to revert", NamedTextColor.LIGHT_PURPLE, TextDecoration.ITALIC))
+    if (revertable && this.reversion == null) hover.append(newline(), text("Click to revert", NamedTextColor.LIGHT_PURPLE, TextDecoration.ITALIC))
 
     var finalComponent =
         text("[", NamedTextColor.GRAY)
@@ -105,7 +105,7 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
 
     finalComponent = finalComponent.hoverEvent(HoverEvent.showText(hover.build()))
 
-    if (revertable) finalComponent = finalComponent.clickEvent(ClickEvent.runCommand("/revertp ${this._id}"))
+    if (revertable && this.reversion == null) finalComponent = finalComponent.clickEvent(ClickEvent.runCommand("/revertp ${this._id}"))
 
     return finalComponent
 }

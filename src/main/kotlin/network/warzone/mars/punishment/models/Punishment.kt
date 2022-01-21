@@ -12,7 +12,7 @@ data class Punishment(
     val offence: Int,
     val action: PunishmentAction,
     val note: String?,
-    val punisher: SimplePlayer,
+    val punisher: SimplePlayer?,
     val target: SimplePlayer,
     val targetIps: List<String>,
     val reversion: PunishmentReversion? = null

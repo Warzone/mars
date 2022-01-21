@@ -31,7 +31,7 @@ object PunishmentFeature : CachedFeature<Punishment>() {
         offence: Int,
         action: PunishmentAction,
         note: String?,
-        punisher: SimplePlayer,
+        punisher: SimplePlayer?,
         targetName: String,
         targetIps: List<String>,
         silent: Boolean
