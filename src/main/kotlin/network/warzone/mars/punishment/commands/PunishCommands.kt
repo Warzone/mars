@@ -149,7 +149,7 @@ class PunishCommands {
             }
         }
 
-    @Command(aliases = ["acban"], desc = "Manually perm ban a player for an arbitrary reason")
+    @Command(aliases = ["acban"], desc = "Manually perm ban a player for an arbitrary reason", perms = ["mars.punish.manual"])
     fun onManualBan(
         @Sender sender: CommandSender,
         target: PlayerProfile,
