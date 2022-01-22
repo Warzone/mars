@@ -1,6 +1,7 @@
 package network.warzone.mars.player
 
 import network.warzone.mars.Mars
+import network.warzone.mars.player.level.LevelDisplayListener
 import network.warzone.mars.player.listeners.ChatListener
 import network.warzone.mars.player.listeners.InventoryListener
 import network.warzone.mars.player.models.Session
@@ -14,6 +15,7 @@ object PlayerManager {
     init {
         Mars.registerEvents(ChatListener())
         Mars.registerEvents(InventoryListener())
+        Mars.registerEvents(LevelDisplayListener())
     }
 
     fun createPlayer(player: Player, session: Session, activePunishments: List<Punishment>): PlayerContext {
