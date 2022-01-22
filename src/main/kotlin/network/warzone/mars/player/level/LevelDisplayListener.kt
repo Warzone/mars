@@ -2,6 +2,7 @@ package network.warzone.mars.player.level
 
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
+import network.warzone.mars.match.tracker.PlayerXPGainEvent
 import network.warzone.mars.player.PlayerManager
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -131,6 +132,13 @@ class LevelDisplayListener : Listener {
         showVanillaLevel(event.player, 5L)
         // Cancel real event
         event.amount = 0
+    }
+
+    @EventHandler
+    fun onXP(event: PlayerXPGainEvent) {
+        val player: Player? = Bukkit.getPlayer(event.data.playerId)
+        if (player == null || showUntil.contains(player)) return
+        showStatsLevel(player)
     }
 
     @EventHandler
