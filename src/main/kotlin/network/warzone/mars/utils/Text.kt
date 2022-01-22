@@ -116,8 +116,8 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
 }
 
 fun PlayerService.PlayerAltResponse.asTextComponent(): TextComponent {
-    val isMuted = this.punishments.find { it.action.kind == PunishmentKind.MUTE && it.isActive } != null
-    val isBanned = this.punishments.find { it.action.isBan() && it.isActive } != null
+    val isMuted = this.punishments.any { it.action.kind == PunishmentKind.MUTE && it.isActive }
+    val isBanned = this.punishments.any { it.action.isBan() && it.isActive }
     val color = if (isBanned) NamedTextColor.RED else if (isMuted) NamedTextColor.YELLOW else NamedTextColor.GRAY
 
     val hover = PunishCommands.createPlayerLore(player, this.punishments)
