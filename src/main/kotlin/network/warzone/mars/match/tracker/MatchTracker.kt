@@ -40,6 +40,8 @@ class MatchTracker : Listener {
 
         val match = event.match
 
+        if (gameMap.gamemodes.isEmpty()) Bukkit.getLogger().warning("Map '${gameMap.name}' has no registered gamemodes")
+
         ApiClient.emit(
             OutboundEvent.MatchLoad, MatchLoadData(
                 gameMap._id,

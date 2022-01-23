@@ -4,6 +4,7 @@ import network.warzone.mars.api.ApiClient
 import network.warzone.mars.feature.NamedCachedFeature
 import network.warzone.mars.map.models.GameMap
 import network.warzone.mars.map.models.MapContributor
+import org.bukkit.Bukkit
 import tc.oc.pgm.api.PGM
 import tc.oc.pgm.api.map.Contributor
 import tc.oc.pgm.api.map.MapInfo
@@ -56,6 +57,8 @@ object MapFeature : NamedCachedFeature<GameMap>() {
 
             // Try and find a currently loaded map by the same name.
             val existingMap = currentMaps.find { it.name == map.name }
+
+            if (map.gamemodes.isEmpty()) Bukkit.getLogger().warning("Found map '${map.name}' with no registered gamemodes")
 
             // If it is currently loaded, check its version.
             if (existingMap != null) {
