@@ -56,7 +56,7 @@ class TagsCommand {
                         } else if (profile.tagIds.contains(tag._id)) {
                             PlayerFeature.setActiveTag(
                                 context.uuid.toString(),
-                                tag._id
+                                tag
                             )
                             profile.activeTagId = tag._id
                         }

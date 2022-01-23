@@ -14,9 +14,11 @@ import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.exceptions.RankAlreadyPresentException
 import network.warzone.mars.rank.exceptions.RankMissingException
 import network.warzone.mars.rank.models.Rank
+import network.warzone.mars.tag.TagFeature
 import network.warzone.mars.tag.exceptions.TagAlreadyPresentException
 import network.warzone.mars.tag.exceptions.TagMissingException
 import network.warzone.mars.tag.exceptions.TagNotPresentException
+import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.mapErrorSmart
 import network.warzone.mars.utils.parseHttpException
 import java.util.*
@@ -151,11 +153,11 @@ object PlayerService {
         throw RuntimeException("Unreachable")
     }
 
-    suspend fun setActiveTag(player: String, tag: UUID?): PlayerProfile {
+    suspend fun setActiveTag(player: String, tag: Tag?): PlayerProfile {
         val request = parseHttpException {
             ApiClient.put<PlayerProfile, PlayerActiveTagRequest>(
                 "/mc/players/$player/active_tag",
-                PlayerActiveTagRequest(tag)
+                PlayerActiveTagRequest(tag?._id)
             )
         }
         val profile = request.getOrNull()
@@ -164,10 +166,10 @@ object PlayerService {
         request.onFailure {
             when (it.code) {
                 ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player)
-                ApiExceptionType.TAG_MISSING -> throw TagMissingException(tag!!.toString())
+                ApiExceptionType.TAG_MISSING -> throw TagMissingException(tag!!.name)
                 ApiExceptionType.TAG_NOT_PRESENT -> throw TagNotPresentException(
                     player,
-                    tag!!.toString()
+                    tag!!.name
                 )
                 else -> TODO("Unexpected API exception: ${it.code}")
             }

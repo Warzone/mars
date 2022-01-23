@@ -14,6 +14,8 @@ import network.warzone.mars.player.models.Session
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.RankAttachments
 import network.warzone.mars.rank.models.Rank
+import network.warzone.mars.tag.TagFeature
+import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.color
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -88,7 +90,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
         }
     }
 
-    suspend fun setActiveTag(player: String, tag: UUID?) {
+    suspend fun setActiveTag(player: String, tag: Tag?) {
         val profile = PlayerService.setActiveTag(player, tag)
 
         PlayerManager.getPlayer(profile._id)?.let {

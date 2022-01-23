@@ -2,17 +2,19 @@ package network.warzone.mars.tag.commands
 
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
+import app.ashcon.intake.parametric.annotation.Switch
 import kotlinx.coroutines.runBlocking
 import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
-import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.tag.TagFeature
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.FeatureException
 import network.warzone.mars.utils.asTextComponent
 import org.bukkit.ChatColor.GREEN
+import org.bukkit.ChatColor.RED
+import org.bukkit.ChatColor.ITALIC
 import org.bukkit.command.CommandSender
 import javax.annotation.Nullable
 
@@ -82,7 +84,7 @@ class TagCommand {
     @Command(
         aliases = ["player"],
         desc = "Manage a player's tags",
-        usage = "<player> <'add'|'remove'|'list'> [tag]",
+        usage = "<player> <'add'|'remove'|'set'|'list'> [tag]",
         perms = ["mars.tags.manage"]
     )
     fun onTagPlayer(
@@ -90,7 +92,8 @@ class TagCommand {
         audience: Audience,
         playerName: String,
         operation: String,
-        @Nullable tag: Tag?
+        @Nullable tag: Tag?,
+        @Switch('f') force: Boolean = false
     ) = runBlocking {
         val player = PlayerFeature.get(playerName) ?: throw CommandException("Invalid player")
 
@@ -123,6 +126,26 @@ class TagCommand {
                     .map { it.asTextComponent(true) }
                     .map { Component.text("- ", NamedTextColor.GRAY).append(it) }
                     .forEach { audience.sendMessage(it) }
+            }
+            "set" -> {
+                if (tag != null) {
+                    try {
+                        val tags = player.tags()
+                        if (!tags.contains(tag) && force) PlayerFeature.addTag(player.name, tag.name)
+                        PlayerFeature.setActiveTag(player.name, tag)
+                        sender.sendMessage("${GREEN}Set player's active tag to ${tag.name}")
+                    } catch (e: FeatureException) {
+                        audience.sendMessage(e.asTextComponent())
+                    }
+                } else {
+                    try {
+                        val activeTag = player.activeTag()
+                        PlayerFeature.setActiveTag(player.name, null)
+                        sender.sendMessage("${RED}Cleared player's active tag (previous: ${activeTag?.name ?: "${ITALIC}None"})")
+                    } catch (e: FeatureException) {
+                        audience.sendMessage(e.asTextComponent())
+                    }
+                }
             }
             else -> throw CommandException("Invalid operation $operation.")
         }
