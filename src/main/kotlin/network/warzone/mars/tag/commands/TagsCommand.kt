@@ -49,6 +49,7 @@ class TagsCommand {
                         lore = listOf("", itemLore)
                     }
 
+                    // todo: send request on GUI close so player can't spam API reqs by clicking
                     onclick = {
                         if (isActive) {
                             PlayerFeature.setActiveTag(context.uuid.toString(), null)
