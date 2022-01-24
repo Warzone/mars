@@ -24,12 +24,16 @@ import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
 object PlayerService {
+    suspend fun preLogin(playerId: UUID, playerName: String, ip: String): PlayerPreLoginResponse {
+        return ApiClient.post(
+            "/mc/players/$playerId/prelogin",
+            PlayerPreLoginRequest(SimplePlayer(playerId, playerName), ip)
+        )
+    }
+
     suspend fun login(playerId: UUID, playerName: String, ip: String): PlayerLoginResponse {
         return ApiClient.post(
-            "/mc/players/login", PlayerLoginRequest(
-                SimplePlayer(playerId, playerName),
-                ip
-            )
+            "/mc/players/$playerId/login", PlayerPreLoginRequest(SimplePlayer(playerId, playerName), ip)
         )
     }
 
@@ -218,13 +222,17 @@ object PlayerService {
 
     data class PlayerAddNoteRequest(val author: SimplePlayer, val content: String)
 
-    data class PlayerLoginRequest(val player: SimplePlayer, val ip: String)
+    data class PlayerPreLoginRequest(val player: SimplePlayer, val ip: String)
+
+    data class PlayerPreLoginResponse(
+        val new: Boolean,
+        val allowed: Boolean,
+        val player: PlayerProfile,
+        val activePunishments: List<Punishment>
+    )
 
     data class PlayerLoginResponse(
-        val new: Boolean,
-        val player: PlayerProfile,
-        val activeSession: Session?,
-        val activePunishments: List<Punishment>
+        val activeSession: Session,
     )
 
     data class PlayerLogoutRequest(val player: SimplePlayer, val playtime: Long)

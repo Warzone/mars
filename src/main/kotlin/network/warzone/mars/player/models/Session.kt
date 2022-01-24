@@ -11,5 +11,7 @@ data class Session(
     val createdAt: Date,
     val endedAt: Date?,
 
+    val ip: String,
+
     val player: SimplePlayer
 ) : Resource

@@ -16,6 +16,7 @@ import network.warzone.mars.rank.RankAttachments
 import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.TagFeature
 import network.warzone.mars.tag.models.Tag
+import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -33,7 +34,6 @@ import java.util.*
 data class QueuedJoin(
     val isNew: Boolean,
     val profile: PlayerProfile,
-    val activeSession: Session,
     val activePunishments: List<Punishment>
 )
 
@@ -126,22 +126,27 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) = runBlocking {
         try {
             val ip = event.address.hostAddress
-            val (isNew, playerProfile, activeSession, activePunishments) = PlayerService.login(
+            val (isNew, isAllowed, profile, activePunishments) = PlayerService.preLogin(
                 event.uniqueId,
                 event.name,
                 ip
             )
-            if (activeSession == null) { // Player is not allowed to join (banned)
-                val ban = activePunishments.find { it.action.isBan() }!!
-                val expiryString =
-                    if (ban.action.isPermanent()) "&7This ban is permanent." else "&7This ban will expire on &f${ban.expiresAt}&7."
-                val appealLink = Mars.get().config.getString("server.links.appeal")
-                    ?: throw RuntimeException("No appeal link set in config")
-                event.kickMessage =
-                    "&7You have been ${ban.action.kind.pastTense} from the server for &c${ban.reason.name}&7.\n\n&c${ban.reason.message}\n\n$expiryString\n&7Appeal at &b$appealLink".color()
+            if (!isAllowed) { // Player is not allowed to join (banned)
                 event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
+                val ban = activePunishments.find { it.action.isBan() }
+                if (ban != null) {
+                    val expiryString =
+                        if (ban.action.isPermanent()) "&7This ban is permanent." else "&7This ban will expire on &f${ban.expiresAt}&7."
+                    val appealLink = Mars.get().config.getString("server.links.appeal")
+                        ?: throw RuntimeException("No appeal link set in config")
+                    event.kickMessage =
+                        "&7You have been ${ban.action.kind.pastTense} from the server for &c${ban.reason.name}&7.\n\n&c${ban.reason.message}\n\n$expiryString\n&7Appeal at &b$appealLink".color()
+                } else {
+                    event.kickMessage =
+                        "&cYou are not allowed to join. Please contact staff or try again later.".color()
+                }
             } else {
-                queuedJoins[event.uniqueId] = QueuedJoin(isNew, playerProfile, activeSession, activePunishments)
+                queuedJoins[event.uniqueId] = QueuedJoin(isNew, profile, activePunishments)
             }
         } catch (e: Exception) {
             event.kickMessage = "&cUnable to load player profile. Please try again later or contact staff.".color()
@@ -154,10 +159,12 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
         val player = event.player
         val ip = event.address.hostAddress
 
-        val (isNew, profile, session, activePuns) = queuedJoins[player.uniqueId]
-            ?: throw RuntimeException("Queued join unavailable: ${player.name}")
+        val (activeSession) = PlayerService.login(player.uniqueId, player.name, ip)
 
-        val context = PlayerManager.createPlayer(player, session, activePuns)
+        val (_, profile, activePuns) = queuedJoins[player.uniqueId]
+            ?: throw RuntimeException("Queued join unavailable: ${player.name} (${player.uniqueId})")
+
+        val context = PlayerManager.createPlayer(player, activeSession, activePuns)
 
         add(profile)
 
@@ -200,6 +207,16 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
         PlayerService.logout(uuid, player.name, sessionLength)
     }
 
+    // API is telling us to kick the player
+    @EventHandler
+    fun onDisconnectPlayer(event: DisconnectPlayerEvent) {
+        val context = PlayerManager.getPlayer(event.data.playerId) ?: return
+        val reason = event.data.reason?.color() ?: "Disconnected"
+        Bukkit.getScheduler().runTask(Mars.get()) {
+            context.player.kickPlayer("${ChatColor.RED}$reason")
+        }
+    }
+
     override fun getCommands(): List<Any> {
         return listOf(PlayerCommands(), UtilCommands())
     }
@@ -208,3 +225,6 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
         return mapOf(listOf("chat") to ChatCommands())
     }
 }
+
+data class DisconnectPlayerEvent(val data: DisconnectPlayerData) : KEvent()
+data class DisconnectPlayerData(val playerId: UUID, val reason: String?)

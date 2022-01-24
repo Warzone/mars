@@ -122,12 +122,12 @@ class PlayerTracker : Listener {
         PlayerFeature.add(profile)
 
         val newLevel = profile.stats.level
-        if (newLevel > currentLevel) PlayerLevelUpEvent(player, newLevel).callEvent()
+        if (newLevel > currentLevel) PlayerLevelUpEvent(PlayerLevelUpData(player, newLevel)).callEvent()
     }
 
     @EventHandler
     fun onPlayerLevelUp(event: PlayerLevelUpEvent) = runBlocking {
-        val (player, level) = event
+        val (player, level) = event.data
 
         player.playSound(player.location, Sound.LEVEL_UP, 1000f, 1f)
         player.sendMessage("$AQUA$STRIKETHROUGH----------------------------------------")
@@ -136,6 +136,8 @@ class PlayerTracker : Listener {
     }
 }
 
-data class PlayerLevelUpEvent(val player: Player, val level: Int) : KEvent()
+data class PlayerLevelUpEvent(val data: PlayerLevelUpData) : KEvent()
+data class PlayerLevelUpData(val player: Player, val level: Int)
+
 data class PlayerXPGainEvent(val data: PlayerXPGainData) : KEvent()
 data class PlayerXPGainData(val playerId: UUID, val gain: Int, val reason: String, val notify: Boolean)

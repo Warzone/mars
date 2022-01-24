@@ -23,6 +23,8 @@ import network.warzone.mars.api.socket.models.PlayerChatEvent
 import network.warzone.mars.match.tracker.ForceMatchEndEvent
 import network.warzone.mars.match.tracker.PlayerXPGainData
 import network.warzone.mars.match.tracker.PlayerXPGainEvent
+import network.warzone.mars.player.feature.DisconnectPlayerData
+import network.warzone.mars.player.feature.DisconnectPlayerEvent
 import network.warzone.mars.utils.*
 import okhttp3.OkHttpClient
 import org.bukkit.Bukkit
@@ -148,8 +150,10 @@ object ApiClient {
                         val data = GSON.fromJson(json, PlayerXPGainData::class.java)
                         PlayerXPGainEvent(data).callEvent()
                     }
-                    SocketEventType.FORCE_MATCH_END -> {
-                        ForceMatchEndEvent().callEvent()
+                    SocketEventType.FORCE_MATCH_END -> ForceMatchEndEvent().callEvent()
+                    SocketEventType.DISCONNECT_PLAYER -> {
+                        val data = GSON.fromJson(json, DisconnectPlayerData::class.java)
+                        DisconnectPlayerEvent(data).callEvent()
                     }
                 }
             }
