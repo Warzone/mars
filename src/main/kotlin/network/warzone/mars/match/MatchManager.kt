@@ -13,7 +13,7 @@ object MatchManager {
         MatchTracker(),
         PlayerTracker(),
         KillstreakTracker(),
-        WoolTracker(),
+        WoolTracker,
         FlagTracker(),
         DestroyableTracker(),
         ControlPointTracker(),
@@ -29,5 +29,6 @@ object MatchManager {
 
     fun init() {
         trackers.forEach(Mars::registerEvents)
+        Mars.registerEvents(ObjectiveAnnouncer())
     }
 }

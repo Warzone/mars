@@ -18,8 +18,8 @@ import tc.oc.pgm.wool.PlayerWoolPlaceEvent
 import tc.oc.pgm.wool.WoolMatchModule
 import java.util.*
 
-class WoolTracker : Listener {
-    private val holdingCache: MutableMap<MonumentWool, MutableList<UUID>> = mutableMapOf()
+object WoolTracker : Listener {
+    val holdingCache: MutableMap<MonumentWool, MutableList<UUID>> = mutableMapOf()
 
     // Player UUID, Wool ID -> Pickup Time
     private val heldTimeCache: MutableMap<Pair<UUID, String>, Long> = mutableMapOf()
