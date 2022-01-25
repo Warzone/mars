@@ -57,8 +57,9 @@ object TagFeature : NamedCachedFeature<Tag>() {
     }
 
     suspend fun list(): List<Tag> {
-        return TagService.list()
-            .onEach { add(it) }
+        val tags = TagService.list()
+        if (tags.isNotEmpty()) TagFeature.clear()
+        return tags.onEach { add(it) }
     }
 
     override fun getSubcommands(): Map<List<String>, Any> {

@@ -8,6 +8,8 @@ import network.warzone.mars.rank.commands.RankCommands
 import network.warzone.mars.rank.exceptions.RankConflictException
 import network.warzone.mars.rank.exceptions.RankMissingException
 import network.warzone.mars.rank.models.Rank
+import network.warzone.mars.tag.TagFeature
+import network.warzone.mars.tag.TagService
 import java.util.*
 
 object RankFeature : NamedCachedFeature<Rank>() {
@@ -113,7 +115,9 @@ object RankFeature : NamedCachedFeature<Rank>() {
     }
 
     suspend fun list(): List<Rank> {
-        return RankService.list().onEach { add(it) }
+        val ranks = RankService.list()
+        if (ranks.isNotEmpty()) RankFeature.clear()
+        return ranks.onEach { RankFeature.add(it) }
     }
 
     suspend fun updatePermissions(rank: Rank) {
