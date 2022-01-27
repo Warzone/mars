@@ -12,7 +12,7 @@ object MatchManager {
         CoreTracker(),
         MatchTracker(),
         PlayerTracker(),
-        KillstreakTracker(),
+        KillstreakTracker,
         WoolTracker,
         FlagTracker(),
         DestroyableTracker(),

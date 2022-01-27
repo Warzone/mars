@@ -16,7 +16,7 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
 import tc.oc.pgm.util.named.NameStyle
 import java.util.*
 
-class KillstreakTracker : Listener {
+object KillstreakTracker : Listener {
     val trackedKillstreaks = mapOf(
         5 to NamedTextColor.DARK_GREEN,
         10 to NamedTextColor.GOLD,
@@ -28,13 +28,13 @@ class KillstreakTracker : Listener {
         200 to NamedTextColor.BLACK,
     )
 
-    private fun getKillstreak(id: UUID): Int? {
+    fun getKillstreak(id: UUID): Int? {
         val statsModule = MatchManager.getTracker(BigStatsTracker::class)?.matchStatsModule ?: return null
         val stats = statsModule.getPlayerStat(id)
         return stats.killstreak
     }
 
-    private fun getNearestTrackedKillstreak(killstreak: Int): Pair<Int, NamedTextColor> {
+    fun getNearestTrackedKillstreak(killstreak: Int): Pair<Int, NamedTextColor> {
         if (killstreak <= 5) return Pair(5, trackedKillstreaks[5]!!)
         var nearestKillstreak = killstreak
         while (trackedKillstreaks[nearestKillstreak] == null) {
