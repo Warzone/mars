@@ -112,7 +112,7 @@ class ModCommands {
                     if (note.author.id != sender.uniqueId) throw CommandException("You cannot delete this note")
 
                     PlayerFeature.removeNote(profile.name, noteId)
-                    sender.sendMessage("Deleted note #$noteId")
+                    sender.sendMessage("${ChatColor.GREEN}Deleted note #$noteId")
                 } catch (ex: Exception) {
                     throw CommandException("Invalid note ID")
                 }

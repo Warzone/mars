@@ -184,7 +184,7 @@ object PlayerService {
 
     suspend fun addNote(player: String, content: String, author: SimplePlayer): PlayerProfile {
         val request = parseHttpException {
-            ApiClient.put<PlayerProfile, PlayerAddNoteRequest>(
+            ApiClient.post<PlayerProfile, PlayerAddNoteRequest>(
                 "/mc/players/$player/notes",
                 PlayerAddNoteRequest(author, content)
             )
