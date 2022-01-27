@@ -9,6 +9,7 @@ import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.commands.ChatCommands
 import network.warzone.mars.player.commands.ModCommands
 import network.warzone.mars.player.commands.MiscCommands
+import network.warzone.mars.player.commands.StatCommands
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.RankAttachments
@@ -216,7 +217,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     }
 
     override fun getCommands(): List<Any> {
-        return listOf(ModCommands(), MiscCommands())
+        return listOf(ModCommands(), MiscCommands(), StatCommands())
     }
 
     override fun getSubcommands(): Map<List<String>, Any> {

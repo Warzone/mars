@@ -48,26 +48,6 @@ class MiscCommands {
         sender.sendMessage("${ChatColor.AQUA}Gamemode updated")
     }
 
-    @Command(aliases = ["killstreak", "ks"], desc = "View your current killstreak", usage = "[player]")
-    fun onKillstreakView(@Sender sender: Player, @Nullable playerName: String?) {
-        val player = playerName?.let { Bukkit.getPlayer(it) } ?: sender
-        val killstreak = KillstreakTracker.getKillstreak(player.uniqueId ?: sender.uniqueId)
-            ?: return sender.sendMessage("${ChatColor.RED}Killstreaks are not being tracked")
-        val (_, color) = KillstreakTracker.getNearestTrackedKillstreak(killstreak)
-        if (killstreak > 0) {
-            val perspective = if (player == sender) "You're" else "${player.name} is"
-            sender.matchPlayer.sendMessage(
-                Component
-                    .text("$perspective on a killstreak of ", NamedTextColor.GREEN)
-                    .append(Component.text(killstreak, color, TextDecoration.BOLD))
-                    .append(Component.text(" kills.", NamedTextColor.GREEN))
-            )
-        } else {
-            val perspective = if (player == sender) "You don't" else "${player.name} doesn't"
-            sender.sendMessage("${ChatColor.RED}$perspective have a killstreak yet.")
-        }
-    }
-
     @Command(aliases = ["ping"], desc = "View a player's ping", usage = "[player]")
     fun onPingView(@Sender sender: CommandSender, @Nullable playerName: String?) {
         val player = playerName?.let { Bukkit.getPlayer(it) } ?: sender
