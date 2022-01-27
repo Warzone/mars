@@ -23,16 +23,19 @@ class MiscCommands {
     @Command(aliases = ["gmc"], desc = "Set your gamemode to Creative", perms = ["mars.gmc"])
     fun onCreativeSwitch(@Sender sender: Player) {
         sender.gameMode = GameMode.CREATIVE
+        sender.sendMessage("${ChatColor.AQUA}Gamemode updated")
     }
 
     @Command(aliases = ["gms"], desc = "Set your gamemode to Survival", perms = ["mars.gms"])
     fun onSurvivalSwitch(@Sender sender: Player) {
         sender.gameMode = GameMode.SURVIVAL
+        sender.sendMessage("${ChatColor.AQUA}Gamemode updated")
     }
 
     @Command(aliases = ["gmsp"], desc = "Set your gamemode to Spectator", perms = ["mars.gmsp"])
     fun onSpectatorSwitch(@Sender sender: Player) {
         sender.gameMode = GameMode.SPECTATOR
+        sender.sendMessage("${ChatColor.AQUA}Gamemode updated")
     }
 
     @Command(aliases = ["killstreak", "ks"], desc = "View your current killstreak", usage = "[player]")
