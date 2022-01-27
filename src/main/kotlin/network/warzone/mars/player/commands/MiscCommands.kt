@@ -8,7 +8,7 @@ import org.bukkit.GameMode
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-class UtilCommands {
+class MiscCommands {
 //    @Command(aliases = ["discord"], desc = "Join the Discord server")
 //    fun discordInvite(@Sender sender: CommandSender) {
 //        val invite = Mars.get().config.getString("server.links.discord") ?: "No Discord invite available"

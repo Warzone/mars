@@ -7,14 +7,12 @@ import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.NamedCachedFeature
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.commands.ChatCommands
-import network.warzone.mars.player.commands.PlayerCommands
-import network.warzone.mars.player.commands.UtilCommands
+import network.warzone.mars.player.commands.ModCommands
+import network.warzone.mars.player.commands.MiscCommands
 import network.warzone.mars.player.models.PlayerProfile
-import network.warzone.mars.player.models.Session
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.RankAttachments
 import network.warzone.mars.rank.models.Rank
-import network.warzone.mars.tag.TagFeature
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
@@ -218,7 +216,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     }
 
     override fun getCommands(): List<Any> {
-        return listOf(PlayerCommands(), UtilCommands())
+        return listOf(ModCommands(), MiscCommands())
     }
 
     override fun getSubcommands(): Map<List<String>, Any> {

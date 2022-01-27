@@ -27,7 +27,7 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.serializer.plain.PlainTextComponen
 import java.time.Duration
 import javax.annotation.Nullable
 
-class PlayerCommands {
+class ModCommands {
     @Command(aliases = ["lookup", "alts", "lu"], desc = "Lookup player information & alts", usage = "<player>", perms = ["mars.lookup"])
     fun onPlayerLookup(@Sender sender: CommandSender, audience: Audience, context: PlayerContext, target: String) =
         runBlocking {
