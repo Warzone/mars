@@ -9,11 +9,11 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 class UtilCommands {
-    @Command(aliases = ["discord"], desc = "Join the Discord server")
-    fun discordInvite(@Sender sender: CommandSender) {
-        val invite = Mars.get().config.getString("server.links.discord") ?: "No Discord invite available"
-        sender.sendMessage("${ChatColor.AQUA}$invite")
-    }
+//    @Command(aliases = ["discord"], desc = "Join the Discord server")
+//    fun discordInvite(@Sender sender: CommandSender) {
+//        val invite = Mars.get().config.getString("server.links.discord") ?: "No Discord invite available"
+//        sender.sendMessage("${ChatColor.AQUA}$invite")
+//    }
 
     @Command(aliases = ["gmc"], desc = "Set your gamemode to Creative", perms = ["mars.gmc"])
     fun onCreativeSwitch(@Sender sender: Player) {
