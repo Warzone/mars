@@ -2,23 +2,32 @@ package network.warzone.mars.player.commands
 
 import app.ashcon.intake.Command
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
+import network.warzone.mars.Mars
 import network.warzone.mars.match.tracker.KillstreakTracker
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.event.ClickEvent
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
 import javax.annotation.Nullable
 
 class MiscCommands {
-//    @Command(aliases = ["discord"], desc = "Join the Discord server")
-//    fun discordInvite(@Sender sender: CommandSender) {
-//        val invite = Mars.get().config.getString("server.links.discord") ?: "No Discord invite available"
-//        sender.sendMessage("${ChatColor.AQUA}$invite")
-//    }
+    fun onAppealLink(@Sender sender: Player) {
+        val appealLink = Mars.get().config.getString("server.links.appeal") ?: "No appeal link available"
+        sender.matchPlayer.sendMessage(
+            Component.text("Click here to appeal a punishment", NamedTextColor.AQUA).clickEvent(ClickEvent.openUrl(appealLink))
+        )
+    }
+
+    fun onRulesLink(@Sender sender: Player) {
+        val rulesLink = Mars.get().config.getString("server.links.rules") ?: "No rules link available"
+        sender.sendMessage("${ChatColor.YELLOW}Please read and abide by our server rules which can be found at ${ChatColor.GOLD}$rulesLink")
+    }
 
     @Command(aliases = ["gmc"], desc = "Set your gamemode to Creative", perms = ["mars.gmc"])
     fun onCreativeSwitch(@Sender sender: Player) {

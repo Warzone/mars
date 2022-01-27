@@ -4,6 +4,7 @@ server:
     appeal: 'https://warz.one/discord'
     store: 'https://warz.one/store'
     discord: 'https://warz.one/discord'
+    rules: 'https://warz.one/rules'
 
 api:
   secret: 'authtoken'
