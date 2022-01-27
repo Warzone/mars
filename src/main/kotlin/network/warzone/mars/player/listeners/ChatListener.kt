@@ -17,8 +17,11 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor.*
 import org.bukkit.Sound
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import tc.oc.pgm.api.PGM
 import tc.oc.pgm.api.Permissions
 import tc.oc.pgm.api.match.Match
@@ -30,6 +33,8 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.Component.space
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextColor
+import tc.oc.pgm.listeners.ChatDispatcher
+import tc.oc.pgm.util.bukkit.OnlinePlayerMapAdapter
 
 class ChatListener : Listener {
     class MatchPlayerChatEvent(
@@ -38,8 +43,19 @@ class ChatListener : Listener {
         val message: String
     ) : KEvent()
 
+    companion object {
+        val CHANNEL_VALUE_MAP = mapOf(
+            listOf("g", "all") to SettingValue.CHAT_GLOBAL,
+            listOf("t") to SettingValue.CHAT_TEAM,
+            listOf("a") to SettingValue.CHAT_ADMIN
+        )
+    }
+
+    private val queuedChannels: OnlinePlayerMapAdapter<SettingValue> = OnlinePlayerMapAdapter(Mars.get())
+
     init {
         LevelColorService
+        HandlerList.unregisterAll(ChatDispatcher.get())
     }
 
     @EventHandler
@@ -61,6 +77,23 @@ class ChatListener : Listener {
         } else {
             playerIds.mapNotNull { Bukkit.getPlayer(it) }.forEach {
                 it.sendMessage(message)
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onPreCommand(event: PlayerCommandPreprocessEvent) {
+        val message = event.message.toLowerCase().substring(1).split(" ")
+        if (message.size == 1) return // Channel should be persistent
+        val matchPlayer = PGM.get().matchManager.getPlayer(event.player)
+        val oldChannel: SettingValue = matchPlayer?.settings?.getValue(SettingKey.CHAT) ?: SettingValue.CHAT_GLOBAL
+        for (command in CHANNEL_VALUE_MAP) {
+            for (alias in command.key) {
+                if (message[0] == alias || message[0] == "pgm:$alias") {
+                    queuedChannels[event.player] = oldChannel
+                    matchPlayer?.settings?.setValue(SettingKey.CHAT, command.value)
+                    break
+                }
             }
         }
     }
@@ -110,8 +143,10 @@ class ChatListener : Listener {
             else -> sendGlobalChat(match, context, event.message)
         }
 
+        val matchPlayer = PGM.get().matchManager.getPlayer(player)!!
+
         MatchPlayerChatEvent(
-            PGM.get().matchManager.getPlayer(player)!!,
+            matchPlayer,
             when (chatChannel) {
                 SettingValue.CHAT_ADMIN -> ChatChannel.STAFF
                 SettingValue.CHAT_TEAM -> ChatChannel.TEAM
@@ -121,6 +156,8 @@ class ChatListener : Listener {
         ).callEvent()
 
         event.isCancelled = true
+        if (queuedChannels.containsKey(event.player))
+            matchPlayer.settings.setValue(SettingKey.CHAT, queuedChannels.remove(event.player))
     }
 
     private suspend fun sendGlobalChat(match: Match, context: PlayerContext, message: String) {
