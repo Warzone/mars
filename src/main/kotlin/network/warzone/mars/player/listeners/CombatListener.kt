@@ -1,6 +1,5 @@
 package network.warzone.mars.player.listeners
 
-import net.kyori.adventure.title.Title
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -13,7 +12,7 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import java.text.DecimalFormat
 
 class CombatListener : Listener {
-    val DECIMAL_FORMAT = DecimalFormat("0.0")
+    private val decimalFormat = DecimalFormat("0.0")
 
     @EventHandler
     fun onEntityDamage(event: EntityDamageByEntityEvent) {
@@ -29,7 +28,7 @@ class CombatListener : Listener {
         if (damaged.matchPlayer.isObserving || health < 0) return
 
         val name = damaged.matchPlayer.name
-        val component = name.append(text(" • ", NamedTextColor.DARK_GRAY)).append(text("❤ ${DECIMAL_FORMAT.format(health)}", NamedTextColor.RED))
+        val component = name.append(text(" • ", NamedTextColor.DARK_GRAY)).append(text("❤ ${decimalFormat.format(health)}", NamedTextColor.RED))
         shooter.matchPlayer.sendActionBar(component)
     }
 }
