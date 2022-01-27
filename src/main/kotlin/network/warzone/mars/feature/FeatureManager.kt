@@ -9,6 +9,7 @@ import network.warzone.mars.map.MapFeature
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.punishment.PunishmentFeature
 import network.warzone.mars.rank.RankFeature
+import network.warzone.mars.report.ReportFeature
 import network.warzone.mars.tag.TagFeature
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -24,7 +25,8 @@ object FeatureManager : Listener {
         ResourceType.Player to PlayerFeature,
         ResourceType.Rank to RankFeature,
         ResourceType.Punishment to PunishmentFeature,
-        ResourceType.Broadcast to BroadcastFeature
+        ResourceType.Broadcast to BroadcastFeature,
+        ResourceType.Report to ReportFeature
     )
 
     fun <T : Feature<*>> getFeature(type: ResourceType<T>): T {
