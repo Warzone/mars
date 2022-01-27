@@ -65,4 +65,11 @@ object BroadcastFeature : Feature<Broadcast>() {
     override fun getSubcommands(): Map<List<String>, Any> {
         return mapOf(listOf("broadcasts", "broadcast", "bc") to BroadcastCommands())
     }
+
+    /**
+     * Returns a copy of the broadcasts list.
+      */
+    fun getBroadcasts(): List<Broadcast> {
+        return broadcasts.toList()
+    }
 }

@@ -12,6 +12,11 @@ class BroadcastCommands {
         BroadcastFeature.broadcast(message, true, null)
     }
 
+    @Command(aliases = ["preset"], desc = "Broadcast a pre-set message", usage = "<broadcast>", perms = ["mars.broadcast"])
+    fun onPresetBroadcast(sender: CommandSender, broadcast: Broadcast) {
+        BroadcastFeature.broadcast(broadcast.message, broadcast.newline, broadcast.permission)
+    }
+
     @Command(aliases = ["auto", "toggle"], desc = "Toggle auto broadcasts", perms = ["mars.broadcast"])
     fun onToggleBroadcast(sender: CommandSender) {
         val auto = BroadcastFeature.autoBroadcast

@@ -3,6 +3,7 @@ package network.warzone.mars.commands
 import app.ashcon.intake.argument.CommandArgs
 import app.ashcon.intake.parametric.AbstractModule
 import app.ashcon.intake.parametric.Provider
+import network.warzone.mars.broadcast.Broadcast
 import network.warzone.mars.commands.providers.*
 import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
 import network.warzone.mars.player.PlayerContext
@@ -21,6 +22,7 @@ object CommandModule : AbstractModule() {
         bind(PlayerContext::class, PlayerContextProvider())
         bind(Punishment::class, PunishmentProvider())
         bind(PlayerProfile::class, PlayerProfileProvider())
+        bind(Broadcast::class, BroadcastProvider())
     }
 
     private fun <T : Any> bind(type: KClass<T>, provider: Provider<T>) {
