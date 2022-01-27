@@ -81,13 +81,15 @@ object CommandModule : AbstractModule(), Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onCommand(event: PlayerCommandPreprocessEvent) {
-        val isPunishCommand = punishCommands.any { event.message.toLowerCase().startsWith(it) }
+        val command = event.message.toLowerCase().split(" ").first()
+
+        val isPunishCommand = punishCommands.any { command == it }
         if (isPunishCommand) {
             event.isCancelled = true
             event.player.sendMessage("${ChatColor.RED}This command has been disabled in favour of /punish.")
         }
 
-        val isBlockedCommand = miscCommands.any { event.message.toLowerCase().startsWith(it) }
+        val isBlockedCommand = miscCommands.any { command == it }
         if (isBlockedCommand) {
             event.isCancelled = true
             event.player.sendMessage("${ChatColor.RED}This command is unavailable.")
