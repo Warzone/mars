@@ -1,6 +1,7 @@
 package network.warzone.mars.player.commands
 
 import app.ashcon.intake.Command
+import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import network.warzone.mars.Mars
 import network.warzone.mars.match.tracker.KillstreakTracker
@@ -49,12 +50,12 @@ class MiscCommands {
 
     @Command(aliases = ["killstreak", "ks"], desc = "View your current killstreak", usage = "[player]")
     fun onKillstreakView(@Sender sender: Player, @Nullable playerName: String?) {
-        val target = playerName?.let { Bukkit.getPlayer(it) } ?: sender
-        val killstreak = KillstreakTracker.getKillstreak(target.uniqueId ?: sender.uniqueId)
+        val player = playerName?.let { Bukkit.getPlayer(it) } ?: sender
+        val killstreak = KillstreakTracker.getKillstreak(player.uniqueId ?: sender.uniqueId)
             ?: return sender.sendMessage("${ChatColor.RED}Killstreaks are not being tracked")
         val (_, color) = KillstreakTracker.getNearestTrackedKillstreak(killstreak)
         if (killstreak > 0) {
-            val perspective = if (target == sender) "You're" else "${target.name} is"
+            val perspective = if (player == sender) "You're" else "${player.name} is"
             sender.matchPlayer.sendMessage(
                 Component
                     .text("$perspective on a killstreak of ", NamedTextColor.GREEN)
@@ -62,8 +63,19 @@ class MiscCommands {
                     .append(Component.text(" kills.", NamedTextColor.GREEN))
             )
         } else {
-            val perspective = if (target == sender) "You don't" else "${target.name} doesn't"
+            val perspective = if (player == sender) "You don't" else "${player.name} doesn't"
             sender.sendMessage("${ChatColor.RED}$perspective have a killstreak yet.")
         }
+    }
+
+    @Command(aliases = ["ping"], desc = "View a player's ping", usage = "[player]")
+    fun onPingView(@Sender sender: CommandSender, @Nullable playerName: String?) {
+        val player = playerName?.let { Bukkit.getPlayer(it) } ?: sender
+        if (player !is Player) throw CommandException("Consoles cannot check their own pings")
+
+        val possessive = "${player.name}${ChatColor.GRAY}${if (player.name.endsWith("s")) "'" else "'s"}"
+        val ping = player.spigot().ping
+        if (player == sender) sender.sendMessage("${ChatColor.GRAY}Your ping is ${ChatColor.AQUA}${ping}ms")
+        else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
     }
 }
