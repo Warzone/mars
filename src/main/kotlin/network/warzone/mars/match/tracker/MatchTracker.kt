@@ -151,6 +151,7 @@ class MatchTracker : Listener {
                         .eachCount()
                         .maxByOrNull { group -> group.value }
                     !!.key,
+                    it.breaksRequired,
                     it.blockRegion.blocks.size
                 )
             }?.distinctBy { it.id } ?: listOf()

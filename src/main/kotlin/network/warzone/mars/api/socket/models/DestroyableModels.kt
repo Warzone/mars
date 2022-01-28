@@ -9,7 +9,9 @@ data class DestroyablePartial(
     val name: String,
     val ownerName: String,
     val material: Material,
+    val breaksRequired: Int,
     val blockCount: Int
 )
 
 data class DestroyableDestroyData(val destroyableId: String, val contributions: List<Contribution>)
+data class DestroyableDamageData(val destroyableId: String, val damage: Int)

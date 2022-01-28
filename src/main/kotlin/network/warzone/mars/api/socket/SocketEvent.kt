@@ -11,6 +11,7 @@ open class OutboundEvent<T : Any>(event: SocketEventType) : SocketEvent<T>(event
     object CoreLeak : OutboundEvent<CoreLeakData>(SocketEventType.CORE_LEAK)
 
     object DestroyableDestroy : OutboundEvent<DestroyableDestroyData>(SocketEventType.DESTROYABLE_DESTROY)
+    object DestroyableDamage : OutboundEvent<DestroyableDamageData>(SocketEventType.DESTROYABLE_DAMAGE)
 
     object FlagPickup : OutboundEvent<FlagPickupData>(SocketEventType.FLAG_PICKUP)
     object FlagCapture : OutboundEvent<FlagCaptureData>(SocketEventType.FLAG_CAPTURE)
