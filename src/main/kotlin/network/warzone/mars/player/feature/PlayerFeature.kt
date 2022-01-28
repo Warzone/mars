@@ -17,6 +17,7 @@ import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
+import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
@@ -173,11 +174,8 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
-        val player = PGM.get().matchManager.getPlayer(event.player)!!
+        val player = event.player.matchPlayer
         val join = queuedJoins[player.id] ?: return
-
-        // No one is able to see PGM's Join & Leave messages
-        player.settings.setValue(SettingKey.JOIN, SettingValue.JOIN_OFF)
 
         Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} joined. ${if (join.isNew) "${ChatColor.LIGHT_PURPLE}[NEW]" else ""}")
 

@@ -159,7 +159,7 @@ class PunishCommands {
     fun onManualBan(
         @Sender sender: CommandSender,
         target: PlayerProfile,
-        reason: String,
+        @Text reason: String,
         @Switch('s') isSilent: Boolean = false
     ) = runBlocking {
         if (sender is Player) throw CommandException("This command cannot be used by players. Please see /punish ${target.name}.")
