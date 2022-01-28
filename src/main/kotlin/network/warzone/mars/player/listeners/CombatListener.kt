@@ -22,6 +22,9 @@ class CombatListener : Listener {
         val shooter = (event.damager as? Projectile)?.shooter as? Player ?: return
         val damaged = event.entity as Player
 
+        // If the place shoot themselves, don't show the health
+        if (shooter == damaged) return
+
         val health = damaged.health - event.finalDamage
 
         // If player is observing or if health is negative, don't send message
