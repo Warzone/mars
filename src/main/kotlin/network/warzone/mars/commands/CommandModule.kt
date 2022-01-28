@@ -110,5 +110,8 @@ object CommandModule : AbstractModule(), Listener {
 
         val isStatsCommand = listOf("/pgm:stats", "/stats").any { command == it }
         if (isStatsCommand) event.message = event.message.replace(command, "/mars:stats")
+
+        val isStaffChatAlias = listOf("/s", "/sc").any { command == it }
+        if (isStaffChatAlias) event.message = event.message.replace(command, "/pgm:a")
     }
 }
