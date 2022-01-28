@@ -14,4 +14,4 @@ data class DestroyablePartial(
 )
 
 data class DestroyableDestroyData(val destroyableId: String, val contributions: List<Contribution>)
-data class DestroyableDamageData(val destroyableId: String, val damage: Int)
+data class DestroyableDamageData(val destroyableId: String, val playerId: UUID, val damage: Int)

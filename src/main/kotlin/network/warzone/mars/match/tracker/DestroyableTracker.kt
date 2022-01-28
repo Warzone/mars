@@ -43,6 +43,7 @@ class DestroyableTracker : Listener {
                     OutboundEvent.DestroyableDamage,
                     DestroyableDamageData(
                         event.destroyable.id,
+                        player.id,
                         batch.count
                     )
                 )
