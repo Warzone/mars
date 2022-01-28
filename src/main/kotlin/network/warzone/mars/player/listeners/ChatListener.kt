@@ -1,5 +1,6 @@
 package network.warzone.mars.player.listeners
 
+import github.scarsz.discordsrv.DiscordSRV
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.ChatChannel
@@ -16,6 +17,7 @@ import network.warzone.mars.utils.getPlayerLevelAsComponent
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor.*
 import org.bukkit.Sound
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.HandlerList
@@ -36,6 +38,7 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextColor
 import tc.oc.pgm.listeners.ChatDispatcher
 import tc.oc.pgm.util.bukkit.OnlinePlayerMapAdapter
 
+
 class ChatListener : Listener {
     class MatchPlayerChatEvent(
         val matchPlayer: MatchPlayer,
@@ -49,11 +52,13 @@ class ChatListener : Listener {
             listOf("t") to SettingValue.CHAT_TEAM,
             listOf("a") to SettingValue.CHAT_ADMIN
         )
+        var DISCORDSRV_ENABLED = false
     }
 
     private val queuedChannels: OnlinePlayerMapAdapter<SettingValue> = OnlinePlayerMapAdapter(Mars.get())
 
     init {
+        DISCORDSRV_ENABLED = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null
         LevelColorService
         HandlerList.unregisterAll(ChatDispatcher.get())
     }
@@ -184,6 +189,7 @@ class ChatListener : Listener {
         val messageComponent = messageBuilder.build()
 
         match.sendMessage(messageComponent)
+        sendToDiscord(context.player, message)
     }
 
     private fun sendTeamChat(team: Party, context: PlayerContext, message: String) {
@@ -208,5 +214,17 @@ class ChatListener : Listener {
             .map { it.bukkit }
             .filter { it.hasPermission(Permissions.ADMINCHAT) }
             .forEach { it.sendMessage("$DARK_RED[STAFF] $RESET$coloredPrefix$magicSpace$GRAY$username$server: $GREEN$message") }
+    }
+
+    private fun sendToDiscord(player: Player, message: String) {
+        if (!DISCORDSRV_ENABLED) return
+        Bukkit.getScheduler().runTaskAsynchronously(Mars.get()) {
+            DiscordSRV.getPlugin().processChatMessage(
+                player,
+                message,
+                DiscordSRV.getPlugin().getOptionalChannel("global"),
+                false
+            )
+        }
     }
 }

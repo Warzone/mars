@@ -24,6 +24,8 @@ repositories {
     maven("https://repo.ashcon.app/nexus/content/repositories/snapshots/")
     maven("https://repo.aikar.co/nexus/content/groups/aikar/")
     maven("https://repo.codemc.io/repository/maven-snapshots/")
+    maven("https://m2.dv8tion.net/releases/")
+    maven("https://nexus.scarsz.me/content/groups/public")
 }
 
 dependencies {
@@ -41,6 +43,8 @@ dependencies {
         exclude(group = "fr.mrmicky", module = "FastBoard")
     }
     compileOnly("fr.mrmicky:fastboard:1.2.0")
+
+    compileOnly("com.discordsrv:discordsrv:1.24.0")
 
     compileOnly("net.kyori:adventure-api:4.8.1")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.8.1")
