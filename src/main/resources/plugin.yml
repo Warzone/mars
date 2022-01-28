@@ -2,4 +2,5 @@ name: Mars
 version: 1.0-SNAPSHOT
 main: network.warzone.mars.Mars
 depend: [ PGM ]
+softdepend: [ DiscordSRV ]
 website: https://github.com/Warzone
