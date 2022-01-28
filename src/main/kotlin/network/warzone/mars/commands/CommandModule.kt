@@ -94,5 +94,8 @@ object CommandModule : AbstractModule(), Listener {
             event.isCancelled = true
             event.player.sendMessage("${ChatColor.RED}This command is unavailable.")
         }
+
+        val isStatsCommand = listOf("/pgm:stats", "/stats").any { command == it }
+        if (isStatsCommand) event.message = event.message.replace(command, "/mars:stats")
     }
 }

@@ -1,6 +1,5 @@
 package network.warzone.mars.player.models
 
-import kotlinx.serialization.Serializable
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.NamedResource
 import network.warzone.mars.punishment.models.StaffNote
@@ -10,11 +9,11 @@ import network.warzone.mars.tag.TagFeature
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.color
 import org.bukkit.ChatColor
-import org.bukkit.entity.EntityType
 import tc.oc.pgm.api.map.Gamemode
+import java.text.NumberFormat
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.math.floor
+
 
 data class PlayerProfile(
     override val _id: UUID,
@@ -93,6 +92,22 @@ data class PlayerStats(
 ) {
     val level: Int
         get() = floor(((xp + 5000) / 5000).toDouble()).toInt()
+
+    val wlr: String
+    get() {
+        val nf = NumberFormat.getInstance()
+        nf.maximumFractionDigits = 2
+        nf.minimumFractionDigits = 2
+        return if (losses == 0) nf.format(wins.toDouble()) else nf.format(wins.toDouble() / losses)
+    }
+
+    val kdr: String
+        get() {
+            val nf = NumberFormat.getInstance()
+            nf.maximumFractionDigits = 2
+            nf.minimumFractionDigits = 2
+            return if (deaths == 0) nf.format(kills.toDouble()) else nf.format(kills.toDouble() / deaths)
+        }
 }
 
 data class PlayerRecords(
