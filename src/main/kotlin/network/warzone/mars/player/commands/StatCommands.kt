@@ -51,7 +51,7 @@ class StatCommands {
         } else viewStats(sender.matchPlayer, player)
     }
 
-    fun viewStats(sender: MatchPlayer, profile: PlayerProfile) {
+    private fun viewStats(sender: MatchPlayer, profile: PlayerProfile) {
         val stats = profile.stats
         val outline = text("-------------------------------", NamedTextColor.BLUE, TextDecoration.STRIKETHROUGH)
         sender.sendMessage(outline)
