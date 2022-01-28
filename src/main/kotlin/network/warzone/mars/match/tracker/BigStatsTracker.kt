@@ -1,7 +1,5 @@
 package network.warzone.mars.match.tracker
 
-import network.warzone.mars.api.socket.models.ChatChannel
-import network.warzone.mars.player.listeners.ChatListener
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -27,12 +25,12 @@ data class PlayerBlocks(
 class BigStatsTracker : Listener {
     val blockCache = HashMap<UUID, PlayerBlocks>()
     val offlinePlayersPendingStatSave = mutableSetOf<UUID>()
-    var matchStatsModule: StatsMatchModule? = null
+    lateinit var matchStatsModule: StatsMatchModule
 
     @EventHandler
     fun onMatchLoad(event: MatchLoadEvent) {
         offlinePlayersPendingStatSave.clear()
-        matchStatsModule = event.match.getModule(StatsMatchModule::class.java)
+        matchStatsModule = event.match.getModule(StatsMatchModule::class.java)!!
     }
 
     @EventHandler

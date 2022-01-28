@@ -49,24 +49,6 @@ class ObjectiveAnnouncer : Listener {
         }
     }
 
-    /**
-     * Broadcast flag drop to entire match
-     */
-    @EventHandler(priority = EventPriority.LOW)
-    fun onFlagDrop(event: FlagStateChangeEvent) {
-        if (!event.match.hasMode(Gamemode.KING_OF_THE_FLAG, Gamemode.CAPTURE_THE_FLAG)) return
-        if (event.oldState is Carried && event.newState is Dropped) {
-            val carried = event.oldState as Carried
-            val flag = event.flag
-
-            val message = flag.componentName.append(
-                Component.text(" was dropped by ", NamedTextColor.WHITE).append(carried.carrier.name)
-            )
-
-            flag.match.sendMessage(message)
-        }
-    }
-
     private fun sendToEnemies(party: Party, message: Component, includeObservers: Boolean) {
         val parties = party.match.parties.filterNot { it.nameLegacy == party.nameLegacy }
             .filter { if (!includeObservers) it is Competitor else true }

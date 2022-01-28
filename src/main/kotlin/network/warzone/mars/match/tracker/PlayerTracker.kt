@@ -33,9 +33,6 @@ import tc.oc.pgm.util.named.NameStyle
 import java.util.*
 
 class PlayerTracker : Listener {
-    // entity uuid mapped to player uuid & location
-    val projectileCache = hashMapOf<UUID, Pair<UUID, Vector>>()
-
     private var pendingFirstBlood = true
 
     @EventHandler
@@ -92,7 +89,7 @@ class PlayerTracker : Listener {
         if (!pendingFirstBlood) return
 
         val killer = event.killer ?: return
-        if (!event.isSuicide) {
+        if (event.isEnemyKill) {
             pendingFirstBlood = false
             event.match.sendMessage(
                 killer.getName(NameStyle.COLOR).append(Component.text(" drew first blood!", NamedTextColor.RED))

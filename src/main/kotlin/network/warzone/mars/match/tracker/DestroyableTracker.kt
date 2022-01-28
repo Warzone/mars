@@ -10,6 +10,7 @@ import network.warzone.mars.match.models.Contribution
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import tc.oc.pgm.api.match.event.MatchStartEvent
 import tc.oc.pgm.destroyable.Destroyable
 import tc.oc.pgm.destroyable.DestroyableHealthChangeEvent
 import java.util.*
@@ -27,11 +28,16 @@ class DestroyableTracker : Listener {
     private val damageCache: ConcurrentHashMap<UUID, MutableList<DestroyableDamageBatch>> = ConcurrentHashMap()
 
     @EventHandler
+    fun onMatchStart(event: MatchStartEvent) {
+        damageCache.clear()
+    }
+
+    @EventHandler
     fun onDestroyableDamaged(event: DestroyableHealthChangeEvent) {
         val change = event.change ?: return
         val player = change.playerCause ?: return
 
-        if (damageCache[player.id] == null) damageCache[player.id] = mutableListOf()
+        if (!damageCache.contains(player.id)) damageCache[player.id] = mutableListOf()
         val batchList = damageCache[player.id] ?: return
 
         val destroyableBatch = batchList.find { it.destroyable == event.destroyable }

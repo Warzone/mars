@@ -17,7 +17,7 @@ import tc.oc.pgm.util.named.NameStyle
 import java.util.*
 
 object KillstreakTracker : Listener {
-    val trackedKillstreaks = mapOf(
+    private val trackedKillstreaks = mapOf(
         5 to NamedTextColor.DARK_GREEN,
         10 to NamedTextColor.GOLD,
         25 to NamedTextColor.RED,
@@ -61,7 +61,6 @@ object KillstreakTracker : Listener {
         val victim = event.victim
         val killer = event.killer ?: return // no killer = no broadcast
         val killstreak = getKillstreak(victim.id)!!
-        println("Victim killstreak: $killstreak")
 
         if (killstreak >= 5) {
             event.match.sendMessage(createKillstreakEndMessage(killer, event.victim.participantState!!, killstreak))

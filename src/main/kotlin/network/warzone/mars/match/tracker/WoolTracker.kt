@@ -26,7 +26,6 @@ object WoolTracker : Listener {
 
     @EventHandler
     fun onMatchStart(event: MatchStartEvent) {
-        println(event.match.map.gamemodes)
         if (!event.match.hasMode(Gamemode.CAPTURE_THE_WOOL, Gamemode.RACE_FOR_WOOL)) return
 
         val woolMatchModule = event.match.getModule(WoolMatchModule::class.java) ?: return
@@ -36,7 +35,6 @@ object WoolTracker : Listener {
 
         woolMatchModule.wools.values().forEach {
             holdingCache[it] = mutableListOf()
-            println(it.id)
         }
     }
 
