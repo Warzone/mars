@@ -77,7 +77,20 @@ object CommandModule : AbstractModule(), Listener {
     )
 
     val miscCommands =
-        listOf("/msg", "/pgm:msg", "/pgm:tell", "/w", "/pgm:w", "/pm", "/dm", "/pgm:pm", "/pgm:dm", "/tell")
+        listOf(
+            "/msg",
+            "/pgm:msg",
+            "/pgm:tell",
+            "/w",
+            "/pgm:w",
+            "/pm",
+            "/dm",
+            "/pgm:pm",
+            "/pgm:dm",
+            "/tell",
+            "/pgm:settings",
+            "/settings"
+        )
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onCommand(event: PlayerCommandPreprocessEvent) {

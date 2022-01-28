@@ -115,7 +115,7 @@ object ApiClient {
 
     fun <T : Any> emit(outboundEvent: OutboundEvent<T>, data: T) {
         val packet = Packet(outboundEvent.event, data)
-        logger.finer("Emitting outbound packet. Type ${outboundEvent.event}, Data: ${GSON.toJson(packet)}")
+//        logger.finer("Emitting outbound packet. Type ${outboundEvent.event}, Data: ${GSON.toJson(packet)}")
 
         socket.send(packet)
     }
@@ -135,7 +135,7 @@ object ApiClient {
 
         socket.receive()
             .subscribe {
-                println("Received event ${it.event}, data: ${it.data}")
+//                println("Received event ${it.event}, data: ${it.data}")
                 val json = GSON.toJson(it.data)
                 when (it.event) {
                     SocketEventType.PLAYER_CHAT -> {

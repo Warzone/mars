@@ -6,6 +6,7 @@ import network.warzone.mars.player.listeners.ChatListener
 import network.warzone.mars.player.listeners.CombatListener
 import network.warzone.mars.player.listeners.InventoryListener
 import network.warzone.mars.player.models.Session
+import network.warzone.mars.player.settings.SettingsListener
 import network.warzone.mars.punishment.models.Punishment
 import org.bukkit.entity.Player
 import java.util.*
@@ -18,6 +19,7 @@ object PlayerManager {
         Mars.registerEvents(InventoryListener())
         Mars.registerEvents(LevelDisplayListener())
         Mars.registerEvents(CombatListener())
+        Mars.registerEvents(SettingsListener())
     }
 
     fun createPlayer(player: Player, session: Session, activePunishments: List<Punishment>): PlayerContext {
