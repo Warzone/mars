@@ -59,7 +59,7 @@ class LevelDisplayListener : Listener {
     }
 
     private fun getVanillaExpFromMetadata(player: Player): Float {
-        return player.getMetadata(METADATA_KEY, Mars.get()).asFloat()
+        return player.getMetadata(METADATA_KEY, Mars.get())?.asFloat() ?: 0.0F
     }
 
     private fun setVanillaExpInMetadata(player: Player, level: Float) {
