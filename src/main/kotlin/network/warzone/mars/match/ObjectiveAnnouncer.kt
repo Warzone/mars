@@ -1,5 +1,6 @@
 package network.warzone.mars.match
 
+import network.warzone.mars.match.tracker.DestroyableDamageEvent
 import network.warzone.mars.match.tracker.WoolTracker
 import network.warzone.mars.utils.hasMode
 import org.bukkit.event.EventHandler
@@ -14,6 +15,7 @@ import tc.oc.pgm.flag.state.Carried
 import tc.oc.pgm.flag.state.Dropped
 import tc.oc.pgm.goals.events.GoalTouchEvent
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.JoinConfiguration
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.wool.MonumentWool
 
@@ -47,6 +49,30 @@ class ObjectiveAnnouncer : Listener {
 
             player.match.sendMessage(message)
         }
+    }
+
+    /**
+     * Broadcast destroyable damage to the entire match
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    fun onDestroyableDamage(event: DestroyableDamageEvent) {
+        if (event.destroyable.isDestroyed || !event.destroyable.isVisible) return
+
+        var message = Component.join(JoinConfiguration.noSeparators(),
+            event.destroyable.owner.name,
+            Component.text("'s "),
+            event.destroyable.componentName,
+            Component.text(" was damaged by "),
+            event.player.name
+        )
+
+        if (event.damage > 1) {
+            message = message
+                .append(Component.space())
+                .append(Component.text("(${event.damage.toDouble() / event.destroyable.breaksRequired * 100f}%)", NamedTextColor.GRAY))
+        }
+
+        event.player.match.sendMessage(message)
     }
 
     private fun sendToEnemies(party: Party, message: Component, includeObservers: Boolean) {
