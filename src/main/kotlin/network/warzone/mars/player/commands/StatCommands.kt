@@ -84,7 +84,7 @@ class StatCommands {
                 .append { newline() }
                 .append { createLabelledStat("Wins", stats.wins, StatType.POSITIVE) }
                 .append { createLabelledStat("Losses", stats.losses, StatType.NEGATIVE) }
-                .append { createLabelledStat("W/L", stats.wlr, StatType.NEUTRAL) }
+                .append { createLabelledStat("Win %", stats.winPercentage, StatType.NEUTRAL) }
                 .append { outline }
         sender.sendMessage(component)
     }
