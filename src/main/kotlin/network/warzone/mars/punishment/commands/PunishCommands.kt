@@ -8,6 +8,7 @@ import app.ashcon.intake.parametric.annotation.Text
 import net.wesjd.anvilgui.AnvilGUI
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
+import network.warzone.mars.commands.providers.PunishmentTypes
 import network.warzone.mars.match.MatchManager
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
@@ -47,9 +48,9 @@ class PunishCommands {
         audience: Audience,
         context: PlayerContext,
         target: PlayerProfile,
-        @Nullable @Text reason: String?,
+        @Nullable @PunishmentTypes reason: String?,
         @Switch('s') isSilent: Boolean = false
-    )  {
+    ) {
         Mars.async {
             val types = PunishmentFeature.punishmentTypes.filter { player.hasPermission(it.requiredPermission) }
 
