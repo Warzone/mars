@@ -98,7 +98,7 @@ data class PlayerStats(
             val nf = NumberFormat.getInstance()
             nf.maximumFractionDigits = 1
             nf.minimumFractionDigits = 1
-            return if (matches == 0) "0%" else "${nf.format(wins.toDouble() / matches * 100f)}%"
+            return if (matches == 0) "0%" else "${nf.format(wins.toDouble() / matchesPresentEnd * 100f)}%"
         }
 
     val kdr: String
