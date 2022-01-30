@@ -190,18 +190,20 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
 
     @EventHandler
     fun onPlayerLogout(event: PlayerQuitEvent) = runBlocking {
-        val player = event.player
-        val uuid = player.uniqueId
+        Mars.async {
+            val player = event.player
+            val uuid = player.uniqueId
 
-        val activeSession = PlayerManager.getPlayer(uuid)?.activeSession ?: return@runBlocking
+            val activeSession = PlayerManager.getPlayer(uuid)?.activeSession ?: return@async
 
-        val context = PlayerManager.removePlayer(uuid)!! // We know the player is online
-        RankAttachments.removeAttachment(context)
+            val context = PlayerManager.removePlayer(uuid)!! // We know the player is online
+            RankAttachments.removeAttachment(context)
 
-        remove(uuid)
+            remove(uuid)
 
-        val sessionLength = Date().time - activeSession.createdAt.time
-        PlayerService.logout(uuid, player.name, sessionLength)
+            val sessionLength = Date().time - activeSession.createdAt.time
+            PlayerService.logout(uuid, player.name, sessionLength)
+        }
     }
 
     // API is telling us to kick the player
