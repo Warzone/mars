@@ -44,11 +44,11 @@ class StatCommands {
     fun onStatsView(@Sender sender: Player, @Nullable playerName: String?) {
         Mars.async {
             if (playerName == null) {
-                viewStats(sender.matchPlayer, PlayerFeature.fetch(sender.name) ?: throw CommandException("No sender for player."))
+                viewStats(sender.matchPlayer, PlayerFeature.fetch(sender.name) ?: throw CommandException("Cant find profile for player."))
             } else {
                 val profile = PlayerFeature.fetch(playerName)
                     ?: PlayerFeature.fetch(sender.name)
-                    ?: throw CommandException("No sender for player.")
+                    ?: throw CommandException("Cant find profile for player.")
                 viewStats(sender.matchPlayer, profile)
             }
         }
