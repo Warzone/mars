@@ -114,6 +114,14 @@ object ApiClient {
     }
 
     fun <T : Any> emit(outboundEvent: OutboundEvent<T>, data: T) {
+        Mars.async {
+            val packet = Packet(outboundEvent.event, data)
+
+            socket.send(packet)
+        }
+    }
+
+    fun <T : Any> emitBlocking(outboundEvent: OutboundEvent<T>, data: T) {
         val packet = Packet(outboundEvent.event, data)
 
         socket.send(packet)
