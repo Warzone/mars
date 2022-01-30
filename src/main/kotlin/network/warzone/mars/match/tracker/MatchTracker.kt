@@ -5,6 +5,7 @@ import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.models.*
 import network.warzone.mars.map.MapFeature
+import network.warzone.mars.map.exceptions.MapMissingException
 import network.warzone.mars.map.models.GameMap
 import network.warzone.mars.match.MatchManager
 import network.warzone.mars.match.models.ParticipantData
@@ -17,7 +18,6 @@ import tc.oc.pgm.api.match.Match
 import tc.oc.pgm.api.match.event.MatchFinishEvent
 import tc.oc.pgm.api.match.event.MatchLoadEvent
 import tc.oc.pgm.api.match.event.MatchStartEvent
-import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.controlpoint.ControlPoint
 import tc.oc.pgm.core.Core
 import tc.oc.pgm.destroyable.DestroyableMatchModule
@@ -36,7 +36,7 @@ class MatchTracker : Listener {
             .filterIsInstance<Team>()
             .map { PartyData(it.defaultName, it.nameLegacy, it.color.name, it.minPlayers, it.maxPlayers) }
 
-        val gameMap: GameMap = MapFeature.getKnown(event.match.map.name)
+        val gameMap: GameMap = MapFeature.getCached(event.match.map.name) ?: throw MapMissingException(event.match.map.name)
 
         val match = event.match
 
