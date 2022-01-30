@@ -41,6 +41,12 @@ class Mars : JavaPlugin() {
     companion object {
         lateinit var instance: Mars
 
+        fun async(block: suspend() -> Unit) {
+            Bukkit.getScheduler().runTaskAsynchronously(get()) {
+                runBlocking { block.invoke() }
+            }
+        }
+
         fun get() = instance
 
         fun registerEvents(listener: Listener) = Bukkit.getPluginManager().registerEvents(listener, instance)

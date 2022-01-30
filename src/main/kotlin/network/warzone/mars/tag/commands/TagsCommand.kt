@@ -2,7 +2,7 @@ package network.warzone.mars.tag.commands
 
 import app.ashcon.intake.Command
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
-import kotlinx.coroutines.runBlocking
+import network.warzone.mars.Mars
 import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.feature.PlayerFeature
@@ -22,15 +22,17 @@ class TagsCommand {
         desc = "View and manage your tags",
         perms = ["mars.tags"]
     )
-    fun onTags(@Sender player: Player, context: PlayerContext, audience: Audience) = runBlocking {
-        val tags = context.getPlayerProfile().tags()
+    fun onTags(@Sender player: Player, context: PlayerContext, audience: Audience) {
+        Mars.async {
+            val tags = context.getPlayerProfile().tags()
 
-        if (tags.isEmpty()) {
-            player.sendMessage("${RED}You do not have any tags. Purchase some with /buy!")
-            return@runBlocking
+            if (tags.isEmpty()) {
+                player.sendMessage("${RED}You do not have any tags. Purchase some with /buy!")
+                return@async
+            }
+
+            player.open(createTagGUI(context, tags))
         }
-
-        player.open(createTagGUI(context, tags))
     }
 
     private suspend fun createTagGUI(context: PlayerContext, tags: List<Tag>): GUI {

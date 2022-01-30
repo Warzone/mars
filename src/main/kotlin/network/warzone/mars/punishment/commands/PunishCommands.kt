@@ -5,7 +5,6 @@ import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
-import kotlinx.coroutines.runBlocking
 import net.wesjd.anvilgui.AnvilGUI
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
@@ -16,7 +15,6 @@ import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.feature.PlayerService
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.PunishmentFeature
-import network.warzone.mars.punishment.PunishmentService
 import network.warzone.mars.punishment.models.*
 import network.warzone.mars.utils.*
 import network.warzone.mars.utils.menu.*
@@ -51,38 +49,40 @@ class PunishCommands {
         target: PlayerProfile,
         @Nullable @Text reason: String?,
         @Switch('s') isSilent: Boolean = false
-    ) = runBlocking {
-        val types = PunishmentFeature.punishmentTypes.filter { player.hasPermission(it.requiredPermission) }
+    )  {
+        Mars.async {
+            val types = PunishmentFeature.punishmentTypes.filter { player.hasPermission(it.requiredPermission) }
 
-        try {
-            val history = PlayerFeature.getPunishmentHistory(target._id.toString())
+            try {
+                val history = PlayerFeature.getPunishmentHistory(target._id.toString())
 
-            if (reason != null) {
-                val searchResults = types.filter {
-                    it.name.toLowerCase().contains(reason.toLowerCase()) || it.short.equals(
-                        reason,
-                        ignoreCase = true
+                if (reason != null) {
+                    val searchResults = types.filter {
+                        it.name.toLowerCase().contains(reason.toLowerCase()) || it.short.equals(
+                            reason,
+                            ignoreCase = true
+                        )
+                    }
+                    if (searchResults.size == 1) player.open(
+                        createPunishConfirmGUI(
+                            context,
+                            target,
+                            target.getDisplayName(ChatColor.GRAY),
+                            searchResults.last(),
+                            history,
+                            null,
+                            isSilent
+                        )
                     )
+                    else if (searchResults.isEmpty()) player.sendMessage("${ChatColor.RED}Could not find punishment types for query '${reason}'")
+                    else player.open(createPunishGUI(context, target, history, searchResults, isSilent))
+                    return@async
                 }
-                if (searchResults.size == 1) player.open(
-                    createPunishConfirmGUI(
-                        context,
-                        target,
-                        target.getDisplayName(ChatColor.GRAY),
-                        searchResults.last(),
-                        history,
-                        null,
-                        isSilent
-                    )
-                )
-                else if (searchResults.isEmpty()) player.sendMessage("${ChatColor.RED}Could not find punishment types for query '${reason}'")
-                else player.open(createPunishGUI(context, target, history, searchResults, isSilent))
-                return@runBlocking
-            }
 
-            player.open(createPunishGUI(context, target, history, types, isSilent))
-        } catch (e: FeatureException) {
-            audience.sendMessage(e.asTextComponent())
+                player.open(createPunishGUI(context, target, history, types, isSilent))
+            } catch (e: FeatureException) {
+                audience.sendMessage(e.asTextComponent())
+            }
         }
     }
 
@@ -97,49 +97,57 @@ class PunishCommands {
         audience: Audience,
         punishment: Punishment,
         @Nullable @Text reason: String?
-    ) = runBlocking {
-        if (punishment.reversion != null) throw CommandException("This punishment was already reverted ${Date(punishment.reversion.revertedAt).getTimeAgo()} by ${punishment.reversion.reverter.name} for ${ChatColor.WHITE}${punishment.reversion.reason}${ChatColor.RED}.")
+    ) {
+        Mars.async {
+            if (punishment.reversion != null) throw CommandException(
+                "This punishment was already reverted ${
+                    Date(
+                        punishment.reversion.revertedAt
+                    ).getTimeAgo()
+                } by ${punishment.reversion.reverter.name} for ${ChatColor.WHITE}${punishment.reversion.reason}${ChatColor.RED}."
+            )
 
-        try {
-            if (reason == null) {
-                val anvil =
-                    AnvilGUI.Builder().text("Reversion reason").plugin(Mars.get())
-                anvil.onComplete { player, reason ->
-                    player.performCommand("mars:revertp ${punishment._id} $reason")
-                    return@onComplete AnvilGUI.Response.close()
+            try {
+                if (reason == null) {
+                    val anvil =
+                        AnvilGUI.Builder().text("Reversion reason").plugin(Mars.get())
+                    anvil.onComplete { player, reason ->
+                        player.performCommand("mars:revertp ${punishment._id} $reason")
+                        return@onComplete AnvilGUI.Response.close()
+                    }
+                    anvil.open(player)
+                } else {
+                    val pun = PunishmentFeature.revert(
+                        punishment._id,
+                        reason,
+                        SimplePlayer(id = player.uniqueId, name = player.name)
+                    )
+
+                    val target = PlayerManager.getPlayer(pun.target.id)
+                    if (target != null) { // Target is online
+                        target.activePunishments = target.activePunishments.filterNot { it._id == pun._id }
+                    }
+
+                    sendModeratorBroadcast(
+                        text(player.name, NamedTextColor.YELLOW).append(space())
+                            .append(text("reverted", NamedTextColor.YELLOW))
+                            .append(
+                                space()
+                            ).append(pun.asTextComponent(false))
+                    )
                 }
-                anvil.open(player)
-            } else {
-                val pun = PunishmentFeature.revert(
-                    punishment._id,
-                    reason,
-                    SimplePlayer(id = player.uniqueId, name = player.name)
-                )
-
-                val target = PlayerManager.getPlayer(pun.target.id)
-                if (target != null) { // Target is online
-                    target.activePunishments = target.activePunishments.filterNot { it._id == pun._id }
-                }
-
-                sendModeratorBroadcast(
-                    text(player.name, NamedTextColor.YELLOW).append(space())
-                        .append(text("reverted", NamedTextColor.YELLOW))
-                        .append(
-                            space()
-                        ).append(pun.asTextComponent(false))
-                )
+            } catch (e: FeatureException) {
+                audience.sendMessage(e.asTextComponent())
             }
-        } catch (e: FeatureException) {
-            audience.sendMessage(e.asTextComponent())
         }
     }
 
     @Command(aliases = ["punishments", "puns"], desc = "View a player's punishment history", perms = ["mars.punish"])
-    fun onPunishmentHistory(@Sender sender: CommandSender, audience: Audience, target: String) =
-        runBlocking {
+    fun onPunishmentHistory(@Sender sender: CommandSender, audience: Audience, target: String) {
+        Mars.async {
             try {
                 val history = PlayerService.getPunishmentHistory(target)
-                if (history.isEmpty()) return@runBlocking sender.sendMessage("${ChatColor.YELLOW}${target} has no punishment history")
+                if (history.isEmpty()) return@async sender.sendMessage("${ChatColor.YELLOW}${target} has no punishment history")
 
                 sender.sendMessage("${ChatColor.RED}Punishments for ${target}:")
                 history
@@ -150,6 +158,7 @@ class PunishCommands {
                 audience.sendMessage(e.asTextComponent())
             }
         }
+    }
 
     @Command(
         aliases = ["acban"],
@@ -161,26 +170,28 @@ class PunishCommands {
         target: PlayerProfile,
         @Text reason: String,
         @Switch('s') isSilent: Boolean = false
-    ) = runBlocking {
-        if (sender is Player) throw CommandException("This command cannot be used by players. Please see /punish ${target.name}.")
-        val history = PlayerService.getPunishmentHistory(target._id.toString())
-        val previous =
-            history.filter { it.reason.short == "cheating" && it.reversion == null }
-        val offence = previous.count() + 1
-        issuePunishment(
-            target,
-            offence,
-            null,
-            PunishmentReason(
-                "Cheating",
-                "Using client modifications to gain unfair advantages is not allowed.",
-                short = "cheating"
-            ),
-            PunishmentAction(PunishmentKind.BAN, -1),
-            isSilent,
-            "AC: $reason"
-        )
-        sender.sendMessage("${ChatColor.GREEN}Manual ban successful")
+    ) {
+        Mars.async {
+            if (sender is Player) throw CommandException("This command cannot be used by players. Please see /punish ${target.name}.")
+            val history = PlayerService.getPunishmentHistory(target._id.toString())
+            val previous =
+                history.filter { it.reason.short == "cheating" && it.reversion == null }
+            val offence = previous.count() + 1
+            issuePunishment(
+                target,
+                offence,
+                null,
+                PunishmentReason(
+                    "Cheating",
+                    "Using client modifications to gain unfair advantages is not allowed.",
+                    short = "cheating"
+                ),
+                PunishmentAction(PunishmentKind.BAN, -1),
+                isSilent,
+                "AC: $reason"
+            )
+            sender.sendMessage("${ChatColor.GREEN}Manual ban successful")
+        }
     }
 
     private suspend fun createPunishGUI(
