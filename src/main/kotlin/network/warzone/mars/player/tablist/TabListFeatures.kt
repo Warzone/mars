@@ -7,6 +7,7 @@ import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
+import network.warzone.mars.utils.getLevelAsComponent
 import network.warzone.mars.utils.getPlayerLevelAsComponent
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.PGM
@@ -48,8 +49,9 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
         val uuid = if (!isOffline) player.uniqueId else null
         val builder = Component.text()
         if (!isOffline) { // Add levels
-            val profile = PlayerFeature.getCached(player.uniqueId)!!
-            builder.append(getPlayerLevelAsComponent(profile)).append(Component.space())
+            val profile = PlayerFeature.getCached(player.uniqueId)
+            val level = if (profile != null) getPlayerLevelAsComponent(profile) else getLevelAsComponent(1)
+            builder.append(level).append(Component.space())
         }
         val name = Component.text().content(
             (player.name)!!
