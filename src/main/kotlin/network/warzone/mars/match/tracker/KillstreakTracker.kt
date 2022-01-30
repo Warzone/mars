@@ -47,7 +47,7 @@ object KillstreakTracker : Listener {
     fun onKillstreak(event: MatchPlayerDeathEvent) {
         val killer = event.killer ?: return
         if (!event.isEnemyKill) return
-        val killstreak = getKillstreak(killer.id)!!
+        val killstreak = getKillstreak(killer.id)!! + 1
         if (!trackedKillstreaks.contains(killstreak)) return
         event.match.sendMessage(createKillstreakMessage(killer, killstreak))
         ApiClient.emit(
