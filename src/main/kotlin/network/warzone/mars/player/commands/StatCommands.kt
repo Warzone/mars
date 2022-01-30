@@ -41,13 +41,16 @@ class StatCommands {
     }
 
     @Command(aliases = ["stats", "statistics"], desc = "View a player's stats", usage = "[player]")
-    fun onStatsView(@Sender sender: Player, @Nullable player: PlayerProfile?) {
+    fun onStatsView(@Sender sender: Player, @Nullable playerName: String?) {
         Mars.async {
-            if (player == null) {
-                val profile =
-                    PlayerFeature.pull(sender.uniqueId) ?: throw CommandException("Sender has no player profile")
-                viewStats(sender.matchPlayer, profile)
-            } else viewStats(sender.matchPlayer, player)
+            var profile = PlayerFeature.fetch(sender.name)
+            if (playerName != null) {
+                PlayerFeature.fetch(playerName)?.let { profile = it }
+            }
+
+            profile ?: return@async
+
+            viewStats(sender.matchPlayer, profile!!)
         }
     }
 

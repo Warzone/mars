@@ -1,6 +1,5 @@
 package network.warzone.mars.punishment
 
-import com.github.kittinunf.result.Result
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.CachedFeature

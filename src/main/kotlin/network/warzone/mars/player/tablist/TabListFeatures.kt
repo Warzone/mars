@@ -5,6 +5,7 @@ import network.warzone.mars.Mars
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.LevelColorService
+import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.getPlayerLevelAsComponent
 import org.bukkit.entity.Player
@@ -39,7 +40,7 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
 
     private fun tabPlayer(
         player: Player, viewer: Player?
-    ): Component = runBlocking {
+    ): Component {
         val isOffline = !player.isOnline
         var provider = NameDecorationProvider.DEFAULT
         val metadata = player.getMetadata(NameDecorationProvider.METADATA_KEY, PGM.get())
@@ -47,8 +48,7 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
         val uuid = if (!isOffline) player.uniqueId else null
         val builder = Component.text()
         if (!isOffline) { // Add levels
-            val context = PlayerManager.getPlayer(player.uniqueId)!!
-            val profile = context.getPlayerProfile()
+            val profile = PlayerFeature.getCached(player.uniqueId)!!
             builder.append(getPlayerLevelAsComponent(profile)).append(Component.space())
         }
         val name = Component.text().content(
@@ -75,7 +75,7 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
         if (style.contains(NameStyle.Flag.FLAIR) && !isOffline) {
             builder.append(provider.getSuffixComponent(uuid))
         }
-        return@runBlocking builder.build()
+        return builder.build()
     }
 
 }

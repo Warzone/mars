@@ -20,6 +20,7 @@ class SettingsListener : Listener {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         event.player.matchPlayer.settings.setValue(SettingKey.JOIN, SettingValue.JOIN_OFF)
         event.player.matchPlayer.settings.setValue(SettingKey.STATS, SettingValue.STATS_ON)
+        event.player.matchPlayer.settings.setValue(SettingKey.CHAT, SettingValue.CHAT_GLOBAL)
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
