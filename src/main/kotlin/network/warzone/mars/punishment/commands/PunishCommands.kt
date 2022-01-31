@@ -340,6 +340,62 @@ class PunishCommands {
                 }
             }
 
+            slot(23) {
+                item = item(Material.PAPER) {
+                    name = "${ChatColor.AQUA}Staff Note"
+                    lore = if (note == null) listOf(
+                        "",
+                        "${ChatColor.GRAY}Click to add a staff note."
+                    ) else listOf(
+                        "",
+                        "${ChatColor.YELLOW}$note",
+                        "",
+                        "${ChatColor.GRAY}Click to change."
+                    )
+                    onclick = {
+                        val anvil =
+                            AnvilGUI.Builder().text("Enter note here").plugin(Mars.get())
+                        anvil.onComplete { _, note ->
+                            return@onComplete AnvilGUI.Response.openInventory(
+                                createPunishConfirmGUI(
+                                    context,
+                                    target,
+                                    targetDisplay,
+                                    type,
+                                    history,
+                                    note,
+                                    isSilent
+                                ).inventory
+                            )
+                        }
+                        anvil.open(this.actor)
+                    }
+                }
+            }
+
+            slot(24) {
+                item = item(Material.NOTE_BLOCK) {
+                    name = "${ChatColor.AQUA}Toggle Silent"
+                    lore = listOf(
+                        "",
+                        "${ChatColor.GRAY}Silent: ${if (isSilent) "${ChatColor.GREEN}Yes" else "${ChatColor.RED}No"}"
+                    )
+                    onclick = {
+                        it.player.openInventory(
+                            createPunishConfirmGUI(
+                                context,
+                                target,
+                                targetDisplay,
+                                type,
+                                history,
+                                note,
+                                !isSilent
+                            ).inventory
+                        )
+                    }
+                }
+            }
+
             slot(26) {
                 item = item(Material.ARROW) {
                     name = "${ChatColor.DARK_RED}${selectedAction.kind.verb} ${target.name}"
