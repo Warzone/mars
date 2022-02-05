@@ -526,9 +526,9 @@ class PunishCommands {
                                 ).append(newline())
                         )
                     }
-                    PunishmentKind.KICK -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been kicked from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Further offences may result in harsher punishments.")
-                    PunishmentKind.BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}$appealLink")
-                    PunishmentKind.IP_BAN -> targetContext.player.kickPlayer("${ChatColor.GRAY}You have been IP banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}$appealLink")
+                    PunishmentKind.KICK -> Mars.sync { targetContext.player.kickPlayer("${ChatColor.GRAY}You have been kicked from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Further offences may result in harsher punishments.") }
+                    PunishmentKind.BAN -> Mars.sync { targetContext.player.kickPlayer("${ChatColor.GRAY}You have been banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}$appealLink") }
+                    PunishmentKind.IP_BAN -> Mars.sync { targetContext.player.kickPlayer("${ChatColor.GRAY}You have been IP banned from the server.\n\n${ChatColor.RED}${reason.message}\n\n${ChatColor.GRAY}Appeal at ${ChatColor.AQUA}$appealLink") }
                     PunishmentKind.MUTE -> {
                         targetContext.activePunishments = targetContext.activePunishments + punishment
                         targetContext.matchPlayer.sendMessage(

@@ -47,6 +47,8 @@ class Mars : JavaPlugin() {
             }
         }
 
+        fun sync(block: () -> Unit) = Bukkit.getScheduler().runTask(get(), block) // Run next tick
+
         fun get() = instance
 
         fun registerEvents(listener: Listener) = Bukkit.getPluginManager().registerEvents(listener, instance)
