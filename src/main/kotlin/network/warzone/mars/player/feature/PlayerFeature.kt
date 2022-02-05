@@ -158,7 +158,6 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
         } catch (e: Exception) {
             event.kickMessage = "&cUnable to load player profile. Please try again later or contact staff.".color()
             event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
-            e.printStackTrace()
         }
     }
 
