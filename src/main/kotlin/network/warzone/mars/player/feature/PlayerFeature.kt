@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import tc.oc.pgm.api.PGM
+import tc.oc.pgm.api.Permissions
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
 import java.util.*
@@ -181,6 +182,13 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
         val join = queuedJoins[player.id] ?: return
         if (!player.isVanished)
             Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} joined. ${if (join.isNew) "${ChatColor.LIGHT_PURPLE}[NEW]" else ""}")
+        else
+            Bukkit.getOnlinePlayers()
+                .filter { it.hasPermission(Permissions.ADMINCHAT) }
+                .forEach {
+                    it.sendMessage("${ChatColor.GRAY}${ChatColor.ITALIC}${event.player.name} joined quietly.")
+                }
+
 
         // Join process has finished, we don't need the queued join anymore
         queuedJoins.remove(player.id)
@@ -189,8 +197,14 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     fun onPlayerLeave(event: PlayerQuitEvent) {
         val player = event.player.matchPlayer
-        if (player.isVanished) return
-        Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} left.")
+        if (!player.isVanished)
+            Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} left.")
+        else
+            Bukkit.getOnlinePlayers()
+                .filter { it.hasPermission(Permissions.ADMINCHAT) }
+                .forEach {
+                    it.sendMessage("${ChatColor.GRAY}${ChatColor.ITALIC}${event.player.name} left quietly.")
+                }
     }
 
     @EventHandler
