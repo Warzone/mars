@@ -10,6 +10,7 @@ import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
+import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.*
 import org.bukkit.ChatColor
@@ -23,7 +24,7 @@ import javax.annotation.Nullable
 
 class ModCommands {
     @Command(aliases = ["lookup", "alts", "lu"], desc = "Lookup player information & alts", usage = "<player>", perms = ["mars.lookup"])
-    fun onPlayerLookup(@Sender sender: CommandSender, audience: Audience, context: PlayerContext, target: String) {
+    fun onPlayerLookup(@Sender sender: CommandSender, audience: Audience, context: PlayerContext, @PlayerName target: String) {
         Mars.async {
             try {
                 val lookup =
@@ -86,11 +87,7 @@ class ModCommands {
         @Nullable @Text value: String?
     )  {
         Mars.async {
-            val profile = PlayerFeature.get(name)
-            if (profile == null) {
-                sender.sendMessage("${ChatColor.RED}Player '${name}' was not found.")
-                return@async
-            }
+            val profile = PlayerFeature.lookup(name).player
             when (op) {
                 null -> {
                     var message = text("Notes for ${profile.name}", NamedTextColor.GREEN).append { newline() }

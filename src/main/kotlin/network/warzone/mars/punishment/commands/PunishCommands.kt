@@ -8,12 +8,14 @@ import app.ashcon.intake.parametric.annotation.Text
 import net.wesjd.anvilgui.AnvilGUI
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
+import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.commands.providers.PunishmentTypes
 import network.warzone.mars.match.MatchManager
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.feature.PlayerService
+import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.PunishmentFeature
 import network.warzone.mars.punishment.models.*
@@ -47,11 +49,12 @@ class PunishCommands {
         @Sender player: Player,
         audience: Audience,
         context: PlayerContext,
-        target: PlayerProfile,
+        @PlayerName name: String,
         @Nullable @PunishmentTypes reason: String?,
         @Switch('s') isSilent: Boolean = false
     ) {
         Mars.async {
+            val target = PlayerFeature.lookup(name, false).player
             val types = PunishmentFeature.punishmentTypes.filter { player.hasPermission(it.requiredPermission) }
 
             try {

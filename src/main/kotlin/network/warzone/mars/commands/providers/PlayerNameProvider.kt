@@ -18,6 +18,9 @@ class PlayerNameProvider : BukkitProvider<String> {
         namespace: Namespace?,
         mods: MutableList<out Annotation>?
     ): MutableList<String> {
-        return Bukkit.getOnlinePlayers().map { it.name }.toMutableList()
+        return Bukkit.getOnlinePlayers()
+            .map { it.name }
+            .filter {it.startsWith(prefix ?: "", ignoreCase = true)}
+            .toMutableList()
     }
 }

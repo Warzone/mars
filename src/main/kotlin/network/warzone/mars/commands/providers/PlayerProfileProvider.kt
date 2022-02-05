@@ -8,6 +8,7 @@ import com.github.kittinunf.result.getOrNull
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
+import network.warzone.mars.player.feature.exceptions.PlayerNotOnlineException
 import network.warzone.mars.player.models.PlayerProfile
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -25,7 +26,7 @@ class PlayerProfileProvider : BukkitProvider<PlayerProfile> {
         val name = args.next()
 
         val profile = PlayerFeature.getCached(name) // Only online players
-        profile ?: throw ArgumentParseException(PlayerMissingException(name).asTextComponent().content())
+        profile ?: throw ArgumentParseException(PlayerNotOnlineException(name).asTextComponent().content())
 
         return@runBlocking profile
     }
@@ -36,7 +37,7 @@ class PlayerProfileProvider : BukkitProvider<PlayerProfile> {
         modifiers: MutableList<out Annotation>?
     ): MutableList<String> {
         return Bukkit.getOnlinePlayers()
-            .filter { it.name.startsWith(prefix ?: "") }
+            .filter { it.name.startsWith(prefix ?: "", ignoreCase = true) }
             .map { it.name }
             .toMutableList()
     }
