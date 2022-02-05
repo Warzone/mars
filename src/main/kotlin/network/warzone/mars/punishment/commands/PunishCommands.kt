@@ -481,7 +481,7 @@ class PunishCommands {
 
     }
 
-    private suspend fun issuePunishment(
+    private fun issuePunishment(
         target: PlayerProfile,
         offence: Int,
         staff: PlayerContext?,
@@ -489,7 +489,7 @@ class PunishCommands {
         action: PunishmentAction,
         silent: Boolean,
         note: String?
-    ) {
+    ) = Mars.async {
         try {
             val targetContext = PlayerManager.getPlayer(target._id)
 
