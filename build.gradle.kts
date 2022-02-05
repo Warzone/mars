@@ -6,10 +6,26 @@ plugins {
     kotlin("plugin.serialization") version "1.5.20"
 
     id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("me.qoomon.git-versioning") version "5.1.1"
 }
 
 group = "network.warzone.mars"
-version = "1.0-SNAPSHOT"
+
+val majorVersion = "1.0-SNAPSHOT"
+version = majorVersion
+
+gitVersioning.apply {
+    refs {
+        branch(".+") {
+            version = "${project.version}-\${ref}-\${commit.short}"
+        }
+    }
+
+    // fallback configuration in case of no matching ref configuration
+    rev {
+        version = "${project.version}-\${commit.short}"
+    }
+}
 
 repositories {
     mavenCentral()
@@ -85,6 +101,13 @@ tasks.withType<ShadowJar> {
 //    minimize()
     manifest {
         attributes["Main-Class"] = "network.warzone.mars.MarsKt"
+    }
+
+    archiveBaseName.set("Mars")
+    archiveVersion.set("$majorVersion")
+
+    filesMatching("**/plugin.yml") {
+        expand("version" to project.version)
     }
 }
 
