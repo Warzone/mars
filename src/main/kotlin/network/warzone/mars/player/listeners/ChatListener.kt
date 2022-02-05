@@ -132,8 +132,9 @@ class ChatListener : Listener {
             else player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name} ${GRAY}until ${WHITE}${activeMute.expiresAt}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
             return@runBlocking
         }
-
-        val chatChannel = context.matchPlayer.settings.getValue(SettingKey.CHAT)
+        val chatChannel =
+            if (context.matchPlayer.isVanished && context.player.hasPermission(Permissions.ADMINCHAT)) SettingValue.CHAT_ADMIN
+            else context.matchPlayer.settings.getValue(SettingKey.CHAT)
 
         val isChatEnabled = Mars.get().config.getBoolean("chat.enabled")
         if (chatChannel == SettingValue.CHAT_GLOBAL && !isChatEnabled && !player.hasPermission("mars.chat.mute.bypass")) {
