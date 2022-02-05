@@ -22,6 +22,7 @@ import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -178,15 +179,17 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player.matchPlayer
         val join = queuedJoins[player.id] ?: return
-
-        Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} joined. ${if (join.isNew) "${ChatColor.LIGHT_PURPLE}[NEW]" else ""}")
+        if (!player.isVanished)
+            Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} joined. ${if (join.isNew) "${ChatColor.LIGHT_PURPLE}[NEW]" else ""}")
 
         // Join process has finished, we don't need the queued join anymore
         queuedJoins.remove(player.id)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun onPlayerLeave(event: PlayerQuitEvent) {
+        val player = event.player.matchPlayer
+        if (player.isVanished) return
         Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} left.")
     }
 
