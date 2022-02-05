@@ -35,6 +35,7 @@ object CommandModule : AbstractModule(), Listener {
         bind(Broadcast::class, BroadcastProvider())
 
         bind(String::class, PunishmentTypes::class, PunishmentTypeProvider())
+        bind(String::class, PlayerName::class, PunishmentTypeProvider())
     }
 
     private fun <T : Any> bind(type: KClass<T>, provider: Provider<T>) {

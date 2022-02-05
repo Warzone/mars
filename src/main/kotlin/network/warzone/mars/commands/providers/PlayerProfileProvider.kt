@@ -24,7 +24,7 @@ class PlayerProfileProvider : BukkitProvider<PlayerProfile> {
     ): PlayerProfile = runBlocking {
         val name = args.next()
 
-        val profile = PlayerFeature.get(name)
+        val profile = PlayerFeature.getCached(name) // Only online players
         profile ?: throw ArgumentParseException(PlayerMissingException(name).asTextComponent().content())
 
         return@runBlocking profile

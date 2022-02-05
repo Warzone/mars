@@ -6,6 +6,7 @@ import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import app.ashcon.intake.parametric.annotation.Text
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
+import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
@@ -80,11 +81,16 @@ class ModCommands {
         @Sender sender: Player,
         audience: Audience,
         context: PlayerContext,
-        profile: PlayerProfile,
+        @PlayerName name: String, // Accept offline players too
         @Nullable op: String?,
         @Nullable @Text value: String?
     )  {
         Mars.async {
+            val profile = PlayerFeature.get(name)
+            if (profile == null) {
+                sender.sendMessage("${ChatColor.RED}Player '${name}' was not found.")
+                return@async
+            }
             when (op) {
                 null -> {
                     var message = text("Notes for ${profile.name}", NamedTextColor.GREEN).append { newline() }
