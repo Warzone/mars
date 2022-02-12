@@ -104,8 +104,9 @@ class MatchTracker : Listener {
      */
     @EventHandler
     fun onForceMatchEnd(event: ForceMatchEndEvent) {
-        val match = MatchManager.match
-        if (!match.isFinished) match.finish()
+        // TODO: Re-enable forced match ending when API is stable
+//        val match = MatchManager.match
+//        if (!match.isFinished) match.finish()
     }
 
     private fun getFlagPartials(match: Match): List<FlagPartial> {
