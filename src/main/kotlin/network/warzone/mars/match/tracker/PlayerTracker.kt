@@ -64,6 +64,9 @@ class PlayerTracker : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerDeath(event: MatchPlayerDeathEvent) {
+        // Suicides aren't classified as team kills, so both checks are necessary.
+        if (event.isTeamKill) return
+
         val translatableComponent = LegacyTextDeathMessageBuilder(event)
 
         val weapon = translatableComponent.weaponString

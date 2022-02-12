@@ -8,8 +8,7 @@ import network.warzone.mars.rank.commands.RankCommands
 import network.warzone.mars.rank.exceptions.RankConflictException
 import network.warzone.mars.rank.exceptions.RankMissingException
 import network.warzone.mars.rank.models.Rank
-import network.warzone.mars.tag.TagFeature
-import network.warzone.mars.tag.TagService
+import org.bukkit.Bukkit
 import java.util.*
 
 object RankFeature : NamedCachedFeature<Rank>() {
@@ -121,10 +120,10 @@ object RankFeature : NamedCachedFeature<Rank>() {
     }
 
     suspend fun updatePermissions(rank: Rank) {
-        PlayerFeature.query {
-            it.rankIds.contains(rank._id)
+        Bukkit.getOnlinePlayers().filter {
+            PlayerFeature.getCached(it.uniqueId)?.rankIds?.contains(rank._id) ?: false
         }.forEach {
-            RankAttachments.refresh(PlayerManager.getPlayer(it._id)!!)
+            RankAttachments.refresh(PlayerManager.getPlayer(it.uniqueId)!!)
         }
     }
 

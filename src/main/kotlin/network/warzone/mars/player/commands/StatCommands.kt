@@ -3,16 +3,14 @@ package network.warzone.mars.player.commands
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
-import kotlinx.coroutines.runBlocking
+import network.warzone.mars.Mars
 import network.warzone.mars.match.tracker.KillstreakTracker
-import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
@@ -20,7 +18,6 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.Component.*
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
 import javax.annotation.Nullable
-import kotlin.reflect.jvm.internal.impl.builtins.StandardNames.FqNames.target
 
 
 class StatCommands {
@@ -44,11 +41,17 @@ class StatCommands {
     }
 
     @Command(aliases = ["stats", "statistics"], desc = "View a player's stats", usage = "[player]")
-    fun onStatsView(@Sender sender: Player, @Nullable player: PlayerProfile?) = runBlocking {
-        if (player == null) {
-            val profile = PlayerFeature.get(sender.uniqueId) ?: throw CommandException("Sender has no player profile")
-            viewStats(sender.matchPlayer, profile)
-        } else viewStats(sender.matchPlayer, player)
+    fun onStatsView(@Sender sender: Player, @Nullable playerName: String?) {
+        Mars.async {
+            if (playerName == null) {
+                viewStats(sender.matchPlayer, PlayerFeature.fetch(sender.name) ?: throw CommandException("Cant find profile for player."))
+            } else {
+                val profile = PlayerFeature.fetch(playerName)
+                    ?: PlayerFeature.fetch(sender.name)
+                    ?: throw CommandException("Cant find profile for player.")
+                viewStats(sender.matchPlayer, profile)
+            }
+        }
     }
 
     private fun viewStats(sender: MatchPlayer, profile: PlayerProfile) {
@@ -84,7 +87,7 @@ class StatCommands {
                 .append { newline() }
                 .append { createLabelledStat("Wins", stats.wins, StatType.POSITIVE) }
                 .append { createLabelledStat("Losses", stats.losses, StatType.NEGATIVE) }
-                .append { createLabelledStat("W/L", stats.wlr, StatType.NEUTRAL) }
+                .append { createLabelledStat("Win %", stats.winPercentage, StatType.NEUTRAL) }
                 .append { outline }
         sender.sendMessage(component)
     }

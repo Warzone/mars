@@ -2,7 +2,7 @@ package network.warzone.mars.broadcast
 
 import app.ashcon.intake.Command
 import app.ashcon.intake.parametric.annotation.Text
-import kotlinx.coroutines.runBlocking
+import network.warzone.mars.Mars
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 
@@ -26,8 +26,10 @@ class BroadcastCommands {
     }
 
     @Command(aliases = ["reload"], desc = "Reload the broadcast list", perms = ["mars.broadcast"])
-    fun onReloadBroadcast(sender: CommandSender) = runBlocking {
-        BroadcastFeature.reload()
-        sender.sendMessage("${ChatColor.GREEN}Reloaded broadcasts")
+    fun onReloadBroadcast(sender: CommandSender) {
+        Mars.async {
+            BroadcastFeature.reload()
+            sender.sendMessage("${ChatColor.GREEN}Reloaded broadcasts")
+        }
     }
 }

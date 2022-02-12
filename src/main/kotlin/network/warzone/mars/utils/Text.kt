@@ -287,9 +287,13 @@ fun String.chunkedWords(size: Int): List<String> {
     return chunked.map { it.joinToString(" ") }
 }
 
-fun getPlayerLevelAsComponent(profile: PlayerProfile): Component {
+fun getLevelAsComponent(level: Int): Component {
     return text(
-        "[${profile.stats.level}]",
-        LevelColorService.chatColorFromLevel(profile.stats.level)
+        "[$level]",
+        LevelColorService.chatColorFromLevel(level)
     )
+}
+
+fun getPlayerLevelAsComponent(profile: PlayerProfile): Component {
+    return getLevelAsComponent(profile.stats.level)
 }

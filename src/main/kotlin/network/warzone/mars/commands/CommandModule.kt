@@ -33,6 +33,9 @@ object CommandModule : AbstractModule(), Listener {
         bind(Punishment::class, PunishmentProvider())
         bind(PlayerProfile::class, PlayerProfileProvider())
         bind(Broadcast::class, BroadcastProvider())
+
+        bind(String::class, PunishmentTypes::class, PunishmentTypeProvider())
+        bind(String::class, PlayerName::class, PlayerNameProvider())
     }
 
     private fun <T : Any> bind(type: KClass<T>, provider: Provider<T>) {
@@ -41,6 +44,10 @@ object CommandModule : AbstractModule(), Listener {
 
     private fun <T : Any> bind(type: KClass<T>, supplier: Singleton<T>) {
         bind(type, supplier)
+    }
+
+    private fun <T : Any, V : Annotation> bind(type: KClass<T>, annotatedWith: KClass<V>, provider: Provider<T>) {
+        bind(type.java).annotatedWith(annotatedWith.java).toProvider(provider)
     }
 
     @FunctionalInterface

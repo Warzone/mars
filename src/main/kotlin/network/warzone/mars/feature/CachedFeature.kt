@@ -105,6 +105,14 @@ abstract class CachedFeature<T : Resource> : Feature<T>() {
         return cache[id]
     }
 
+    suspend fun pull(id: UUID): T? {
+        val resource = fetch(id.toString())
+
+        if (resource != null) add(resource)
+
+        return resource
+    }
+
     /**
      * Attempts to get resource from local cache, and API if not in cache.
      *

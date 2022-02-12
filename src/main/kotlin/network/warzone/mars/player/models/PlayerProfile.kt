@@ -93,13 +93,13 @@ data class PlayerStats(
     val level: Int
         get() = floor(((xp + 5000) / 5000).toDouble()).toInt()
 
-    val wlr: String
-    get() {
-        val nf = NumberFormat.getInstance()
-        nf.maximumFractionDigits = 2
-        nf.minimumFractionDigits = 2
-        return if (losses == 0) nf.format(wins.toDouble()) else nf.format(wins.toDouble() / losses)
-    }
+    val winPercentage: String
+        get() {
+            val nf = NumberFormat.getInstance()
+            nf.maximumFractionDigits = 1
+            nf.minimumFractionDigits = 1
+            return if (matches == 0) "0%" else "${nf.format(wins.toDouble() / matchesPresentEnd * 100f)}%"
+        }
 
     val kdr: String
         get() {
