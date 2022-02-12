@@ -147,7 +147,7 @@ class PunishCommands {
     }
 
     @Command(aliases = ["punishments", "puns"], desc = "View a player's punishment history", perms = ["mars.punish"])
-    fun onPunishmentHistory(@Sender sender: CommandSender, audience: Audience, target: String) {
+    fun onPunishmentHistory(@Sender sender: CommandSender, audience: Audience, @PlayerName target: String) {
         Mars.async {
             try {
                 val history = PlayerService.getPunishmentHistory(target)

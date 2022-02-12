@@ -6,6 +6,7 @@ import app.ashcon.intake.parametric.annotation.Default
 import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
 import network.warzone.mars.Mars
+import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.rank.RankFeature
 import network.warzone.mars.rank.models.Rank
@@ -156,7 +157,7 @@ class RankCommands {
     fun onRankPlayer(
         sender: CommandSender,
         audience: Audience,
-        playerName: String,
+        @PlayerName playerName: String,
         operation: String,
         @Nullable rank: Rank?
     )  {

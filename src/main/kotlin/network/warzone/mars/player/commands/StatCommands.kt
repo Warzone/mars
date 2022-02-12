@@ -4,6 +4,7 @@ import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import network.warzone.mars.Mars
+import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.match.tracker.KillstreakTracker
 import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.player.feature.PlayerFeature
@@ -22,7 +23,7 @@ import javax.annotation.Nullable
 
 class StatCommands {
     @Command(aliases = ["killstreak", "ks"], desc = "View your current killstreak", usage = "[player]")
-    fun onKillstreakView(@Sender sender: Player, @Nullable playerName: String?) {
+    fun onKillstreakView(@Sender sender: Player, @Nullable @PlayerName playerName: String?) {
         val player = playerName?.let { Bukkit.getPlayer(it) } ?: sender
         val killstreak = KillstreakTracker.getKillstreak(player.uniqueId ?: sender.uniqueId)
             ?: return sender.sendMessage("${ChatColor.RED}Killstreaks are not being tracked")
@@ -41,7 +42,7 @@ class StatCommands {
     }
 
     @Command(aliases = ["stats", "statistics"], desc = "View a player's stats", usage = "[player]")
-    fun onStatsView(@Sender sender: Player, @Nullable playerName: String?) {
+    fun onStatsView(@Sender sender: Player, @Nullable @PlayerName playerName: String?) {
         Mars.async {
             if (playerName == null) {
                 viewStats(sender.matchPlayer, PlayerFeature.fetch(sender.name) ?: throw CommandException("Cant find profile for player."))

@@ -4,6 +4,7 @@ import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import network.warzone.mars.Mars
+import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.match.tracker.KillstreakTracker
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
@@ -49,7 +50,7 @@ class MiscCommands {
     }
 
     @Command(aliases = ["ping"], desc = "View a player's ping", usage = "[player]")
-    fun onPingView(@Sender sender: CommandSender, @Nullable playerName: String?) {
+    fun onPingView(@Sender sender: CommandSender, @Nullable @PlayerName playerName: String?) {
         val player = playerName?.let { Bukkit.getPlayer(it) } ?: sender
         if (player !is Player) throw CommandException("Consoles cannot check their own pings")
 
