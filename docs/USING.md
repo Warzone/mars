@@ -15,3 +15,7 @@ On a PGM server ([setup guide](https://github.com/PGMDev/PGM/blob/dev/docs/RUNNI
 You can learn more about Mars' architecture [here](https://github.com/Warzone/mars/tree/master/docs/CONTRIBUTING.md).
 
 **Currently, to obtain an up-to-date plugin JAR, you need to [build the plugin yourself](https://github.com/Warzone/mars/tree/master/docs/CONTRIBUTING.md)**.
+
+### Caveats
+
+- For gamemode stats to work during a match (i.e. Flags Captured, Cores Leaked), the map definition (`map.xml`) must include a `<gamemode>` tag with the map's gamemodes. This may be changed in the future, but it is advisable to use `<gamemode>` tags for data accuracy regardless.
