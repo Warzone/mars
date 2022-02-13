@@ -15,3 +15,6 @@ Before starting to work on sizeable contributions, we highly recommend you [crea
 ### Architecture
 
 Mars, the Spigot plugin, depends on [Mars API](https://github.com/Warzone/mars-api). Mars API handles persistent storage, stat calculations, authorisation, etc, while Mars is the "client" on the Minecraft server. Mars depends on PGM's Java API. Mars and Mars API communicate using HTTP(s) and WebSockets. Mars API depends on Redis and Mongo (see [Mars API](https://github.com/Warzone/mars-api) for more info).
+
+Refer to the diagram below for more information.<br /><br />
+![Mars architecture diagram](https://raw.githubusercontent.com/Warzone/mars/master/docs/mars-architecture.svg)
