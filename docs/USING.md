@@ -10,11 +10,11 @@ At the moment, we would not recommend using Mars for servers that rely on perfec
 
 ### Using
 
+Download the latest Mars build [here](https://nightly.link/Warzone/mars/workflows/build/master/Mars.zip).
+
 On a PGM server ([setup guide](https://github.com/PGMDev/PGM/blob/dev/docs/RUNNING.md)), add the Mars plugin JAR file to the server's `plugins/` folder. After starting the server once, Mars will generate [a config file](https://github.com/Warzone/mars/blob/master/src/main/resources/config.yml) which you need to modify to match the API (API URLs and secret token). Once the config is updated, restart the server and Mars should be working (you should see a connection message in the API console).
 
 You can learn more about Mars' architecture [here](https://github.com/Warzone/mars/tree/master/docs/CONTRIBUTING.md).
-
-**Currently, to obtain an up-to-date plugin JAR, you need to [build the plugin yourself](https://github.com/Warzone/mars/tree/master/docs/CONTRIBUTING.md)**.
 
 ### Caveats
 
