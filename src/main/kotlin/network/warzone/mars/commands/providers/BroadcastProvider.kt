@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import network.warzone.mars.broadcast.Broadcast
 import network.warzone.mars.broadcast.BroadcastFeature
 import network.warzone.mars.broadcast.exceptions.BroadcastMissingException
+import network.warzone.mars.utils.translate
 import org.bukkit.command.CommandSender
 
 class BroadcastProvider : BukkitProvider<Broadcast> {
@@ -19,7 +20,9 @@ class BroadcastProvider : BukkitProvider<Broadcast> {
         val broadcastName = args.next()
 
         val broadcast: Broadcast? = BroadcastFeature.fetch(broadcastName)
-        broadcast ?: throw ArgumentParseException(BroadcastMissingException(broadcastName).asTextComponent().content())
+        broadcast ?: throw ArgumentParseException(
+            translate(BroadcastMissingException(broadcastName).asComponent(), sender)
+        )
 
         return@runBlocking broadcast
     }

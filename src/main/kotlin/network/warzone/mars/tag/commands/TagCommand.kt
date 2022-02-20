@@ -4,18 +4,16 @@ import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import app.ashcon.intake.parametric.annotation.Switch
 import network.warzone.mars.Mars
-import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.tag.TagFeature
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.FeatureException
 import network.warzone.mars.utils.asTextComponent
-import org.bukkit.ChatColor.GREEN
-import org.bukkit.ChatColor.RED
-import org.bukkit.ChatColor.ITALIC
+import org.bukkit.ChatColor.*
 import org.bukkit.command.CommandSender
+import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import javax.annotation.Nullable
 
 class TagCommand {
@@ -31,7 +29,7 @@ class TagCommand {
                 TagFeature.create(name, display)
                 sender.sendMessage("${GREEN}Created tag $name")
             } catch (e: FeatureException) {
-                audience.sendMessage(e.asTextComponent())
+                audience.sendMessage(e.asComponent())
             }
         }
     }
@@ -43,7 +41,7 @@ class TagCommand {
                 TagFeature.delete(tag._id)
                 sender.sendMessage("${GREEN}Deleted tag ${tag.name}")
             } catch (e: FeatureException) {
-                audience.sendMessage(e.asTextComponent())
+                audience.sendMessage(e.asComponent())
             }
         }
     }
@@ -69,7 +67,7 @@ class TagCommand {
                 TagFeature.update(tag._id, mutableTag)
                 sender.sendMessage("${GREEN}Tag updated")
             } catch (e: FeatureException) {
-                audience.sendMessage(e.asTextComponent())
+                audience.sendMessage(e.asComponent())
             }
         }
     }
@@ -112,7 +110,7 @@ class TagCommand {
                         PlayerFeature.addTag(player.name, tag.name)
                         sender.sendMessage("${GREEN}Added ${tag.name} to player")
                     } catch (e: FeatureException) {
-                        audience.sendMessage(e.asTextComponent())
+                        audience.sendMessage(e.asComponent())
                     }
                 }
                 "remove" -> {
@@ -122,7 +120,7 @@ class TagCommand {
                         PlayerFeature.removeTag(player.name, tag.name)
                         sender.sendMessage("${GREEN}Removed ${tag.name} from player")
                     } catch (e: FeatureException) {
-                        audience.sendMessage(e.asTextComponent())
+                        audience.sendMessage(e.asComponent())
                     }
                 }
                 "list" -> {
@@ -142,7 +140,7 @@ class TagCommand {
                             PlayerFeature.setActiveTag(player.name, tag)
                             sender.sendMessage("${GREEN}Set player's active tag to ${tag.name}")
                         } catch (e: FeatureException) {
-                            audience.sendMessage(e.asTextComponent())
+                            audience.sendMessage(e.asComponent())
                         }
                     } else {
                         try {
@@ -150,7 +148,7 @@ class TagCommand {
                             PlayerFeature.setActiveTag(player.name, null)
                             sender.sendMessage("${RED}Cleared player's active tag (previous: ${activeTag?.name ?: "${ITALIC}None"})")
                         } catch (e: FeatureException) {
-                            audience.sendMessage(e.asTextComponent())
+                            audience.sendMessage(e.asComponent())
                         }
                     }
                 }

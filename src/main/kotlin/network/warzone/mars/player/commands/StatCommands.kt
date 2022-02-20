@@ -9,9 +9,10 @@ import network.warzone.mars.match.tracker.KillstreakTracker
 import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
+import network.warzone.mars.utils.audience
 import network.warzone.mars.utils.matchPlayer
+import network.warzone.mars.utils.translate
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
@@ -26,18 +27,29 @@ class StatCommands {
     fun onKillstreakView(@Sender sender: Player, @Nullable @PlayerName playerName: String?) {
         val player = playerName?.let { Bukkit.getPlayer(it) } ?: sender
         val killstreak = KillstreakTracker.getKillstreak(player.uniqueId ?: sender.uniqueId)
-            ?: return sender.sendMessage("${ChatColor.RED}Killstreaks are not being tracked")
+            ?: return sender.audience.sendMessage(translatable("command.stat.killstreak.untracked", NamedTextColor.RED))
         val (_, color) = KillstreakTracker.getNearestTrackedKillstreak(killstreak)
         if (killstreak > 0) {
-            val perspective = if (player == sender) "You're" else "${player.name} is"
-            sender.matchPlayer.sendMessage(
-                text("$perspective on a killstreak of ", NamedTextColor.GREEN)
-                    .append(text(killstreak, color, TextDecoration.BOLD))
-                    .append(text(" kills.", NamedTextColor.GREEN))
-            )
+            if (player == sender) {
+                sender.audience.sendMessage(
+                    translatable("command.stat.killstreak.self", NamedTextColor.GREEN,
+                        text(killstreak, color, TextDecoration.BOLD))
+                )
+            } else {
+                sender.audience.sendMessage(
+                    translatable("command.stat.killstreak.other", NamedTextColor.GREEN,
+                        text(player.name),
+                        text(killstreak.toString(), color, TextDecoration.BOLD))
+                )
+            }
         } else {
-            val perspective = if (player == sender) "You don't" else "${player.name} doesn't"
-            sender.sendMessage("${ChatColor.RED}$perspective have a killstreak yet.")
+            if (player == sender) {
+                sender.audience.sendMessage(translatable("command.stat.killstreak.self.none", NamedTextColor.RED))
+            } else {
+                sender.audience.sendMessage(
+                    translatable("command.stat.killstreak.other.none", NamedTextColor.RED, text(player.name))
+                )
+            }
         }
     }
 
@@ -45,11 +57,12 @@ class StatCommands {
     fun onStatsView(@Sender sender: Player, @Nullable @PlayerName playerName: String?) {
         Mars.async {
             if (playerName == null) {
-                viewStats(sender.matchPlayer, PlayerFeature.fetch(sender.name) ?: throw CommandException("Cant find profile for player."))
+                viewStats(sender.matchPlayer, PlayerFeature.fetch(sender.name) ?: throw CommandException(
+                    translate("command.stat.stats.error", sender)))
             } else {
                 val profile = PlayerFeature.fetch(playerName)
                     ?: PlayerFeature.fetch(sender.name)
-                    ?: throw CommandException("Cant find profile for player.")
+                    ?: throw CommandException(translate("command.stat.stats.error", sender))
                 viewStats(sender.matchPlayer, profile)
             }
         }
@@ -64,7 +77,7 @@ class StatCommands {
                 .append(
                     space(),
                     space(),
-                    text("Viewing stats for ", NamedTextColor.DARK_AQUA).append(
+                    translatable("command.stat.stats.title", NamedTextColor.DARK_AQUA,
                         text(
                             profile.name,
                             NamedTextColor.AQUA
@@ -74,21 +87,21 @@ class StatCommands {
                 .append { newline() }
                 .append {
                     createCustomStat(
-                        "Level",
+                        "command.stat.stats.label.level",
                         stats.level,
                         LevelColorService.chatColorFromLevel(stats.level)
                     )
                 }
-                .append { createLabelledStat("XP", stats.xp, StatType.NEUTRAL) }
+                .append { createLabelledStat("command.stat.stats.label.xp", stats.xp, StatType.NEUTRAL) }
                 .append { newline() }
-                .append { createLabelledStat("Kills", stats.kills, StatType.POSITIVE) }
-                .append { createLabelledStat("First Bloods", stats.firstBloods, StatType.POSITIVE) }
-                .append { createLabelledStat("Deaths", stats.deaths, StatType.NEGATIVE) }
-                .append { createLabelledStat("K/D", stats.kdr, StatType.NEUTRAL) }
+                .append { createLabelledStat("command.stat.stats.label.kills", stats.kills, StatType.POSITIVE) }
+                .append { createLabelledStat("command.stat.stats.label.first-bloods", stats.firstBloods, StatType.POSITIVE) }
+                .append { createLabelledStat("command.stat.stats.label.deaths", stats.deaths, StatType.NEGATIVE) }
+                .append { createLabelledStat("command.stat.stats.label.kdr", stats.kdr, StatType.NEUTRAL) }
                 .append { newline() }
-                .append { createLabelledStat("Wins", stats.wins, StatType.POSITIVE) }
-                .append { createLabelledStat("Losses", stats.losses, StatType.NEGATIVE) }
-                .append { createLabelledStat("Win %", stats.winPercentage, StatType.NEUTRAL) }
+                .append { createLabelledStat("command.stat.stats.label.wins", stats.wins, StatType.POSITIVE) }
+                .append { createLabelledStat("command.stat.stats.label.losses", stats.losses, StatType.NEGATIVE) }
+                .append { createLabelledStat("command.stat.stats.label.wr", stats.winPercentage, StatType.NEUTRAL) }
                 .append { outline }
         sender.sendMessage(component)
     }
@@ -100,21 +113,14 @@ class StatCommands {
     }
 
     private fun createLabelledStat(label: String, value: Any, type: StatType): Component {
-        return text()
-            .append { space() }
-            .append { space() }
-            .append { text("$label: ", NamedTextColor.DARK_AQUA) }
-            .append { text(value.toString(), type.color) }
-            .append { newline() }
-            .build()
+        return createCustomStat(label, value, type.color)
     }
 
     private fun createCustomStat(label: String, value: Any, color: NamedTextColor): Component {
         return text()
             .append { space() }
             .append { space() }
-            .append { text("$label: ", NamedTextColor.DARK_AQUA) }
-            .append { text(value.toString(), color) }
+            .append { translatable(label, NamedTextColor.DARK_AQUA, text(value.toString(), color)) }
             .append { newline() }
             .build()
     }

@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import network.warzone.mars.punishment.PunishmentFeature
 import network.warzone.mars.punishment.exceptions.PunishmentMissingException
 import network.warzone.mars.punishment.models.Punishment
+import network.warzone.mars.utils.translate
 import org.bukkit.command.CommandSender
 import java.util.*
 
@@ -21,7 +22,7 @@ class PunishmentProvider : BukkitProvider<Punishment> {
 
             val punishment: Punishment? = PunishmentFeature.get(punId)
             punishment ?: throw ArgumentParseException(
-                PunishmentMissingException(punId.toString()).asTextComponent().content()
+                translate(PunishmentMissingException(punId.toString()).asComponent(), sender)
             )
 
             return@runBlocking punishment

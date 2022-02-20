@@ -1,12 +1,13 @@
 package network.warzone.mars.tag.exceptions
 
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.TextComponent
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.utils.FeatureException
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.translatable
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
 
 data class TagConflictException(val name: String) : FeatureException() {
-    override fun asTextComponent(): TextComponent {
-        return Component.text("A tag by the name $name already exists.", NamedTextColor.RED)
+    override fun asComponent(): Component {
+        return translatable("exception.tag.exists", NamedTextColor.RED, text(name))
     }
 }

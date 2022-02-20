@@ -1,9 +1,9 @@
 package network.warzone.mars.utils
 
-import tc.oc.pgm.lib.net.kyori.adventure.text.TextComponent
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
 
 data class MissingConfigPathException(val path: String) : RuntimeException("Missing path: $path")
 
 abstract class FeatureException : RuntimeException() {
-    abstract fun asTextComponent(): TextComponent
+    abstract fun asComponent(): Component
 }

@@ -5,30 +5,33 @@ import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import network.warzone.mars.Mars
 import network.warzone.mars.commands.providers.PlayerName
-import network.warzone.mars.match.tracker.KillstreakTracker
+import network.warzone.mars.utils.audience
 import network.warzone.mars.utils.matchPlayer
+import network.warzone.mars.utils.translate
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.translatable
 import tc.oc.pgm.lib.net.kyori.adventure.text.event.ClickEvent
 import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
 import javax.annotation.Nullable
 
 class MiscCommands {
     fun onAppealLink(@Sender sender: Player) {
-        val appealLink = Mars.get().config.getString("server.links.appeal") ?: "No appeal link available"
+        val appealLink = Mars.get().config.getString("server.links.appeal") ?: translate("command.misc.appeal.error", sender)
         sender.matchPlayer.sendMessage(
-            Component.text("Click here to appeal a punishment", NamedTextColor.AQUA).clickEvent(ClickEvent.openUrl(appealLink))
+            translatable("command.misc.appeal.output", NamedTextColor.AQUA).clickEvent(ClickEvent.openUrl(appealLink))
         )
     }
 
     fun onRulesLink(@Sender sender: Player) {
         val rulesLink = Mars.get().config.getString("server.links.rules") ?: "No rules link available"
-        sender.sendMessage("${ChatColor.YELLOW}Please read and abide by our server rules which can be found at ${ChatColor.GOLD}$rulesLink")
+        sender.matchPlayer.sendMessage(
+            translatable("command.misc.rules.output", NamedTextColor.YELLOW, text(rulesLink, NamedTextColor.GOLD))
+        )
     }
 
     @Command(aliases = ["gmc"], desc = "Set your gamemode to Creative", perms = ["mars.gmc"])
@@ -54,9 +57,16 @@ class MiscCommands {
         val player = playerName?.let { Bukkit.getPlayer(it) } ?: sender
         if (player !is Player) throw CommandException("Consoles cannot check their own pings")
 
-        val possessive = "${player.name}${ChatColor.GRAY}${if (player.name.endsWith("s")) "'" else "'s"}"
         val ping = player.spigot().ping
-        if (player == sender) sender.sendMessage("${ChatColor.GRAY}Your ping is ${ChatColor.AQUA}${ping}ms")
-        else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
+        val pingComponent = translatable("misc.ping", NamedTextColor.AQUA, text(ping))
+        if (player == sender) sender.audience.sendMessage(
+            translatable("command.misc.ping.self", NamedTextColor.GRAY,
+                pingComponent
+            ))
+        else sender.audience.sendMessage(
+            translatable("command.misc.ping.other", NamedTextColor.GRAY,
+                text(player.name, NamedTextColor.AQUA),
+                pingComponent
+            ))
     }
 }

@@ -48,7 +48,7 @@ class RankCommands {
                 )
                 sender.sendMessage("${GREEN}Created rank $YELLOW$name")
             } catch (e: FeatureException) {
-                audience.sendMessage(e.asTextComponent())
+                audience.sendMessage(e.asComponent())
             }
         }
     }
@@ -60,7 +60,7 @@ class RankCommands {
                 RankFeature.delete(targetRank._id)
                 sender.sendMessage("${GREEN}Deleted rank $YELLOW${targetRank.name}")
             } catch (e: FeatureException) {
-                audience.sendMessage(e.asTextComponent())
+                audience.sendMessage(e.asComponent())
             }
         }
     }
@@ -130,7 +130,7 @@ class RankCommands {
                                 "[$duplicates duplicate${if (duplicates == 1) "" else "s"} ignored]"
                     )
                 } catch (e: FeatureException) {
-                    audience.sendMessage(e.asTextComponent())
+                    audience.sendMessage(e.asComponent())
                 }
             } else {
                 when (targetProperty) {
@@ -147,7 +147,7 @@ class RankCommands {
                     RankFeature.update(rank._id, mutableRank)
                     sender.sendMessage("${GREEN}Updated rank")
                 } catch (e: FeatureException) {
-                    audience.sendMessage(e.asTextComponent())
+                    audience.sendMessage(e.asComponent())
                 }
             }
         }
@@ -172,7 +172,7 @@ class RankCommands {
                         PlayerFeature.addRank(player.name, rank)
                         sender.sendMessage("${GREEN}Added ${rank.name} to player")
                     } catch (e: FeatureException) {
-                        audience.sendMessage(e.asTextComponent())
+                        audience.sendMessage(e.asComponent())
                     }
                 }
                 "remove" -> {
@@ -182,7 +182,7 @@ class RankCommands {
                         PlayerFeature.removeRank(player.name, rank)
                         sender.sendMessage("${GREEN}Removed ${rank.name} from player")
                     } catch (e: FeatureException) {
-                        audience.sendMessage(e.asTextComponent())
+                        audience.sendMessage(e.asComponent())
                     }
                 }
                 "list" -> {

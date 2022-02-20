@@ -14,6 +14,8 @@ import network.warzone.mars.tag.models.Tag
 import org.bukkit.ChatColor
 import org.bukkit.ChatColor.RED
 import org.bukkit.ChatColor.translateAlternateColorCodes
+import org.bukkit.command.CommandSender
+import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
 import tc.oc.pgm.lib.net.kyori.adventure.platform.bukkit.BukkitAudiences
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component
 import tc.oc.pgm.lib.net.kyori.adventure.text.Component.*
@@ -27,6 +29,9 @@ import java.time.Duration
 import java.util.*
 
 val AUDIENCE_PROVIDER: BukkitAudiences = BukkitAudiences.create(Mars.get())
+
+val CommandSender.audience: Audience
+    get() = AUDIENCE_PROVIDER.sender(this)
 
 fun Rank.asTextComponent(editable: Boolean = true): TextComponent {
     val translatedPrefix = (this.prefix ?: "${RED}None").color()

@@ -7,6 +7,7 @@ import app.ashcon.intake.bukkit.parametric.provider.BukkitProvider
 import network.warzone.mars.rank.RankFeature
 import network.warzone.mars.rank.exceptions.RankMissingException
 import network.warzone.mars.rank.models.Rank
+import network.warzone.mars.utils.translate
 import org.bukkit.command.CommandSender
 
 class RankProvider : BukkitProvider<Rank> {
@@ -18,7 +19,9 @@ class RankProvider : BukkitProvider<Rank> {
         val rankName = args.next()
 
         val rank: Rank? = RankFeature.getCached(rankName)
-        rank ?: throw ArgumentParseException(RankMissingException(rankName).asTextComponent().content())
+        rank ?: throw ArgumentParseException(
+            translate(RankMissingException(rankName).asComponent(), sender)
+        )
 
         return rank
     }

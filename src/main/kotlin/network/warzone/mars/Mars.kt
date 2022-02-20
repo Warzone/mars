@@ -26,15 +26,15 @@ import network.warzone.mars.commands.CommandModule
 import network.warzone.mars.feature.FeatureManager
 import network.warzone.mars.match.MatchManager
 import network.warzone.mars.player.PlayerManager
-import org.bukkit.Bukkit
-import org.bukkit.event.Listener
-import org.bukkit.plugin.java.JavaPlugin
-
 import network.warzone.mars.player.decoration.PrefixDecorationProvider
 import network.warzone.mars.player.feature.PlayerService
 import network.warzone.mars.player.tablist.overrideTabManager
+import network.warzone.mars.utils.loadTranslations
+import org.bukkit.Bukkit
+import org.bukkit.event.Listener
+import org.bukkit.plugin.java.JavaPlugin
 import tc.oc.pgm.api.PGM
-import tc.oc.pgm.tablist.*
+import tc.oc.pgm.tablist.MatchTabManager
 import java.util.*
 
 class Mars : JavaPlugin() {
@@ -63,6 +63,8 @@ class Mars : JavaPlugin() {
         instance = this@Mars
 
         this@Mars.saveDefaultConfig()
+
+        loadTranslations()
 
         serverId = config.getString("server.id")
 

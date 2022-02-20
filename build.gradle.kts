@@ -27,6 +27,21 @@ gitVersioning.apply {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir("src/main/kotlin")
+        }
+
+        resources {
+            srcDirs(
+                "src/main/resources",
+                "src/main/translations"
+            )
+        }
+    }
+}
+
 repositories {
     mavenCentral()
 

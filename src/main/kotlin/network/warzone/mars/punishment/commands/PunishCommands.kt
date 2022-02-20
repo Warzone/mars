@@ -15,12 +15,14 @@ import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.feature.PlayerService
-import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.PunishmentFeature
 import network.warzone.mars.punishment.models.*
 import network.warzone.mars.utils.*
-import network.warzone.mars.utils.menu.*
+import network.warzone.mars.utils.menu.GUI
+import network.warzone.mars.utils.menu.gui
+import network.warzone.mars.utils.menu.item
+import network.warzone.mars.utils.menu.open
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
@@ -85,7 +87,7 @@ class PunishCommands {
 
                 player.open(createPunishGUI(context, target, history, types, isSilent))
             } catch (e: FeatureException) {
-                audience.sendMessage(e.asTextComponent())
+                audience.sendMessage(e.asComponent())
             }
         }
     }
@@ -141,7 +143,7 @@ class PunishCommands {
                     )
                 }
             } catch (e: FeatureException) {
-                audience.sendMessage(e.asTextComponent())
+                audience.sendMessage(e.asComponent())
             }
         }
     }
@@ -159,7 +161,7 @@ class PunishCommands {
                     .map { text("- ", NamedTextColor.GRAY).append(it) }
                     .forEach(audience::sendMessage)
             } catch (e: FeatureException) {
-                audience.sendMessage(e.asTextComponent())
+                audience.sendMessage(e.asComponent())
             }
         }
     }

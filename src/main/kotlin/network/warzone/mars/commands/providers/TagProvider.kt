@@ -7,6 +7,7 @@ import app.ashcon.intake.bukkit.parametric.provider.BukkitProvider
 import network.warzone.mars.tag.TagFeature
 import network.warzone.mars.tag.exceptions.TagMissingException
 import network.warzone.mars.tag.models.Tag
+import network.warzone.mars.utils.translate
 import org.bukkit.command.CommandSender
 
 class TagProvider : BukkitProvider<Tag> {
@@ -18,7 +19,9 @@ class TagProvider : BukkitProvider<Tag> {
         val tagName = args.next()
 
         val tag: Tag? = TagFeature.getCached(tagName)
-        tag ?: throw ArgumentParseException(TagMissingException(tagName).asTextComponent().content())
+        tag ?: throw ArgumentParseException(
+            translate(TagMissingException(tagName).asComponent(), sender)
+        )
 
         return tag
     }
