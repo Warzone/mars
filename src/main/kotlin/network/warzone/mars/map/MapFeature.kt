@@ -9,7 +9,6 @@ import tc.oc.pgm.api.PGM
 import tc.oc.pgm.api.map.Contributor
 import tc.oc.pgm.api.map.MapInfo
 import tc.oc.pgm.map.contrib.PlayerContributor
-import tc.oc.pgm.util.Version
 import java.util.*
 
 object MapFeature : NamedCachedFeature<GameMap>() {
@@ -60,9 +59,14 @@ object MapFeature : NamedCachedFeature<GameMap>() {
 
             if (map.gamemodes.isEmpty()) Bukkit.getLogger().warning("Found map '${map.name}' with no registered gamemodes")
 
-            // Create map load request for current map (regardless of version).
-            // API will only update if there are changes.
-            mapLoadRequests.add(toMapLoadRequest(map, if (existingMap != null) existingMap._id else null))
+            if (existingMap != null) { // Map is already loaded
+                if (existingMap.hasChanged(map)) {
+                    // Create map load request for current map (regardless of version) for update.
+                    mapLoadRequests.add(toMapLoadRequest(map, existingMap._id))
+                }
+            } else { // Create new map
+                mapLoadRequests.add(toMapLoadRequest(map, null))
+            }
         }
 
         // Send all the map load requests to the API.
@@ -85,6 +89,14 @@ object MapFeature : NamedCachedFeature<GameMap>() {
             is PlayerContributor -> MapContributor(contributor.id, contributor.contribution)
             else -> null
         }
+    }
+
+    private fun GameMap.hasChanged(map: MapInfo): Boolean {
+        return !this.name.equals(map.name, ignoreCase = true) ||
+                this.version != map.version.toString() ||
+                this.gamemodes != map.gamemodes.map { it.name } ||
+                this.authors != map.authors.mapNotNull { resolveContributor(it) } ||
+                this.contributors != map.contributors.mapNotNull { resolveContributor(it) }
     }
 
     data class MapLoadOneRequest(
