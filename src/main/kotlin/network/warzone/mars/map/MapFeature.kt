@@ -56,33 +56,13 @@ object MapFeature : NamedCachedFeature<GameMap>() {
             val map = pgmMaps.next()
 
             // Try and find a currently loaded map by the same name.
-            val existingMap = currentMaps.find { it.name == map.name }
+            val existingMap = currentMaps.find { it.name.equals(map.name, ignoreCase = true) }
 
             if (map.gamemodes.isEmpty()) Bukkit.getLogger().warning("Found map '${map.name}' with no registered gamemodes")
 
-            // If it is currently loaded, check its version.
-            if (existingMap != null) {
-                // Get the current maps version components.
-                val components = existingMap.version.split(".").map { it.toInt() }
-                val existingVersion: Version = if (components.size == 3) {
-                    val (major, minor, patch) = components
-                    Version(major, minor, patch)
-                } else {
-                    val (major, minor) = components
-                    Version(major, minor, 0)
-                }
-
-                // Load the map if the existing version is older than the new version.
-                if (existingVersion.isOlderThan(map.version)) mapLoadRequests.add(
-                    toMapLoadRequest(
-                        map,
-                        existingMap._id
-                    )
-                )
-            } else {
-                // Else, convert the map into a map load request and add it the list.
-                mapLoadRequests.add(toMapLoadRequest(map, null))
-            }
+            // Create map load request for current map (regardless of version).
+            // API will only update if there are changes.
+            mapLoadRequests.add(toMapLoadRequest(map, if (existingMap != null) existingMap._id else null))
         }
 
         // Send all the map load requests to the API.
