@@ -2,9 +2,11 @@ package network.warzone.mars.broadcast
 
 import network.warzone.mars.Mars
 import network.warzone.mars.feature.Feature
+import network.warzone.mars.utils.audience
 import network.warzone.mars.utils.color
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitTask
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
 
 object BroadcastFeature : Feature<Broadcast>() {
     private var broadcasts = listOf<Broadcast>()
@@ -55,6 +57,11 @@ object BroadcastFeature : Feature<Broadcast>() {
 
         if (permission != null) Bukkit.getOnlinePlayers().filter { it.hasPermission(permission) }.forEach { it.sendMessage(formatted) }
         else Bukkit.getOnlinePlayers().forEach { it.sendMessage(formatted) }
+    }
+
+    fun broadcast(component: Component, newline: Boolean = true, permission: String?) {
+        if (permission != null) Bukkit.getOnlinePlayers().filter { it.hasPermission(permission) }.forEach { it.audience.sendMessage(component) }
+        else Bukkit.getOnlinePlayers().forEach { it.audience.sendMessage(component) }
     }
 
     suspend fun reload() {

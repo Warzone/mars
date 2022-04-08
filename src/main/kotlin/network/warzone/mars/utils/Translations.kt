@@ -191,7 +191,7 @@ fun translate(key: String, sender: CommandSender?, vararg args: Any): String {
  * @return A legacy text.
  * @see .translate
  */
-fun translate(component: Component, sender: CommandSender?): String {
+fun translate(component: Component, sender: CommandSender? = null): String {
     val locale = getLocale(sender)
     return LegacyComponentSerializer.legacySection().serialize(translate(component, locale))
 }

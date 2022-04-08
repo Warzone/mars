@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.models.SimplePlayer
+import network.warzone.mars.broadcast.BroadcastFeature
 import network.warzone.mars.feature.NamedCachedFeature
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.commands.ChatCommands
@@ -19,6 +20,7 @@ import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
 import network.warzone.mars.utils.matchPlayer
+import network.warzone.mars.utils.translate
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
@@ -32,6 +34,11 @@ import tc.oc.pgm.api.PGM
 import tc.oc.pgm.api.Permissions
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import tc.oc.pgm.lib.net.kyori.adventure.text.Component.*
+import tc.oc.pgm.lib.net.kyori.adventure.text.JoinConfiguration
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -140,15 +147,38 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
                 event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
                 val ban = activePunishments.find { it.action.isBan() }
                 if (ban != null) {
-                    val expiryString =
-                        if (ban.action.isPermanent()) "&7This ban is permanent." else "&7This ban will expire on &f${ban.expiresAt}&7."
+                    val expiry =
+                        if (ban.action.isPermanent()) translatable("events.join.banned.expiry.permanent", NamedTextColor.RED)
+                        else translatable("events.join.banned.expiry.timed", NamedTextColor.GRAY,
+                            text(ban.expiresAt.toString(), NamedTextColor.WHITE)
+                        )
                     val appealLink = Mars.get().config.getString("server.links.appeal")
-                        ?: throw RuntimeException("No appeal link set in config")
-                    event.kickMessage =
-                        "&7You have been ${ban.action.kind.pastTense} from the server for &c${ban.reason.name}&7.\n\n&c${ban.reason.message}\n\n$expiryString\n&7Appeal at &b$appealLink".color()
+
+                    var kickComponent = join(
+                        JoinConfiguration.noSeparators(),
+                        translatable(
+                            "events.join.banned.title",
+                            NamedTextColor.GRAY,
+                            ban.action.kind.pastTense(),
+                            text(ban.reason.name)
+                        ),
+                        newline(),
+                        newline(),
+                        text(ban.reason.message, NamedTextColor.RED),
+                        newline(),
+                        newline(),
+                        expiry,
+                    )
+
+                    if (appealLink != null)
+                        kickComponent = kickComponent
+                            .append(newline())
+                            .append(translatable("events.join.banned.appeal", NamedTextColor.GRAY,
+                                text(appealLink, NamedTextColor.AQUA)
+                            ))
+                    event.kickMessage = translate(kickComponent)
                 } else {
-                    event.kickMessage =
-                        "&cYou are not allowed to join. Please contact staff or try again later.".color()
+                    event.kickMessage = translate(translatable("events.join.unallowed", NamedTextColor.RED))
                 }
             } else { // Join success
                 val (activeSession) = PlayerService.login(event.uniqueId, event.name, ip)
@@ -156,7 +186,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
                 queuedJoins[event.uniqueId] = queuedJoin
             }
         } catch (e: Exception) {
-            event.kickMessage = "&cUnable to load player profile. Please try again later or contact staff.".color()
+            event.kickMessage = translate(translatable("events.join.exception", NamedTextColor.RED))
             event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
         }
     }
@@ -180,14 +210,23 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player.matchPlayer
         val join = queuedJoins[player.id] ?: return
-        if (!player.isVanished)
-            Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} joined. ${if (join.isNew) "${ChatColor.LIGHT_PURPLE}[NEW]" else ""}")
+        if (!player.isVanished) {
+            val component: Component = translatable("events.join", NamedTextColor.GRAY, text(event.player.name))
+            if (join.isNew)
+                component.append(space())
+                    .append(translatable("events.join.new", NamedTextColor.LIGHT_PURPLE))
+            BroadcastFeature.broadcast(
+                component,
+                newline = false,
+                permission = null
+            )
+        }
         else
-            Bukkit.getOnlinePlayers()
-                .filter { it.hasPermission(Permissions.ADMINCHAT) }
-                .forEach {
-                    it.sendMessage("${ChatColor.GRAY}${ChatColor.ITALIC}${event.player.name} joined quietly.")
-                }
+            BroadcastFeature.broadcast(
+                translatable("events.join.quiet", NamedTextColor.GRAY, setOf(TextDecoration.ITALIC), text(event.player.name)),
+                newline = false,
+                Permissions.ADMINCHAT
+            )
 
 
         // Join process has finished, we don't need the queued join anymore
@@ -197,14 +236,19 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     fun onPlayerLeave(event: PlayerQuitEvent) {
         val player = event.player.matchPlayer
-        if (!player.isVanished)
-            Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} left.")
+        if (!player.isVanished) {
+            BroadcastFeature.broadcast(
+                translatable("events.quit", NamedTextColor.GRAY, text(event.player.name)),
+                newline = false,
+                permission = null
+            )
+        }
         else
-            Bukkit.getOnlinePlayers()
-                .filter { it.hasPermission(Permissions.ADMINCHAT) }
-                .forEach {
-                    it.sendMessage("${ChatColor.GRAY}${ChatColor.ITALIC}${event.player.name} left quietly.")
-                }
+            BroadcastFeature.broadcast(
+                translatable("events.quit.quiet", NamedTextColor.GRAY, setOf(TextDecoration.ITALIC), text(event.player.name)),
+                newline = false,
+                Permissions.ADMINCHAT
+            )
     }
 
     @EventHandler
@@ -229,7 +273,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     @EventHandler
     fun onDisconnectPlayer(event: DisconnectPlayerEvent) {
         val context = PlayerManager.getPlayer(event.data.playerId) ?: return
-        val reason = event.data.reason?.color() ?: "Disconnected"
+        val reason = event.data.reason?.color() ?: translate("events.disconnected", context.player)
         Bukkit.getScheduler().runTask(Mars.get()) {
             context.player.kickPlayer("${ChatColor.RED}$reason")
         }
