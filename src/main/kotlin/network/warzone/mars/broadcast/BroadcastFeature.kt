@@ -35,11 +35,12 @@ object BroadcastFeature : Feature<Broadcast>() {
 
     private fun startTask() {
         stopTask()
-        task = Bukkit.getScheduler().runTaskTimer(Mars.get(), {
-            if ((index + 1) > broadcasts.size) index = 0
-            val broadcast = broadcasts[index++]
-            broadcast(broadcast.message, broadcast.newline, broadcast.permission)
-        }, BROADCAST_INTERVAL, BROADCAST_INTERVAL)
+        if (broadcasts.size > 0)
+            task = Bukkit.getScheduler().runTaskTimer(Mars.get(), {
+                if ((index + 1) > broadcasts.size) index = 0
+                val broadcast = broadcasts[index++]
+                broadcast(broadcast.message, broadcast.newline, broadcast.permission)
+            }, BROADCAST_INTERVAL, BROADCAST_INTERVAL)
     }
 
     private fun stopTask() {
