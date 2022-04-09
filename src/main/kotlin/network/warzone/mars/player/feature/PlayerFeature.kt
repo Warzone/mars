@@ -221,7 +221,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
             remove(uuid)
 
             val sessionLength = Date().time - activeSession.createdAt.time
-            PlayerService.logout(uuid, player.name, sessionLength)
+            PlayerService.logout(uuid, player.name, activeSession._id, sessionLength)
         }
     }
 

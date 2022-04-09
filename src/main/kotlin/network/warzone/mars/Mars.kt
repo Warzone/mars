@@ -85,7 +85,7 @@ class Mars : JavaPlugin() {
         Bukkit.getOnlinePlayers().forEach {
             val activeSession = PlayerManager.getPlayer(it.uniqueId)?.activeSession!!
             val sessionLength = Date().time - activeSession.createdAt.time
-            PlayerService.logout(it.uniqueId, it.name, sessionLength)
+            PlayerService.logout(it.uniqueId, it.name, activeSession._id, sessionLength)
         }
 
         this@Mars.matchTabManager.disable()
