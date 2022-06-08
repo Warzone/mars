@@ -8,7 +8,7 @@ import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.player.ParticipantState
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.api.tracker.info.*
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component
 import tc.oc.pgm.tracker.Trackers
 import tc.oc.pgm.tracker.info.*
 import tc.oc.pgm.util.material.Materials

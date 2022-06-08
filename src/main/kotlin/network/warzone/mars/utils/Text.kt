@@ -14,15 +14,15 @@ import network.warzone.mars.tag.models.Tag
 import org.bukkit.ChatColor
 import org.bukkit.ChatColor.RED
 import org.bukkit.ChatColor.translateAlternateColorCodes
-import tc.oc.pgm.lib.net.kyori.adventure.platform.bukkit.BukkitAudiences
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component.*
-import tc.oc.pgm.lib.net.kyori.adventure.text.TextComponent
-import tc.oc.pgm.lib.net.kyori.adventure.text.event.ClickEvent
-import tc.oc.pgm.lib.net.kyori.adventure.text.event.HoverEvent
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
-import tc.oc.pgm.lib.net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.event.HoverEvent
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import java.time.Duration
 import java.util.*
 

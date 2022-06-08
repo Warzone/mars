@@ -7,8 +7,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.NamedTextColor
 import java.text.DecimalFormat
 
 class CombatListener : Listener {

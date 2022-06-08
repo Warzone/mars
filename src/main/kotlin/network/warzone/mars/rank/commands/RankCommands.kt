@@ -14,9 +14,9 @@ import network.warzone.mars.utils.FeatureException
 import network.warzone.mars.utils.asTextComponent
 import org.bukkit.ChatColor.*
 import org.bukkit.command.CommandSender
-import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import javax.annotation.Nullable
 
 class RankCommands {
