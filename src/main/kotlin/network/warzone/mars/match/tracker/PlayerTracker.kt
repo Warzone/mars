@@ -27,8 +27,8 @@ import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.events.PlayerJoinPartyEvent
 import tc.oc.pgm.events.PlayerLeavePartyEvent
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.util.named.NameStyle
 import java.util.*
 

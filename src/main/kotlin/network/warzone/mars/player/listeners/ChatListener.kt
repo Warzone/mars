@@ -31,10 +31,10 @@ import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component.space
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.Component.space
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
 import tc.oc.pgm.listeners.ChatDispatcher
 import tc.oc.pgm.util.bukkit.OnlinePlayerMapAdapter
 

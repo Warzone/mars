@@ -3,7 +3,7 @@ package network.warzone.mars.tag.commands
 import app.ashcon.intake.Command
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import network.warzone.mars.Mars
-import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
+import net.kyori.adventure.audience.Audience
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.tag.models.Tag

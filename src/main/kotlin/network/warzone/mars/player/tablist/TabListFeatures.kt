@@ -11,9 +11,9 @@ import network.warzone.mars.utils.getLevelAsComponent
 import network.warzone.mars.utils.getPlayerLevelAsComponent
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.PGM
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import tc.oc.pgm.tablist.*
 import tc.oc.pgm.teams.Team
 import tc.oc.pgm.util.named.NameDecorationProvider
