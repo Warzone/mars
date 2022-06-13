@@ -42,7 +42,7 @@ class PunishCommands {
     @Command(
         aliases = ["punish", "p", "pun"],
         desc = "Punish a player",
-        usage = "<player> [reason] [-s (silent?)]",
+        usage = "<player> [type] [-s (silent)] [-c (confirm)] [-o <number> (offense)] [-n \"<message>\" (staff note)]",
         perms = ["mars.punish"]
     )
     fun onPunish(
@@ -51,7 +51,10 @@ class PunishCommands {
         context: PlayerContext,
         @PlayerName name: String,
         @Nullable @PunishmentTypes reason: String?,
-        @Switch('s') isSilent: Boolean = false
+        @Switch('s') isSilent: Boolean = false,
+        @Switch('n') note: String?,
+        @Switch('o') offenceNumber: Int?,
+        @Switch('c') skipConfirmation: Boolean = false
     ) {
         Mars.async {
             val target = PlayerFeature.lookup(name, false).player
@@ -67,23 +70,43 @@ class PunishCommands {
                             ignoreCase = true
                         )
                     }
-                    if (searchResults.size == 1) player.open(
-                        createPunishConfirmGUI(
-                            context,
-                            target,
-                            target.getDisplayName(ChatColor.GRAY),
-                            searchResults.last(),
-                            history,
-                            null,
-                            isSilent
-                        )
-                    )
+                    if (searchResults.size == 1) {
+                        val type = searchResults.last()
+                        val previous =
+                            history.filter { (it.reason.short == type.short || it.reason.name == type.name) && it.reversion == null }
+
+                        val offence = offenceNumber ?: (previous.count() + 1)
+                        if (skipConfirmation) {
+                            issuePunishment(
+                                target,
+                                offence,
+                                context,
+                                type.toReason(),
+                                type.getActionByOffence(offence),
+                                isSilent,
+                                note
+                            )
+                        } else {
+                            player.open(
+                                createPunishConfirmGUI(
+                                    context,
+                                    target,
+                                    target.getDisplayName(ChatColor.GRAY),
+                                    type,
+                                    history,
+                                    note,
+                                    offence,
+                                    isSilent
+                                )
+                            )
+                        }
+                    }
                     else if (searchResults.isEmpty()) player.sendMessage("${ChatColor.RED}Could not find punishment types for query '${reason}'")
-                    else player.open(createPunishGUI(context, target, history, searchResults, isSilent))
+                    else player.open(createPunishGUI(context, target, history, searchResults, isSilent, note, offenceNumber))
                     return@async
                 }
 
-                player.open(createPunishGUI(context, target, history, types, isSilent))
+                player.open(createPunishGUI(context, target, history, types, isSilent, note, offenceNumber))
             } catch (e: FeatureException) {
                 audience.sendMessage(e.asTextComponent())
             }
@@ -203,7 +226,9 @@ class PunishCommands {
         target: PlayerProfile,
         history: List<Punishment>,
         types: List<PunishmentType>,
-        isSilent: Boolean = false
+        isSilent: Boolean = false,
+        note: String?,
+        offenceNumber: Int?
     ): GUI {
         val targetDisplay = target.getDisplayName(ChatColor.GRAY)
 
@@ -248,6 +273,7 @@ class PunishCommands {
                                         type,
                                         history,
                                         note,
+                                        offenceNumber,
                                         isSilent
                                     ).inventory
                                 )
@@ -261,7 +287,8 @@ class PunishCommands {
                                     targetDisplay,
                                     type,
                                     history,
-                                    null,
+                                    note,
+                                    offenceNumber,
                                     isSilent
                                 )
                             )
@@ -287,12 +314,13 @@ class PunishCommands {
         type: PunishmentType,
         history: List<Punishment>,
         note: String?,
+        offenceNumber: Int?,
         isSilent: Boolean = false
     ): GUI {
         val previous =
             history.filter { (it.reason.short == type.short || it.reason.name == type.name) && it.reversion == null }
 
-        val offence = previous.count() + 1
+        val offence = offenceNumber ?: (previous.count() + 1)
         val offenceAction = type.getActionByOffence(offence)
         var selectedAction = offenceAction
         println("Offence: $offence | Action: $selectedAction")
@@ -367,6 +395,7 @@ class PunishCommands {
                                     type,
                                     history,
                                     note,
+                                    offence,
                                     isSilent
                                 ).inventory
                             )
@@ -392,6 +421,7 @@ class PunishCommands {
                                 type,
                                 history,
                                 note,
+                                offence,
                                 !isSilent
                             ).inventory
                         )
