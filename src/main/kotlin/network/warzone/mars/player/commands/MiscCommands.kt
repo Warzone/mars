@@ -19,6 +19,7 @@ import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
 import javax.annotation.Nullable
 
 class MiscCommands {
+    @Command(aliases = ["appeal"], desc = "Get a direct link to the appeal site")
     fun onAppealLink(@Sender sender: Player) {
         val appealLink = Mars.get().config.getString("server.links.appeal") ?: "No appeal link available"
         sender.matchPlayer.sendMessage(
@@ -26,7 +27,8 @@ class MiscCommands {
         )
     }
 
-    fun onRulesLink(@Sender sender: Player) {
+    @Command(aliases = ["rules"], desc = "Get a direct link to the rules site")
+    fun onRulesLink(@Sender sender: CommandSender) {
         val rulesLink = Mars.get().config.getString("server.links.rules") ?: "No rules link available"
         sender.sendMessage("${ChatColor.YELLOW}Please read and abide by our server rules which can be found at ${ChatColor.GOLD}$rulesLink")
     }
