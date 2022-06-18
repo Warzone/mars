@@ -15,7 +15,6 @@ import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.feature.PlayerService
-import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.PunishmentFeature
 import network.warzone.mars.punishment.models.*
@@ -38,6 +37,13 @@ import java.time.Duration
 import java.util.*
 import javax.annotation.Nullable
 
+data class PunishmentArguments(
+    var silent: Boolean = false,
+    var note: String?,
+    var offenceNumber: Int?,
+    var skipConfirmation: Boolean = false
+)
+
 class PunishCommands {
     @Command(
         aliases = ["punish", "p", "pun"],
@@ -59,7 +65,12 @@ class PunishCommands {
         Mars.async {
             val target = PlayerFeature.lookup(name, false).player
             val types = PunishmentFeature.punishmentTypes.filter { player.hasPermission(it.requiredPermission) }
-
+            val arguments = PunishmentArguments(
+                isSilent,
+                note,
+                offenceNumber,
+                skipConfirmation
+            )
             try {
                 val history = PlayerFeature.getPunishmentHistory(target._id.toString())
 
@@ -94,19 +105,17 @@ class PunishCommands {
                                     target.getDisplayName(ChatColor.GRAY),
                                     type,
                                     history,
-                                    note,
-                                    offence,
-                                    isSilent
+                                    arguments
                                 )
                             )
                         }
                     }
                     else if (searchResults.isEmpty()) player.sendMessage("${ChatColor.RED}Could not find punishment types for query '${reason}'")
-                    else player.open(createPunishGUI(context, target, history, searchResults, isSilent, note, offenceNumber))
+                    else player.open(createPunishGUI(context, target, history, searchResults, arguments))
                     return@async
                 }
 
-                player.open(createPunishGUI(context, target, history, types, isSilent, note, offenceNumber))
+                player.open(createPunishGUI(context, target, history, types, arguments))
             } catch (e: FeatureException) {
                 audience.sendMessage(e.asTextComponent())
             }
@@ -226,9 +235,7 @@ class PunishCommands {
         target: PlayerProfile,
         history: List<Punishment>,
         types: List<PunishmentType>,
-        isSilent: Boolean = false,
-        note: String?,
-        offenceNumber: Int?
+        arguments: PunishmentArguments
     ): GUI {
         val targetDisplay = target.getDisplayName(ChatColor.GRAY)
 
@@ -265,6 +272,7 @@ class PunishCommands {
                             val anvil =
                                 AnvilGUI.Builder().text("Enter note here").plugin(Mars.get())
                             anvil.onComplete { player, note ->
+                                arguments.note = note
                                 return@onComplete AnvilGUI.Response.openInventory(
                                     createPunishConfirmGUI(
                                         context,
@@ -272,9 +280,7 @@ class PunishCommands {
                                         targetDisplay,
                                         type,
                                         history,
-                                        note,
-                                        offenceNumber,
-                                        isSilent
+                                        arguments
                                     ).inventory
                                 )
                             }
@@ -287,9 +293,7 @@ class PunishCommands {
                                     targetDisplay,
                                     type,
                                     history,
-                                    note,
-                                    offenceNumber,
-                                    isSilent
+                                    arguments
                                 )
                             )
                         }
@@ -313,14 +317,12 @@ class PunishCommands {
         targetDisplay: String,
         type: PunishmentType,
         history: List<Punishment>,
-        note: String?,
-        offenceNumber: Int?,
-        isSilent: Boolean = false
+        arguments: PunishmentArguments
     ): GUI {
         val previous =
             history.filter { (it.reason.short == type.short || it.reason.name == type.name) && it.reversion == null }
 
-        val offence = offenceNumber ?: (previous.count() + 1)
+        val offence = arguments.offenceNumber ?: (previous.count() + 1)
         val offenceAction = type.getActionByOffence(offence)
         var selectedAction = offenceAction
         println("Offence: $offence | Action: $selectedAction")
@@ -355,6 +357,7 @@ class PunishCommands {
 
                     onclick = {
                         if (action != selectedAction) {
+                            arguments.offenceNumber = index + 1
                             selectedAction = action
                             // todo: play sound
                             refresh()
@@ -374,12 +377,12 @@ class PunishCommands {
             slot(23) {
                 item = item(Material.PAPER) {
                     name = "${ChatColor.AQUA}Staff Note"
-                    lore = if (note == null) listOf(
+                    lore = if (arguments.note == null) listOf(
                         "",
                         "${ChatColor.GRAY}Click to add a staff note."
                     ) else listOf(
                         "",
-                        "${ChatColor.YELLOW}$note",
+                        "${ChatColor.YELLOW}${arguments.note}",
                         "",
                         "${ChatColor.GRAY}Click to change."
                     )
@@ -387,6 +390,7 @@ class PunishCommands {
                         val anvil =
                             AnvilGUI.Builder().text("Enter note here").plugin(Mars.get())
                         anvil.onComplete { _, note ->
+                            arguments.note = note
                             return@onComplete AnvilGUI.Response.openInventory(
                                 createPunishConfirmGUI(
                                     context,
@@ -394,9 +398,7 @@ class PunishCommands {
                                     targetDisplay,
                                     type,
                                     history,
-                                    note,
-                                    offence,
-                                    isSilent
+                                    arguments
                                 ).inventory
                             )
                         }
@@ -410,9 +412,10 @@ class PunishCommands {
                     name = "${ChatColor.AQUA}Toggle Silent"
                     lore = listOf(
                         "",
-                        "${ChatColor.GRAY}Silent: ${if (isSilent) "${ChatColor.GREEN}Yes" else "${ChatColor.RED}No"}"
+                        "${ChatColor.GRAY}Silent: ${if (arguments.silent) "${ChatColor.GREEN}Yes" else "${ChatColor.RED}No"}"
                     )
                     onclick = {
+                        arguments.silent = !arguments.silent
                         it.player.openInventory(
                             createPunishConfirmGUI(
                                 context,
@@ -420,9 +423,7 @@ class PunishCommands {
                                 targetDisplay,
                                 type,
                                 history,
-                                note,
-                                offence,
-                                !isSilent
+                                arguments
                             ).inventory
                         )
                     }
@@ -437,9 +438,9 @@ class PunishCommands {
                     lore = listOf(
                         "",
                         "${ChatColor.GRAY}Reason: ${ChatColor.WHITE}${type.name}",
-                        "${ChatColor.GRAY}Note: ${ChatColor.WHITE}${note ?: "${ChatColor.ITALIC}(None)"}",
+                        "${ChatColor.GRAY}Note: ${ChatColor.WHITE}${arguments.note ?: "${ChatColor.ITALIC}(None)"}",
                         "${ChatColor.GRAY}Length: ${ChatColor.WHITE}${length}",
-                        "${ChatColor.GRAY}Silent? ${if (isSilent) "${ChatColor.GREEN}Yes" else "${ChatColor.RED}No"}",
+                        "${ChatColor.GRAY}Silent? ${if (arguments.silent) "${ChatColor.GREEN}Yes" else "${ChatColor.RED}No"}",
                         "${ChatColor.GRAY}Offence: ${ChatColor.WHITE}${offence} ${
                             if (offenceAction != selectedAction) "${ChatColor.RED}(Action: ${
                                 type.actions.indexOf(
@@ -457,8 +458,8 @@ class PunishCommands {
                         context,
                         type.toReason(),
                         selectedAction,
-                        isSilent,
-                        note
+                        arguments.silent,
+                        arguments.note
                     )
                     actor.closeInventory()
                 }
