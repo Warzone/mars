@@ -332,30 +332,30 @@ fun formatTimeSpan(s: Long, precise: Boolean = false): String {
     var minutes = floor(((((s % 31_536_000.0) % 2_592_000) % 86_400) % 3600) / 60).toInt()
     var seconds = floor(((((s % 31_536_000.0) % 2_592_000) % 86_400) % 3600) % 60).toInt()
 
-    var stringBuilder = StringBuilder()
+    var stringJoiner = StringJoiner(" ")
     if (years > 0) {
-        stringBuilder.append("$years year${if (years == 1) "" else "s"}")
-        if (!precise) return stringBuilder.toString()
+        stringJoiner.add("$years year${if (years == 1) "" else "s"}")
+        if (!precise) return stringJoiner.toString()
     }
     if (months > 0) {
-        stringBuilder.append("$months month${if (months == 1) "" else "s"}")
-        if (!precise) return stringBuilder.toString()
+        stringJoiner.add("$months month${if (months == 1) "" else "s"}")
+        if (!precise) return stringJoiner.toString()
     }
     if (days > 0) {
-        stringBuilder.append("$days day${if (days == 1) "" else "s"}")
-        if (!precise) return stringBuilder.toString()
+        stringJoiner.add("$days day${if (days == 1) "" else "s"}")
+        if (!precise) return stringJoiner.toString()
     }
     if (hours > 0) {
-        stringBuilder.append("$hours hour${if (hours == 1) "" else "s"}")
-        if (!precise) return stringBuilder.toString()
+        stringJoiner.add("$hours hour${if (hours == 1) "" else "s"}")
+        if (!precise) return stringJoiner.toString()
     }
     if (minutes > 0) {
-        stringBuilder.append("$minutes minute${if (minutes == 1) "" else "s"}")
-        if (!precise) return stringBuilder.toString()
+        stringJoiner.add("$minutes minute${if (minutes == 1) "" else "s"}")
+        if (!precise) return stringJoiner.toString()
     }
     if (seconds > 0) {
-        stringBuilder.append("$seconds second${if (seconds == 1) "" else "s"}")
-        if (!precise) return stringBuilder.toString()
+        stringJoiner.add("$seconds second${if (seconds == 1) "" else "s"}")
+        if (!precise) return stringJoiner.toString()
     }
-    return stringBuilder.toString().ifBlank { "0 seconds" }
+    return stringJoiner.toString().ifBlank { "0 seconds" }
 }
