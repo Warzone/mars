@@ -7,11 +7,8 @@ import app.ashcon.intake.parametric.annotation.Text
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.commands.providers.PlayerName
-import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.player.feature.exceptions.PlayerMissingException
-import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.*
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -39,13 +36,13 @@ class ModCommands {
                     .append {
                         createUncoloredLabelled(
                             "First Joined",
-                            "${player.firstJoinedAt} (${player.firstJoinedAt.getTimeAgo()})"
+                            "${player.firstJoinedAt} (${player.firstJoinedAt.getRelativeTime()})"
                         )
                     }
                     .append {
                         createUncoloredLabelled(
                             "Last Joined",
-                            if (isOnline) "${ChatColor.GREEN}Online" else "${player.lastJoinedAt} (${player.lastJoinedAt.getTimeAgo()}"
+                            if (isOnline) "${ChatColor.GREEN}Online" else "${player.lastJoinedAt} (${player.lastJoinedAt.getRelativeTime()}"
                         )
                     }
                     .append {

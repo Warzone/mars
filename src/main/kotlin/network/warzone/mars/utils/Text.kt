@@ -17,6 +17,7 @@ import org.bukkit.ChatColor.translateAlternateColorCodes
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
@@ -25,8 +26,12 @@ import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import java.time.Duration
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.floor
 
 val AUDIENCE_PROVIDER: BukkitAudiences = BukkitAudiences.create(Mars.get())
+
+val JOIN_CONFIG = JoinConfiguration.noSeparators()
 
 fun Rank.asTextComponent(editable: Boolean = true): TextComponent {
     val translatedPrefix = (this.prefix ?: "${RED}None").color()
@@ -71,8 +76,8 @@ fun Punishment.asHoverComponent(revertable: Boolean = true): TextComponent {
             newline()
         )
         .append { createUncoloredLabelled("Issued by", this.punisher?.name ?: "CONSOLE") }
-        .append { createUncoloredLabelled("Issued at", "${this.issuedAt} (${this.issuedAt.getTimeAgo()})") }
-        .append { createUncoloredLabelled("Expires", if (action.isPermanent()) "Never" else expiresAt.toString()) }
+        .append { createUncoloredLabelled("Issued at", "${this.issuedAt} (${this.issuedAt.getRelativeTime()})") }
+        .append { createUncoloredLabelled("Expires", if (action.isPermanent()) "Never" else "${expiresAt.toString()} (${this.expiresAt.getRelativeTime()})") }
 //        .append { createNumberedLabelled("Known IPs", this.targetIps.size) }
 
     if (this.note != null) hover = hover.append { createStandardLabelled("Note", this.note) }
@@ -87,7 +92,7 @@ fun Punishment.asHoverComponent(revertable: Boolean = true): TextComponent {
         .append {
             createUncoloredLabelled(
                 "Reverted at",
-                "${Date(this.reversion.revertedAt)} (${Date(this.reversion.revertedAt).getTimeAgo()})"
+                "${Date(this.reversion.revertedAt)} (${Date(this.reversion.revertedAt).getRelativeTime()})"
             )
         }
         .append { createUncoloredLabelled("Reversion reason", this.reversion.reason) }
@@ -101,7 +106,7 @@ fun Punishment.asTextComponent(revertable: Boolean = true): TextComponent {
 
     var finalComponent =
         text("[", NamedTextColor.GRAY)
-            .append(text(this.issuedAt.getTimeAgo().toUpperCase(), NamedTextColor.GRAY))
+            .append(text(this.issuedAt.getRelativeTime().toUpperCase(), NamedTextColor.GRAY))
             .append(text("]", NamedTextColor.GRAY))
             .append(space())
             .append(text("${if (this.isActive) this.action.kind.color else ChatColor.GRAY}${if (this.isReverted) ChatColor.STRIKETHROUGH else ""}${this.action.kind.verb.toUpperCase()}"))
@@ -132,7 +137,7 @@ fun PlayerService.PlayerAltResponse.asTextComponent(): TextComponent {
 fun StaffNote.asTextComponent(player: String, deletable: Boolean): TextComponent {
     var hover = text()
         .append { createNumberedLabelled("ID", this.id) }
-        .append { createUncoloredLabelled("Added at", "${this.createdAt} (${this.createdAt.getTimeAgo()})") }
+        .append { createUncoloredLabelled("Added at", "${this.createdAt} (${this.createdAt.getRelativeTime()})") }
         .append { createStandardLabelled("Author", this.author.name) }
 
     if (deletable) hover = hover.append { newline() }.append { text("Click to delete", NamedTextColor.LIGHT_PURPLE) }
@@ -186,7 +191,8 @@ fun Difference.asTextComponent(): TextComponent {
 }
 
 fun createStandardLabelled(label: String, value: String): Component {
-    return Component.join(
+    return join(
+        JOIN_CONFIG,
         text(""),
         text("$label: ", NamedTextColor.GRAY),
         text(value, NamedTextColor.YELLOW),
@@ -195,7 +201,8 @@ fun createStandardLabelled(label: String, value: String): Component {
 }
 
 fun createNumberedLabelled(label: String, value: Int): Component {
-    return Component.join(
+    return join(
+        JOIN_CONFIG,
         text(""),
         text("$label: ", NamedTextColor.GRAY),
         text(value.toString(), NamedTextColor.WHITE, TextDecoration.BOLD),
@@ -204,7 +211,8 @@ fun createNumberedLabelled(label: String, value: Int): Component {
 }
 
 fun createBooleanLabelled(label: String, value: Boolean): Component {
-    return Component.join(
+    return join(
+        JOIN_CONFIG,
         text(""),
         text("$label: ", NamedTextColor.GRAY),
         value.asTextComponent(),
@@ -213,7 +221,8 @@ fun createBooleanLabelled(label: String, value: Boolean): Component {
 }
 
 fun createUncoloredLabelled(label: String, value: String): Component {
-    return Component.join(
+    return join(
+        JOIN_CONFIG,
         text(""),
         text("$label: ", NamedTextColor.GRAY),
         text(value),
@@ -225,42 +234,12 @@ fun String.color(): String {
     return translateAlternateColorCodes('&', this)
 }
 
+@Deprecated(
+    message = "Replaced with a general time span formatting method.",
+    replaceWith = ReplaceWith("getRelativeTime")
+)
 fun Date.getTimeAgo(): String {
-    val calendar = Calendar.getInstance()
-    calendar.time = this
-
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-    val hour = calendar.get(Calendar.HOUR_OF_DAY)
-    val minute = calendar.get(Calendar.MINUTE)
-
-    val currentCalendar = Calendar.getInstance()
-
-    val currentYear = currentCalendar.get(Calendar.YEAR)
-    val currentMonth = currentCalendar.get(Calendar.MONTH)
-    val currentDay = currentCalendar.get(Calendar.DAY_OF_MONTH)
-    val currentHour = currentCalendar.get(Calendar.HOUR_OF_DAY)
-    val currentMinute = currentCalendar.get(Calendar.MINUTE)
-
-    return if (year < currentYear) {
-        val interval = currentYear - year
-        if (interval == 1) "$interval year ago" else "$interval years ago"
-    } else if (month < currentMonth) {
-        val interval = currentMonth - month
-        if (interval == 1) "$interval month ago" else "$interval months ago"
-    } else if (day < currentDay) {
-        val interval = currentDay - day
-        if (interval == 1) "$interval day ago" else "$interval days ago"
-    } else if (hour < currentHour) {
-        val interval = currentHour - hour
-        if (interval == 1) "$interval hour ago" else "$interval hours ago"
-    } else if (minute < currentMinute) {
-        val interval = currentMinute - minute
-        if (interval == 1) "$interval minute ago" else "$interval minutes ago"
-    } else {
-        "a moment ago"
-    }
+    return this.getRelativeTime()
 }
 
 // only displays days and hours ("7d 3h") - used for punishment lengths
@@ -296,4 +275,87 @@ fun getLevelAsComponent(level: Int): Component {
 
 fun getPlayerLevelAsComponent(profile: PlayerProfile): Component {
     return getLevelAsComponent(profile.stats.level)
+}
+
+/**
+ * Compares two dates (current time if comparison date is set to null) and uses the difference in seconds to return a
+ * formatted time span using the [formatTimeSpan] method. Will be prefixed by "in" if the comparison date is future in
+ * relation to the date it is being checked upon; will be suffixed by "ago" if the comparison date is past in the same
+ * relation; or will return "right now" if both dates are equal at a precision level of seconds.
+ *
+ * Examples:
+ * <b>Input:</b> 7245 (seconds)
+ * <b>Output (precise): "2 hours 45 seconds ago"</b>
+ * <b>Output (non-precise): "2 hours ago"</b>
+ *
+ * <b>Input:</b> -5085 (seconds)
+ * <b>Output (precise): in 1 hour 24 minutes 45 seconds</b>
+ * <b>Output (non-precise): in 1 hour</b>
+ *
+ * @param s Time in seconds
+ * @param precise boolean control for the precision
+ *
+ * @return A formatted time span relative to the comparison date.
+ */
+fun Date.getRelativeTime(other: Date? = null, precise: Boolean = false): String {
+    val o = other ?: Date()
+    val difference = (o.time - this.time) / 1000 // Second-level precision
+    return if (difference < 0) { // other is future
+        "in " + formatTimeSpan(abs(difference), precise)
+    } else if (difference > 0) { // other is past
+        formatTimeSpan(abs(difference), precise) + " ago"
+    } else {
+        "right now"
+    }
+}
+
+/**
+ * Takes an amount of time in seconds and outputs a formatted time span. A precise formatted time span contains every
+ * unit of time (years, months, days, hours, minutes and seconds) which are greater than or equal to one, as opposed to
+ * non-precise formatted time spans which only contain the single highest unit that is greater than or equals to one.
+ *
+ * Examples:
+ * <b>Input:</b> 7245 (seconds)
+ * <b>Output (precise): 2 hours 45 seconds</b>
+ * <b>Output (non-precise): 2 hours</b>
+ *
+ * @param s time in seconds
+ * @param precise boolean control for the precision
+ *
+ * @return A formatted time span.
+ */
+fun formatTimeSpan(s: Long, precise: Boolean = false): String {
+    var years   = floor(    s / 31_536_000.0).toInt()
+    var months  = floor((   s % 31_536_000.0) / 2_592_000).toInt()
+    var days    = floor(((  s % 31_536_000.0) % 2_592_000) / 86_400).toInt()
+    var hours   = floor(((( s % 31_536_000.0) % 2_592_000) % 86_400) / 3600).toInt()
+    var minutes = floor(((((s % 31_536_000.0) % 2_592_000) % 86_400) % 3600) / 60).toInt()
+    var seconds = floor(((((s % 31_536_000.0) % 2_592_000) % 86_400) % 3600) % 60).toInt()
+
+    var stringBuilder = StringBuilder()
+    if (years > 0) {
+        stringBuilder.append("$years year${if (years == 1) "" else "s"}")
+        if (!precise) return stringBuilder.toString()
+    }
+    if (months > 0) {
+        stringBuilder.append("$months month${if (months == 1) "" else "s"}")
+        if (!precise) return stringBuilder.toString()
+    }
+    if (days > 0) {
+        stringBuilder.append("$days day${if (days == 1) "" else "s"}")
+        if (!precise) return stringBuilder.toString()
+    }
+    if (hours > 0) {
+        stringBuilder.append("$hours hour${if (hours == 1) "" else "s"}")
+        if (!precise) return stringBuilder.toString()
+    }
+    if (minutes > 0) {
+        stringBuilder.append("$minutes minute${if (minutes == 1) "" else "s"}")
+        if (!precise) return stringBuilder.toString()
+    }
+    if (seconds > 0) {
+        stringBuilder.append("$seconds second${if (seconds == 1) "" else "s"}")
+        if (!precise) return stringBuilder.toString()
+    }
+    return stringBuilder.toString().ifBlank { "0 seconds" }
 }

@@ -139,7 +139,7 @@ class PunishCommands {
                 "This punishment was already reverted ${
                     Date(
                         punishment.reversion.revertedAt
-                    ).getTimeAgo()
+                    ).getRelativeTime()
                 } by ${punishment.reversion.reverter.name} for ${ChatColor.WHITE}${punishment.reversion.reason}${ChatColor.RED}."
             )
 
@@ -473,7 +473,7 @@ class PunishCommands {
             val historyLore = mutableListOf<String>()
             punHistory.forEach {
                 val time =
-                    "${ChatColor.WHITE}${ChatColor.BOLD}${it.issuedAt.getTimeAgo()}${if (it.isReverted) " ${ChatColor.RED}${ChatColor.BOLD}✗" else ""}"
+                    "${ChatColor.WHITE}${ChatColor.BOLD}${it.issuedAt.getRelativeTime()}${if (it.isReverted) " ${ChatColor.RED}${ChatColor.BOLD}✗" else ""}"
                 val kind = "${if (!it.isReverted) it.action.kind.color else ChatColor.GRAY}${it.action.kind.noun}"
                 val bullet = "${ChatColor.GRAY}•"
                 val reason = "${if (!it.isReverted) ChatColor.RED else ChatColor.GRAY}${it.reason.name} (${it.offence})"
@@ -491,11 +491,11 @@ class PunishCommands {
             val isPlayerOnline = Bukkit.getPlayer(player._id) != null
 
             val profile = mutableListOf<Pair<String, String>>()
-            profile.add(Pair("First Joined", player.firstJoinedAt.getTimeAgo()))
+            profile.add(Pair("First Joined", player.firstJoinedAt.getRelativeTime()))
             profile.add(
                 Pair(
                     "Last Joined",
-                    if (isPlayerOnline) "${ChatColor.GREEN}Online" else player.lastJoinedAt.getTimeAgo()
+                    if (isPlayerOnline) "${ChatColor.GREEN}Online" else player.lastJoinedAt.getRelativeTime()
                 )
             )
             profile.add(Pair("Playtime", Duration.ofMillis(player.stats.serverPlaytime).conciseFormat()))
