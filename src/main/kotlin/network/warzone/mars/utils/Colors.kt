@@ -2,7 +2,7 @@ package network.warzone.mars.utils
 
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.NamedTextColor
 
 private val dyeChatMap = mapOf(
     DyeColor.BLACK to ChatColor.DARK_GRAY,

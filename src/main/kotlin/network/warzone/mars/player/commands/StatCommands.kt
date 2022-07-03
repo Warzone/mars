@@ -14,10 +14,10 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.player.MatchPlayer
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component.*
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import javax.annotation.Nullable
 
 

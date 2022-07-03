@@ -17,13 +17,14 @@ import org.bukkit.entity.Player
 import tc.oc.pgm.api.party.Competitor
 import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.ParticipantState
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.event.ClickEvent
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import javax.annotation.Nullable
 
 class MiscCommands {
+    @Command(aliases = ["appeal"], desc = "Get a direct link to the appeal site")
     fun onAppealLink(@Sender sender: Player) {
         val appealLink = Mars.get().config.getString("server.links.appeal") ?: "No appeal link available"
         sender.matchPlayer.sendMessage(
@@ -31,7 +32,8 @@ class MiscCommands {
         )
     }
 
-    fun onRulesLink(@Sender sender: Player) {
+    @Command(aliases = ["rules"], desc = "Get a direct link to the rules site")
+    fun onRulesLink(@Sender sender: CommandSender) {
         val rulesLink = Mars.get().config.getString("server.links.rules") ?: "No rules link available"
         sender.sendMessage("${ChatColor.YELLOW}Please read and abide by our server rules which can be found at ${ChatColor.GOLD}$rulesLink")
     }

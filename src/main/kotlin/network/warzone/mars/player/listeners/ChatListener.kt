@@ -10,10 +10,6 @@ import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.punishment.models.PunishmentKind
-import network.warzone.mars.utils.KEvent
-import network.warzone.mars.utils.color
-import network.warzone.mars.utils.getMatch
-import network.warzone.mars.utils.getPlayerLevelAsComponent
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor.*
 import org.bukkit.Sound
@@ -31,10 +27,11 @@ import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component.space
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component.text
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.Component.space
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
+import network.warzone.mars.utils.*
 import tc.oc.pgm.listeners.ChatDispatcher
 import tc.oc.pgm.util.bukkit.OnlinePlayerMapAdapter
 
@@ -129,7 +126,7 @@ class ChatListener : Listener {
             val appealLink = Mars.get().config.getString("server.links.appeal")
                 ?: throw RuntimeException("No appeal link set in config")
             if (activeMute.action.isPermanent()) player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
-            else player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name} ${GRAY}until ${WHITE}${activeMute.expiresAt}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
+            else player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name} ${GRAY}until ${WHITE}${activeMute.expiresAt} (${activeMute.expiresAt.getRelativeTime()})${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
             return@runBlocking
         }
         val chatChannel =

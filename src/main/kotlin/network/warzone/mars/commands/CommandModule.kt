@@ -6,7 +6,7 @@ import app.ashcon.intake.parametric.Provider
 import network.warzone.mars.Mars
 import network.warzone.mars.broadcast.Broadcast
 import network.warzone.mars.commands.providers.*
-import tc.oc.pgm.lib.net.kyori.adventure.audience.Audience
+import net.kyori.adventure.audience.Audience
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.models.Punishment

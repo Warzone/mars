@@ -14,9 +14,10 @@ import tc.oc.pgm.flag.event.FlagStateChangeEvent
 import tc.oc.pgm.flag.state.Carried
 import tc.oc.pgm.flag.state.Dropped
 import tc.oc.pgm.goals.events.GoalTouchEvent
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.JoinConfiguration
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.format.NamedTextColor
+import tc.oc.pgm.goals.ShowOption
 import tc.oc.pgm.wool.MonumentWool
 
 class ObjectiveAnnouncer : Listener {
@@ -56,7 +57,7 @@ class ObjectiveAnnouncer : Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     fun onDestroyableDamage(event: DestroyableDamageEvent) {
-        if (event.destroyable.isDestroyed || !event.destroyable.isVisible) return
+        if (event.destroyable.isDestroyed || !event.destroyable.hasShowOption(ShowOption.SHOW_MESSAGES)) return
 
         var message = Component.join(JoinConfiguration.noSeparators(),
             event.destroyable.owner.name,

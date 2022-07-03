@@ -18,6 +18,7 @@ import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.color
+import network.warzone.mars.utils.getRelativeTime
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -140,8 +141,9 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
                 event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
                 val ban = activePunishments.find { it.action.isBan() }
                 if (ban != null) {
+                    Mars.get().logger.info("Player: ${event.uniqueId} (${event.name}) - Punishment ID: ${ban._id}")
                     val expiryString =
-                        if (ban.action.isPermanent()) "&7This ban is permanent." else "&7This ban will expire on &f${ban.expiresAt}&7."
+                        if (ban.action.isPermanent()) "&7This ban is permanent." else "&7This ban will expire &f${ban.expiresAt.getRelativeTime(precise=true)} (${ban.expiresAt})&7."
                     val appealLink = Mars.get().config.getString("server.links.appeal")
                         ?: throw RuntimeException("No appeal link set in config")
                     event.kickMessage =

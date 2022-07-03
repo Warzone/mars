@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.feature.Resource
 import network.warzone.mars.utils.colorFromName
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.NamedTextColor
 import java.util.*
 
 @Serializable

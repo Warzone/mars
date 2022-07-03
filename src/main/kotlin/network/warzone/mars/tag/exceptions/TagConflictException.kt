@@ -1,8 +1,8 @@
 package network.warzone.mars.tag.exceptions
 
-import tc.oc.pgm.lib.net.kyori.adventure.text.Component
-import tc.oc.pgm.lib.net.kyori.adventure.text.TextComponent
-import tc.oc.pgm.lib.net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.utils.FeatureException
 
 data class TagConflictException(val name: String) : FeatureException() {
