@@ -3,19 +3,19 @@ package network.warzone.mars.player.commands
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.commands.providers.PlayerName
-import network.warzone.mars.match.tracker.KillstreakTracker
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.event.ClickEvent
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import javax.annotation.Nullable
 
 class MiscCommands {
@@ -60,5 +60,66 @@ class MiscCommands {
         val ping = player.spigot().ping
         if (player == sender) sender.sendMessage("${ChatColor.GRAY}Your ping is ${ChatColor.AQUA}${ping}ms")
         else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
+    }
+
+    @Command(
+        aliases = ["tp"],
+        desc = "Teleport to a player",
+        perms = ["mars.tp"]
+    )
+    fun onTeleportToPlayer(
+        @Sender sender: Player,
+        audience: Audience,
+        @Nullable @PlayerName playerOneName: String?,
+        @Nullable @PlayerName playerTwoName: String?)
+    {
+        // mars.tp.other: Allow player to teleport players to other players.
+        // mars.tp.bypass: Allow player to teleport while participating in match.
+
+        val targetPlayerOne = playerOneName?.let { Bukkit.getPlayer(it) }
+        val targetPlayerTwo = playerTwoName?.let { Bukkit.getPlayer(it) }
+
+        // Do not allow players to use command while in a match.
+        if (sender.matchPlayer.isParticipating && !sender.hasPermission("mars.tp.bypass")) {
+            audience.sendMessage(text("You cannot use this command while participating!", NamedTextColor.RED))
+            return
+        }
+
+        // Handle usage feedback when no args are provided
+        if (playerOneName == null) {
+            if (sender.hasPermission("mars.tp.other"))
+                audience.sendMessage(text("Usage: /tp <player> [targetPlayer]", NamedTextColor.RED))
+            else
+                audience.sendMessage(text("Usage: /tp <player>", NamedTextColor.RED))
+            return
+        }
+
+        // If an invalid player name is entered, notify sender.
+        if (targetPlayerOne == null) {
+            audience.sendMessage(text("Could not find the player \"" + playerOneName + "\"", NamedTextColor.RED))
+            return
+        }
+
+        if (playerTwoName != null) {
+            // Tell a player without proper permissions that they cannot
+            // tp others if they try to input a second argument in the command.
+            if (!sender.hasPermission("mars.tp.other")) {
+                audience.sendMessage(text("You cannot teleport players to other players!", NamedTextColor.RED))
+            }
+            // If an invalid player name is entered, notify sender.
+            else if (targetPlayerTwo == null) {
+                audience.sendMessage(text("Could not find the player \"" + playerTwoName + "\"", NamedTextColor.RED))
+            }
+            // Teleport player to other player after verifying conditions.
+            else {
+                targetPlayerOne.teleport(targetPlayerTwo.location)
+                audience.sendMessage(text("Teleported " + playerOneName + " to " + playerTwoName, NamedTextColor.YELLOW))
+            }
+            return
+        }
+
+        // Teleport to a player.
+        sender.teleport(targetPlayerOne.location)
+        audience.sendMessage(text("Teleported to " + playerOneName, NamedTextColor.YELLOW))
     }
 }
