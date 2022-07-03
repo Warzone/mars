@@ -71,60 +71,59 @@ class MiscCommands {
         aliases = ["tp"],
         desc = "Teleport to a player",
         perms = ["mars.tp"]
-        // mars.tp.other: Allow player to teleport players to other players.
-        // mars.tp.bypass: Allow player to teleport while participating in match.
-        )
+    )
     fun onTeleportToPlayer(
         @Sender sender: Player,
         @Nullable @PlayerName playerOneName: String?,
         @Nullable @PlayerName playerTwoName: String?)
     {
+        // mars.tp.other: Allow player to teleport players to other players.
+        // mars.tp.bypass: Allow player to teleport while participating in match.
+
         val targetPlayerOne = playerOneName?.let { Bukkit.getPlayer(it) }
         val targetPlayerTwo = playerTwoName?.let { Bukkit.getPlayer(it) }
 
         // Do not allow players to use command while in a match.
         if (sender.matchPlayer.isParticipating && !sender.hasPermission("mars.tp.bypass")) {
-            sender.sendMessage("${ChatColor.RED} You cannot use this command while participating!");
-            return;
+            sender.sendMessage("${ChatColor.RED}You cannot use this command while participating!")
+            return
         }
 
         // Handle usage feedback when no args are provided
-        if (playerOneName == null && !sender.hasPermission("mars.tp.other")) {
-            sender.sendMessage("${ChatColor.RED} Usage: /tp <player>")
-            return;
-        }
-        if (playerOneName == null && sender.hasPermission("mars.tp.other")) {
-            sender.sendMessage("${ChatColor.RED} Usage: /tp <player> [targetPlayer]");
-            return;
-        }
-
-        // Tell a player without proper permissions that they cannot
-        // tp others if they try to input a second argument in the command.
-        if (playerTwoName != null && !sender.hasPermission("mars.tp.other")) {
-            sender.sendMessage("${ChatColor.RED} You cannot teleport players to other players!");
-            return;
+        if (playerOneName == null) {
+            if (sender.hasPermission("mars.tp.other"))
+                sender.sendMessage("${ChatColor.RED}Usage: /tp <player> [targetPlayer]")
+            else
+                sender.sendMessage("${ChatColor.RED}Usage: /tp <player>")
+            return
         }
 
         // If an invalid player name is entered, notify sender.
         if (targetPlayerOne == null) {
-            sender.sendMessage("${ChatColor.RED} Could not find the player \"" + playerOneName + "\"");
-            return;
-        }
-        if (playerTwoName != null && targetPlayerTwo == null) {
-            sender.sendMessage("${ChatColor.RED} Could not find the player \"" + playerTwoName + "\"");
-            return;
+            sender.sendMessage("${ChatColor.RED}Could not find the player \"" + playerOneName + "\"")
+            return
         }
 
-        // Teleport player to other player after verifying conditions.
-        if (targetPlayerTwo != null) {
-            targetPlayerOne.teleport(targetPlayerTwo.location)
-            sender.sendMessage("${ChatColor.YELLOW} Teleported " + playerOneName + " to " + playerTwoName)
-            return;
+        if (playerTwoName != null) {
+            // Tell a player without proper permissions that they cannot
+            // tp others if they try to input a second argument in the command.
+            if (!sender.hasPermission("mars.tp.other")) {
+                sender.sendMessage("${ChatColor.RED}You cannot teleport players to other players!")
+            }
+            // If an invalid player name is entered, notify sender.
+            else if (targetPlayerTwo == null) {
+                sender.sendMessage("${ChatColor.RED}Could not find the player \"" + playerTwoName + "\"")
+            }
+            // Teleport player to other player after verifying conditions.
+            else {
+                targetPlayerOne.teleport(targetPlayerTwo.location)
+                sender.sendMessage("${ChatColor.YELLOW}Teleported " + playerOneName + " to " + playerTwoName)
+            }
+            return
         }
 
         // Teleport to a player.
         sender.teleport(targetPlayerOne.location)
-        sender.sendMessage("${ChatColor.YELLOW} Teleported to " + playerOneName)
-        return;
+        sender.sendMessage("${ChatColor.YELLOW}Teleported to " + playerOneName)
     }
 }
