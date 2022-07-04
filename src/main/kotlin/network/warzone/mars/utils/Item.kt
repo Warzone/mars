@@ -12,3 +12,13 @@ fun getHead(playerName: String): ItemStack {
     item.itemMeta = skull
     return item
 }
+
+object ItemUtils {
+    private val materialNames: List<String> = Material.values().map { it.name }
+
+    fun getMaterialByName(name: String) : Material? {
+        val formattedMaterialName = name.enumify()
+        if (formattedMaterialName !in materialNames) return null
+        return Material.valueOf(formattedMaterialName)
+    }
+}

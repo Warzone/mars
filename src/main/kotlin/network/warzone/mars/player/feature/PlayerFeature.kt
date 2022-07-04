@@ -7,11 +7,13 @@ import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.NamedCachedFeature
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.commands.ChatCommands
-import network.warzone.mars.player.commands.ModCommands
 import network.warzone.mars.player.commands.MiscCommands
+import network.warzone.mars.player.commands.ModCommands
 import network.warzone.mars.player.commands.StatCommands
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.Session
+import network.warzone.mars.player.perks.JoinSoundService
+import network.warzone.mars.player.perks.PerkCommands
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.RankAttachments
 import network.warzone.mars.rank.models.Rank
@@ -29,10 +31,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import tc.oc.pgm.api.PGM
 import tc.oc.pgm.api.Permissions
-import tc.oc.pgm.api.setting.SettingKey
-import tc.oc.pgm.api.setting.SettingValue
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -182,15 +181,21 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player.matchPlayer
         val join = queuedJoins[player.id] ?: return
-        if (!player.isVanished)
+        if (!player.isVanished) {
             Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} joined. ${if (join.isNew) "${ChatColor.LIGHT_PURPLE}[NEW]" else ""}")
-        else
+            val joinSoundId = join.profile.activeJoinSoundId
+            if (joinSoundId != null) {
+                val sound = JoinSoundService.getSoundById(joinSoundId)
+                if (sound != null) {
+                    Bukkit.getOnlinePlayers().forEach { it.playSound(it.location, sound.bukkitSound, sound.volume, sound.pitch) }
+                }
+            }
+        } else
             Bukkit.getOnlinePlayers()
                 .filter { it.hasPermission(Permissions.ADMINCHAT) }
                 .forEach {
                     it.sendMessage("${ChatColor.GRAY}${ChatColor.ITALIC}${event.player.name} joined quietly.")
                 }
-
 
         // Join process has finished, we don't need the queued join anymore
         queuedJoins.remove(player.id)
@@ -238,7 +243,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     }
 
     override fun getCommands(): List<Any> {
-        return listOf(ModCommands(), MiscCommands(), StatCommands())
+        return listOf(ModCommands(), MiscCommands(), StatCommands(), PerkCommands())
     }
 
     override fun getSubcommands(): Map<List<String>, Any> {

@@ -266,6 +266,10 @@ fun String.chunkedWords(size: Int): List<String> {
     return chunked.map { it.joinToString(" ") }
 }
 
+// convert friendly name to enum name for valueOf
+fun String.enumify(): String =
+    this.toUpperCase().replace(" ", "_")
+
 fun getLevelAsComponent(level: Int): Component {
     return text(
         "[$level]",
