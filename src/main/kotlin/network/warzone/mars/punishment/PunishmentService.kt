@@ -23,7 +23,10 @@ object PunishmentService {
     ): Boolean {
 
         val request = parseHttpException {
-            ApiClient.get<Boolean>("/mc/players/$player/punishmentProtection")
+            ApiClient.post<Boolean, PlayerPunishmentProtectionRequest>(
+                "/mc/players/$player/punishmentProtection",
+                PlayerPunishmentProtectionRequest(player, false)
+            )
         }
 
         val status = request.getOrNull()
