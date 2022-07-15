@@ -30,6 +30,7 @@ class BigStatsTracker : Listener {
     @EventHandler
     fun onMatchLoad(event: MatchLoadEvent) {
         offlinePlayersPendingStatSave.clear()
+        blockCache.clear()
         matchStatsModule = event.match.getModule(StatsMatchModule::class.java)!!
     }
 
@@ -51,11 +52,6 @@ class BigStatsTracker : Listener {
         count++
         playerStats.blocksBroken[blockType] = count
         blockCache[event.player.uniqueId] = playerStats
-    }
-
-    @EventHandler
-    fun onMatchEnd(event: MatchFinishEvent) {
-        blockCache.clear()
     }
 
     @EventHandler
