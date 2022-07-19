@@ -40,10 +40,13 @@ object JoinSoundService {
         }
     }
 
-    suspend fun setActiveSound(player: String, activeSoundSetRequest: JoinSoundSetRequest): PlayerProfile {
-        val request = parseHttpException { ApiClient.post<PlayerProfile, JoinSoundSetRequest>(
-            "/mc/perks/join_sounds/$player/sound",
-            activeSoundSetRequest) }
+    suspend fun setActiveSound(player: String, soundId: String?): PlayerProfile {
+        val request = parseHttpException {
+            ApiClient.post<PlayerProfile, JoinSoundSetRequest>(
+                "/mc/perks/join_sounds/$player/sound",
+                JoinSoundSetRequest(soundId)
+            )
+        }
         val profile = request.getOrNull()
         if (profile != null) return profile
 
@@ -67,9 +70,9 @@ object JoinSoundService {
                     item = item(joinSound.guiIcon.type) { name = joinSound.name }
                     onclick = {
                         Mars.async {
-                            val playerProfile = PlayerFeature.getCached(player.name) ?: return@async
+                            val playerProfile = PlayerFeature.get(player.name) ?: return@async
                             if (playerProfile.activeJoinSoundId != joinSound.id) {
-                                setActiveSound(player.name, JoinSoundSetRequest(joinSound.id))
+                                setActiveSound(player.name, joinSound.id)
                                 playerProfile.activeJoinSoundId = joinSound.id
                             }
                             player.sendMessage(
@@ -87,7 +90,7 @@ object JoinSoundService {
                     Mars.async {
                         val playerProfile = PlayerFeature.getCached(player.name) ?: return@async
                         if (playerProfile.activeJoinSoundId != null) {
-                            setActiveSound(player.name, JoinSoundSetRequest(null))
+                            setActiveSound(player.name, null)
                             playerProfile.activeJoinSoundId = null
                         }
                         player.sendMessage(
