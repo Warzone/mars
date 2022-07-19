@@ -186,8 +186,8 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
             val joinSoundId = join.profile.activeJoinSoundId
             if (joinSoundId != null) {
                 val sound = JoinSoundService.getSoundById(joinSoundId)
-                if (sound != null) {
-                    Bukkit.getOnlinePlayers().forEach { it.playSound(it.location, sound.bukkitSound, sound.volume, sound.pitch) }
+                if (sound != null && event.player.hasPermission(sound.permission)) {
+                    JoinSoundService.playSound(sound)
                 }
             }
         } else

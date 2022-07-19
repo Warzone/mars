@@ -59,7 +59,7 @@ class GUI(
 
         // Play a sound if the slot has a click handler
         if (slot.onclick != null) {
-            slot.sound!!(player)
+            slot.sound!!(e, player)
             slot.onclick!!(e, player)
         }
     }
@@ -74,7 +74,7 @@ class GUI(
     inner class Slot {
         var item: Item? = null
         var onclick: (suspend InventoryClickEvent.(Player) -> Unit)? = null
-        var sound: (suspend (Player) -> Unit)? = { it.playSound(it.location, Sound.ORB_PICKUP, .05f, 1f) }
+        var sound: (suspend InventoryClickEvent.(Player) -> Unit)? = { it.playSound(it.location, Sound.ORB_PICKUP, .05f, 1f) }
     }
 
     fun slot(

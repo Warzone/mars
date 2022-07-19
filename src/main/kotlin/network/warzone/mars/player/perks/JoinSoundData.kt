@@ -3,7 +3,7 @@ package network.warzone.mars.player.perks
 import org.bukkit.Sound
 import org.bukkit.inventory.ItemStack
 
-data class JoinSound(
+data class JoinSoundData(
     val id: String,
     val name: String,
     val sound: String,
@@ -14,7 +14,7 @@ data class JoinSound(
     val pitch: Float = 1.0f
 )
 
-data class JoinSoundParsed(
+data class JoinSound(
     val id: String,
     val name: String,
     val bukkitSound: Sound,
