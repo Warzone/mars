@@ -7,9 +7,8 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 class PerkCommands {
-    @Command(aliases = ["sounds"], desc = "Set a join sound")
-    fun onJoinSoundChoose(@Sender sender: CommandSender) {
-        if (sender !is Player) return
+    @Command(aliases = ["joinsounds", "joinsound"], desc = "Set a join sound", perms = ["mars.join-sounds"])
+    fun onJoinSoundChoose(@Sender sender: Player) {
         sender.open(JoinSoundService.getJoinSoundGUI(sender))
     }
 }
