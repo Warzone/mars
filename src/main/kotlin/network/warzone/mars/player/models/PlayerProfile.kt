@@ -35,6 +35,7 @@ data class PlayerProfile(
     val tagIds: MutableList<UUID>,
 
     var activeTagId: UUID?,
+    var activeJoinSoundId: String? = null
 ) : NamedResource {
     suspend fun tags(): List<Tag> = tagIds.mapNotNull { TagFeature.get(it) }
     suspend fun ranks(): List<Rank> = rankIds.mapNotNull { RankFeature.get(it) }
