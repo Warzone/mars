@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack
 data class JoinSoundData(
     val id: String,
     val name: String,
+    val description: List<String> = emptyList(),
     val sound: String,
     val permission: String,
     val guiIcon: String,
@@ -17,6 +18,7 @@ data class JoinSoundData(
 data class JoinSound(
     val id: String,
     val name: String,
+    val description: List<String> = emptyList(),
     val bukkitSound: Sound,
     val permission: String,
     val guiIcon: ItemStack,

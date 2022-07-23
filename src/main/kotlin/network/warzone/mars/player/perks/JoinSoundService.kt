@@ -36,7 +36,7 @@ object JoinSoundService {
                     ?: return@mapNotNull null
                 val material = ItemUtils.getMaterialByName(sound.guiIcon) ?: Material.SIGN
                 val item = ItemStack(material)
-                return@mapNotNull JoinSound(sound.id, sound.name, bukkitSound, sound.permission, item,
+                return@mapNotNull JoinSound(sound.id, sound.name, sound.description, bukkitSound, sound.permission, item,
                     sound.guiSlot, sound.volume, sound.pitch)
             }
         }
@@ -82,19 +82,32 @@ object JoinSoundService {
                 slot(joinSound.guiSlot) {
                     item = item(joinSound.guiIcon.type) {
                         name = "${ChatColor.RESET}${joinSound.name.color()}"
-                        lore = listOf(
-                            "",
-                            if (hasPermission) {
-                                if (joinSound.id == playerProfile.activeJoinSoundId) {
-                                    "${ChatColor.GREEN}Selected"
-                                } else {
-                                    "${ChatColor.YELLOW}Click to select"
-                                }
+
+                        val description = if (joinSound.description.isEmpty()) {
+                            emptyArray<String>()
+                        } else {
+                            arrayOf(
+                                "",
+                                *joinSound.description.map { it.color() }.toTypedArray()
+                            )
+                        }
+
+                        val selection = if (hasPermission) {
+                            if (joinSound.id == playerProfile.activeJoinSoundId) {
+                                "${ChatColor.GREEN}Selected"
                             } else {
-                                "${ChatColor.RED}No permission!"
-                            },
+                                "${ChatColor.YELLOW}Click to select"
+                            }
+                        } else {
+                            "${ChatColor.RED}No permission!"
+                        }
+
+                        lore = listOf(
+                            *description,
                             "",
-                            "${ChatColor.YELLOW}Right Click to preview!"
+                            "${ChatColor.YELLOW}Right Click to preview!",
+                            "",
+                            selection
                         )
 
                     }
