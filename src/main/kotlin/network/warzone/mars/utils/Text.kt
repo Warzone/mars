@@ -190,43 +190,59 @@ fun Difference.asTextComponent(): TextComponent {
         .build()
 }
 
-fun createStandardLabelled(label: String, value: String): Component {
+fun createStandardLabelledSingleLine(label: String, value: String): Component {
     return join(
         JOIN_CONFIG,
         text(""),
         text("$label: ", NamedTextColor.GRAY),
-        text(value, NamedTextColor.YELLOW),
-        text("\n")
+        text(value, NamedTextColor.YELLOW)
     )
 }
 
-fun createNumberedLabelled(label: String, value: Int): Component {
+fun createNumberedLabelledSingleLine(label: String, value: Int): Component {
     return join(
         JOIN_CONFIG,
         text(""),
         text("$label: ", NamedTextColor.GRAY),
-        text(value.toString(), NamedTextColor.WHITE, TextDecoration.BOLD),
-        text("\n")
+        text(value.toString(), NamedTextColor.WHITE, TextDecoration.BOLD)
+    )
+}
+
+fun createNumberedLabelled(label: String, value: Int) = join(
+    JOIN_CONFIG, createNumberedLabelledSingleLine(label, value), newline()
+)
+
+fun createStandardLabelled(label: String, value: String) = join(
+    JOIN_CONFIG, createStandardLabelledSingleLine(label, value), newline()
+)
+
+fun createBooleanLabelledSingleLine(label: String, value: Boolean): Component {
+    return join(
+        JOIN_CONFIG,
+        text(""),
+        text("$label: ", NamedTextColor.GRAY),
+        value.asTextComponent()
+    )
+}
+
+fun createUncoloredLabelledSingleLine(label: String, value: String): Component {
+    return join(
+        JOIN_CONFIG,
+        text(""),
+        text("$label: ", NamedTextColor.GRAY),
+        text(value)
     )
 }
 
 fun createBooleanLabelled(label: String, value: Boolean): Component {
     return join(
-        JOIN_CONFIG,
-        text(""),
-        text("$label: ", NamedTextColor.GRAY),
-        value.asTextComponent(),
-        text("\n")
+        JOIN_CONFIG, createBooleanLabelledSingleLine(label, value), newline()
     )
 }
 
 fun createUncoloredLabelled(label: String, value: String): Component {
     return join(
-        JOIN_CONFIG,
-        text(""),
-        text("$label: ", NamedTextColor.GRAY),
-        text(value),
-        text("\n")
+        JOIN_CONFIG, createUncoloredLabelledSingleLine(label, value), newline()
     )
 }
 
