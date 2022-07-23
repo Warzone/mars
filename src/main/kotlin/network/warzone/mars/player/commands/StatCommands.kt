@@ -18,6 +18,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
+import network.warzone.mars.utils.strategy.multiLine
 import javax.annotation.Nullable
 
 
@@ -60,7 +61,8 @@ class StatCommands {
         val outline = text("-------------------------------", NamedTextColor.BLUE, TextDecoration.STRIKETHROUGH)
         sender.sendMessage(outline)
         val component =
-            text()
+            sender.multiLine()
+                .appendMultiLine { outline }
                 .append(
                     space(),
                     space(),
@@ -69,28 +71,28 @@ class StatCommands {
                             profile.name,
                             NamedTextColor.AQUA
                         )
-                    ).append(newline())
+                    )
                 )
-                .append { newline() }
-                .append {
+                .appendMultiLine {
                     createCustomStat(
                         "Level",
                         stats.level,
                         LevelColorService.chatColorFromLevel(stats.level)
                     )
                 }
-                .append { createLabelledStat("XP", stats.xp, StatType.NEUTRAL) }
-                .append { newline() }
-                .append { createLabelledStat("Kills", stats.kills, StatType.POSITIVE) }
-                .append { createLabelledStat("First Bloods", stats.firstBloods, StatType.POSITIVE) }
-                .append { createLabelledStat("Deaths", stats.deaths, StatType.NEGATIVE) }
-                .append { createLabelledStat("K/D", stats.kdr, StatType.NEUTRAL) }
-                .append { newline() }
-                .append { createLabelledStat("Wins", stats.wins, StatType.POSITIVE) }
-                .append { createLabelledStat("Losses", stats.losses, StatType.NEGATIVE) }
-                .append { createLabelledStat("Win %", stats.winPercentage, StatType.NEUTRAL) }
-                .append { outline }
-        sender.sendMessage(component)
+                .appendMultiLine { createLabelledStat("XP", stats.xp, StatType.NEUTRAL) }
+                .appendMultiLine { empty() }
+                .appendMultiLine { createLabelledStat("Kills", stats.kills, StatType.POSITIVE) }
+                .appendMultiLine { createLabelledStat("First Bloods", stats.firstBloods, StatType.POSITIVE) }
+                .appendMultiLine { createLabelledStat("Deaths", stats.deaths, StatType.NEGATIVE) }
+                .appendMultiLine { createLabelledStat("K/D", stats.kdr, StatType.NEUTRAL) }
+                .appendMultiLine { empty() }
+                .appendMultiLine { createLabelledStat("Wins", stats.wins, StatType.POSITIVE) }
+                .appendMultiLine { createLabelledStat("Losses", stats.losses, StatType.NEGATIVE) }
+                .appendMultiLine { createLabelledStat("Win %", stats.winPercentage, StatType.NEUTRAL) }
+                .appendMultiLine { outline }
+
+        component.deliver()
     }
 
     enum class StatType(val color: NamedTextColor) {
@@ -105,7 +107,6 @@ class StatCommands {
             .append { space() }
             .append { text("$label: ", NamedTextColor.DARK_AQUA) }
             .append { text(value.toString(), type.color) }
-            .append { newline() }
             .build()
     }
 
@@ -115,7 +116,6 @@ class StatCommands {
             .append { space() }
             .append { text("$label: ", NamedTextColor.DARK_AQUA) }
             .append { text(value.toString(), color) }
-            .append { newline() }
             .build()
     }
 }

@@ -16,6 +16,7 @@ import org.bukkit.entity.Player
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
+import network.warzone.mars.utils.strategy.multiLine
 import java.time.Duration
 import javax.annotation.Nullable
 
@@ -30,38 +31,39 @@ class ModCommands {
 
                 val isOnline = PlayerManager.getPlayer(player._id) != null
 
-                var message = text()
-                    .append { createStandardLabelled("Name", player.name) }
-                    .append { createUncoloredLabelled("ID", player._id.toString()) }
-                    .append {
+                var message = audience.multiLine()
+                    .appendMultiLine { createStandardLabelled("Name", player.name) }
+                    .appendMultiLine { createUncoloredLabelled("ID", player._id.toString()) }
+                    .appendMultiLine {
                         createUncoloredLabelled(
                             "First Joined",
                             "${player.firstJoinedAt} (${player.firstJoinedAt.getRelativeTime()})"
                         )
                     }
-                    .append {
+                    .appendMultiLine {
                         createUncoloredLabelled(
                             "Last Joined",
                             if (isOnline) "${ChatColor.GREEN}Online" else "${player.lastJoinedAt} (${player.lastJoinedAt.getRelativeTime()}"
                         )
                     }
-                    .append {
+                    .appendMultiLine {
                         createUncoloredLabelled(
                             "Playtime",
                             Duration.ofMillis(player.stats.serverPlaytime).conciseFormat()
                         )
                     }
-                    .append { createUncoloredLabelled("Alts", "") }
+                    .appendMultiLine { createUncoloredLabelled("Alts", "") }
 
                 lookup.alts.forEach {
                     message = message
-                        .append { text("-", NamedTextColor.GRAY) }
-                        .append { space() }
-                        .append { it.asTextComponent() }
-                        .append { newline() }
+                        .append(
+                            text("-", NamedTextColor.GRAY),
+                            space(),
+                            it.asTextComponent()
+                        )
                 }
 
-                audience.sendMessage(message)
+                message.deliver()
             } catch (e: FeatureException) {
                 audience.sendMessage(e.asTextComponent())
             }
@@ -86,15 +88,22 @@ class ModCommands {
             val profile = PlayerFeature.lookup(name).player
             when (op) {
                 null -> {
-                    var message = text("Notes for ${profile.name}", NamedTextColor.GREEN).append { newline() }
+                    var message = audience
+                        .multiLine()
+                        .appendMultiLineComponent(
+                            text("Notes for ${profile.name}", NamedTextColor.GREEN)
+                        )
+
                     profile.notes.forEach {
-                        message = message.append { it.asTextComponent(
-                            profile.name,
-                            sender !is Player || it.author.id == sender.uniqueId
-                        ) }
-                            .append { newline() }
+                        message = message.appendMultiLine {
+                            it.asTextComponent(
+                                profile.name,
+                                sender !is Player || it.author.id == sender.uniqueId
+                            )
+                        }
                     }
-                    audience.sendMessage(message)
+
+                    message.deliver()
                 }
                 "add" -> {
                     if (sender !is Player) throw CommandException("${ChatColor.RED}You must be a player to add notes.")
