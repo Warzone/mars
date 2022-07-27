@@ -5,6 +5,7 @@ import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
+import com.google.common.cache.CacheBuilder
 import net.wesjd.anvilgui.AnvilGUI
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
@@ -33,8 +34,10 @@ import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
+import network.warzone.mars.punishment.PunishmentService
 import java.time.Duration
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.annotation.Nullable
 
 data class PunishmentArguments(
@@ -45,6 +48,12 @@ data class PunishmentArguments(
 )
 
 class PunishCommands {
+
+    private val protectionAttemptCache = CacheBuilder
+        .newBuilder()
+        .expireAfterWrite(3L, TimeUnit.SECONDS)
+        .build<UUID, Boolean>()
+
     @Command(
         aliases = ["punish", "p", "pun"],
         desc = "Punish a player",
@@ -87,6 +96,26 @@ class PunishCommands {
                             history.filter { (it.reason.short == type.short || it.reason.name == type.name) && it.reversion == null }
 
                         val offence = offenceNumber ?: (previous.count() + 1)
+
+                        if (
+                            this.protectionAttemptCache
+                                .getIfPresent(player.uniqueId) == null
+                        ) {
+                            val status = PunishmentService
+                                .isProtected(
+                                    SimplePlayer(target._id, target.name)
+                                )
+
+                            if (status) {
+                                player.sendMessage(
+                                    "${ChatColor.RED}This player has been punished recently. Please resend this command to confirm the new punishment."
+                                )
+
+                                this.protectionAttemptCache.put(player.uniqueId, true)
+                                return@async
+                            }
+                        }
+
                         if (skipConfirmation) {
                             issuePunishment(
                                 target,
@@ -578,6 +607,8 @@ class PunishCommands {
                     }
                 }
             }
+
+            PunishmentService.protect(SimplePlayer(target._id, target.name))
 
             broadcastPunishment(target, staff?.player?.name ?: "CONSOLE", punishment)
         } catch (e: FeatureException) {

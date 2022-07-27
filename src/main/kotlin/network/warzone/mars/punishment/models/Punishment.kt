@@ -1,5 +1,6 @@
 package network.warzone.mars.punishment.models
 
+import kotlinx.serialization.Serializable
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.Resource
 import java.util.*
@@ -37,3 +38,5 @@ data class Punishment(
 data class PunishmentReason(val name: String, val message: String, val short: String)
 
 data class PunishmentReversion(val revertedAt: Long, val reverter: SimplePlayer, val reason: String)
+
+data class PlayerPunishmentProtectionRequest(val target: SimplePlayer, val apply: Boolean = false)

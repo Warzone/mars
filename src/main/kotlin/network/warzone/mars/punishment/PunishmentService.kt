@@ -8,6 +8,7 @@ import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.punishment.exceptions.PunishmentAlreadyRevertedException
 import network.warzone.mars.punishment.exceptions.PunishmentMissingException
+import network.warzone.mars.punishment.models.PlayerPunishmentProtectionRequest
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.punishment.models.PunishmentAction
 import network.warzone.mars.punishment.models.PunishmentReason
@@ -16,6 +17,55 @@ import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
 object PunishmentService {
+
+    suspend fun isProtected(
+        player: SimplePlayer
+    ): Boolean {
+
+        val request = parseHttpException {
+            ApiClient.post<Boolean, PlayerPunishmentProtectionRequest>(
+                "/mc/players/$player/punishmentProtection",
+                PlayerPunishmentProtectionRequest(player, false)
+            )
+        }
+
+        val status = request.getOrNull()
+        if (status != null) return status
+
+        request.onFailure {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player.name)
+                else -> TODO("Unexpected API exception: ${it.code}")
+            }
+        }
+
+        throw RuntimeException("Unreachable")
+    }
+
+    suspend fun protect(
+        player: SimplePlayer
+    ): Boolean {
+
+        val request = parseHttpException {
+            ApiClient.post<Boolean, PlayerPunishmentProtectionRequest>(
+                "/mc/players/$player/punishmentProtection",
+                PlayerPunishmentProtectionRequest(player, true)
+            )
+        }
+
+        val status = request.getOrNull()
+        if (status != null) return status
+
+        request.onFailure {
+            when (it.code) {
+                ApiExceptionType.PLAYER_MISSING -> throw PlayerMissingException(player.name)
+                else -> TODO("Unexpected API exception: ${it.code}")
+            }
+        }
+
+        throw RuntimeException("Unreachable")
+    }
+
     suspend fun create(
         reason: PunishmentReason,
         offence: Int,
