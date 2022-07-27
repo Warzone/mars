@@ -16,20 +16,20 @@ PGM does provide a few of these features out of the box (stat tracking is not pe
 
 There's a good chance you don't.
 
-If you simply want to host a game server running PGM, whether its competitive, casual, or arcade, PGM as a standalone plugin is probably good enough.
+If you simply want to host a game server running PGM, whether it's competitive, casual, or arcade, PGM as a standalone plugin is probably good enough.
 
 **You'd benefit from Mars if you want...**
 
 - Comprehensive moderation tools beyond those included in PGM/Community
 - Leaderboards (periods spanning [from daily to all-time](https://github.com/Warzone/mars-api/blob/master/src/main/kotlin/socket/leaderboard/Leaderboard.kt#L34)) for [a variety of metrics](https://github.com/Warzone/mars-api/blob/master/src/main/kotlin/socket/leaderboard/Leaderboard.kt#L88)
-- Player, match and map statistics tracked
+- Player, match, and map statistics tracked
 - Automatic chat broadcasts
 - Permission groups (ranks) that can be customised and assigned in-game
 - Chat suffixes (tags) that can be customised and assigned in-game
 - An XP/levelling progression system that rewards team contributions
 
-Mars also overrides and extends some default PGM behaviours. Two examples of this is Mars overriding PGM's player preference system, and Mars announcing enemy objective advancements in chat (PGM intentionally doesn't do this).
+Mars also overrides and extends some default PGM behaviours. Two examples of this are Mars overriding PGM's player preference system, and Mars announcing enemy objective advancements in chat (PGM intentionally doesn't do this).
 
 ## Support
 
-Please raise any questions or issues on the [Issues page](https://github.com/Warzone/mars/issues) or on the [Warzone Discord server](https://warz.one/discord). We are happy to help anyone looking to use Mars for their server or submit contributions to the Mars project.
+Please raise any questions or issues on the [Issues page](https://github.com/Warzone/mars/issues) or the [Warzone Discord server](https://warz.one/discord). We are happy to help anyone looking to use Mars for their server or submit contributions to the Mars project.
