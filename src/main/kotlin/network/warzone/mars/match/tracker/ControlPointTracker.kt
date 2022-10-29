@@ -13,7 +13,7 @@ class ControlPointTracker : Listener {
         val team = event.newController ?: return
 
         val thieves = event.controlPoint.playerTracker
-            .playersOnPoint
+            .players
             .filter { team.players.contains(it) }
             .map { it.id }
 
