@@ -7,13 +7,16 @@ import network.warzone.mars.match.models.Contribution
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import tc.oc.pgm.core.CoreLeakEvent
+import tc.oc.pgm.util.block.BlockVectors
 import kotlin.math.floor
 
 class CoreTracker : Listener {
 
     @EventHandler
     fun onCoreLeak(event: CoreLeakEvent) {
-        val totalBrokenBlocks = event.core.casingRegion.blocks.filter { !event.core.isObjectiveMaterial(it) }.size
+        val totalBrokenBlocks = event.core.casingRegion.blockVectors.filter {
+            !event.core.isObjectiveMaterial(BlockVectors.blockAt(event.world, it))
+        }.size
 
         ApiClient.emit(OutboundEvent.CoreLeak, CoreLeakData(
             event.core.id,

@@ -1,5 +1,6 @@
 package network.warzone.mars.match.tracker
 
+import com.google.common.collect.Iterables
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.OutboundEvent
@@ -25,6 +26,7 @@ import tc.oc.pgm.flag.FlagMatchModule
 import tc.oc.pgm.goals.GoalMatchModule
 import tc.oc.pgm.stats.StatsMatchModule
 import tc.oc.pgm.teams.Team
+import tc.oc.pgm.util.block.BlockVectors
 import tc.oc.pgm.util.bukkit.BukkitUtils
 import tc.oc.pgm.wool.WoolMatchModule
 import java.util.*
@@ -146,14 +148,14 @@ class MatchTracker : Listener {
                     it.id,
                     it.name,
                     it.owner.nameLegacy,
-                    it.blockRegion.blocks
-                        .map { block -> block.type }
+                    it.blockRegion.blockVectors
+                        .map { block -> BlockVectors.blockAt(match.world, block).type }
                         .groupingBy { self -> self }
                         .eachCount()
                         .maxByOrNull { group -> group.value }
                     !!.key,
                     it.breaksRequired,
-                    it.blockRegion.blocks.size
+                    Iterables.size(it.blockRegion.blockVectors)
                 )
             }?.distinctBy { it.id } ?: listOf()
     }
