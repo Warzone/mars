@@ -6,6 +6,7 @@ import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.utils.getRelativeTime
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -40,6 +41,7 @@ class AdminCommands {
                     val events = AdminService.setXPMultiplier(multiplier, if (sender is Player) SimplePlayer(sender.uniqueId, sender.name) else null)
                     val xpMultiplier = events?.xpMultiplier ?: return@async sender.sendMessage("${ChatColor.GREEN}XP multiplier cleared")
                     sender.sendMessage("${ChatColor.GREEN}XP multiplier has been set to ${ChatColor.YELLOW}${xpMultiplier.value}x")
+                    Bukkit.broadcastMessage("${ChatColor.GREEN}XP multiplier has been set to ${ChatColor.YELLOW}${xpMultiplier.value}x ${ChatColor.GREEN}by ${ChatColor.YELLOW}${sender.name}", "pgm.staff")
                 }
             } catch (e: CommandException) {
                 sender.sendMessage("${ChatColor.RED}${e.message}")
