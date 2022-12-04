@@ -43,6 +43,7 @@ repositories {
     maven("https://m2.dv8tion.net/releases/")
     maven("https://nexus.scarsz.me/content/groups/public")
     maven("https://libraries.minecraft.net")
+    maven("https://repo.pgm.fyi/snapshots")
 }
 
 dependencies {
@@ -70,7 +71,6 @@ dependencies {
     }
 
     implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
-
 
 //    compileOnly("me.lucko:adventure-platform-bukkit:4.0.0") {
 //        exclude(group = "org.spigotmc", module = "spigot-api")

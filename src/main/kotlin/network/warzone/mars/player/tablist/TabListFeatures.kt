@@ -20,7 +20,7 @@ import tc.oc.pgm.util.named.NameDecorationProvider
 import tc.oc.pgm.util.named.NameStyle
 import tc.oc.pgm.util.tablist.PlayerTabEntry
 import tc.oc.pgm.util.tablist.TabView
-import tc.oc.pgm.util.text.PlayerComponent
+import tc.oc.pgm.util.player.PlayerComponent
 
 class TeamTabEntryImpl(team: Team) : TeamTabEntry(team) // TeamTabEntry's constructor is protected
 
@@ -56,10 +56,7 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
         val name = Component.text().content(
             (player.name)!!
         )
-        if (!isOffline && style.contains(NameStyle.Flag.DEATH) && PlayerComponent.isDead(
-                player
-            )
-        ) {
+        if (!isOffline && style.contains(NameStyle.Flag.DEATH) && isDead()) {
             name.color(NamedTextColor.DARK_GRAY)
         } else if (style.contains(NameStyle.Flag.COLOR)) {
             name.color(if (isOffline) PlayerComponent.OFFLINE_COLOR else provider.getColor(uuid))
@@ -67,9 +64,7 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
         if (!isOffline && style.contains(NameStyle.Flag.SELF) && player === viewer) {
             name.decoration(TextDecoration.BOLD, true)
         }
-        if (!isOffline && style.contains(NameStyle.Flag.DISGUISE) && PlayerComponent.isDisguised(
-                player
-            )
+        if (!isOffline && style.contains(NameStyle.Flag.DISGUISE) && isDisguised()
         ) {
             name.decoration(TextDecoration.STRIKETHROUGH, true)
         }
@@ -80,6 +75,13 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
         return builder.build()
     }
 
+    private fun isDisguised(): Boolean {
+        return player.hasMetadata("isVanished")
+    }
+
+    private fun isDead(): Boolean {
+        return player.hasMetadata("isDead") || player.isDead
+    }
 }
 
 fun Mars.overrideTabManager() {
