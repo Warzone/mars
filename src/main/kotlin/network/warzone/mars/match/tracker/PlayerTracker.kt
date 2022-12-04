@@ -29,6 +29,7 @@ import tc.oc.pgm.events.PlayerJoinPartyEvent
 import tc.oc.pgm.events.PlayerLeavePartyEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import network.warzone.mars.Mars
 import tc.oc.pgm.util.named.NameStyle
 import java.util.*
 
@@ -103,7 +104,7 @@ class PlayerTracker : Listener {
     // todo: set XP bar progress & level (and ensure compatibility with vanilla exp)
     @EventHandler
     fun onPlayerXPGain(event: PlayerXPGainEvent) = runBlocking {
-        val (id, gain, reason, notify) = event.data
+        val (id, gain, reason, notify, multiplier) = event.data
 
         val context = PlayerManager.getPlayer(id) ?: return@runBlocking
         val player = context.player
@@ -115,7 +116,9 @@ class PlayerTracker : Listener {
         profile.stats.xp += gain
         if (notify) {
             player.playSound(player.location, Sound.ORB_PICKUP, 1000f, 1f)
-            player.sendMessage("$LIGHT_PURPLE+$gain XP ($reason)")
+            var message = "$LIGHT_PURPLE+$gain XP ($reason)"
+            if (multiplier != null && multiplier != 1f) message += " (${multiplier}x multiplier)"
+            player.sendMessage(message)
         }
 
         // Update in cache
@@ -140,4 +143,4 @@ data class PlayerLevelUpEvent(val data: PlayerLevelUpData) : KEvent()
 data class PlayerLevelUpData(val player: Player, val level: Int)
 
 data class PlayerXPGainEvent(val data: PlayerXPGainData) : KEvent()
-data class PlayerXPGainData(val playerId: UUID, val gain: Int, val reason: String, val notify: Boolean)
+data class PlayerXPGainData(val playerId: UUID, val gain: Int, val reason: String, val notify: Boolean, val multiplier: Float?)

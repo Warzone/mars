@@ -2,6 +2,8 @@ package network.warzone.mars.player.feature
 
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
+import network.warzone.mars.admin.AdminCommands
+import network.warzone.mars.admin.AdminService
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.NamedCachedFeature
@@ -197,6 +199,11 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
                     it.sendMessage("${ChatColor.GRAY}${ChatColor.ITALIC}${event.player.name} joined quietly.")
                 }
 
+        val xpMultiplier = AdminService.getCurrentEvents()?.xpMultiplier
+        if (xpMultiplier?.value != null) {
+            player.bukkit.sendMessage("${ChatColor.AQUA}${ChatColor.BOLD}✧ ${ChatColor.AQUA}XP Multiplier Active: ${ChatColor.WHITE}${ChatColor.BOLD}${xpMultiplier.value}x")
+        }
+
         // Join process has finished, we don't need the queued join anymore
         queuedJoins.remove(player.id)
     }
@@ -243,7 +250,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     }
 
     override fun getCommands(): List<Any> {
-        return listOf(ModCommands(), MiscCommands(), StatCommands(), PerkCommands())
+        return listOf(ModCommands(), MiscCommands(), StatCommands(), PerkCommands(), AdminCommands())
     }
 
     override fun getSubcommands(): Map<List<String>, Any> {
