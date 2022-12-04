@@ -10,6 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import tc.oc.pgm.api.Permissions
 import tc.oc.pgm.lib.cloud.commandframework.exceptions.NoPermissionException
 import javax.annotation.Nullable
 
@@ -30,8 +31,8 @@ class AdminCommands {
                     val player = xpMultiplier.player
 
                     var message = "${ChatColor.GREEN}An XP multiplier of ${ChatColor.YELLOW}${xpMultiplier.value}x ${ChatColor.GREEN}is active"
-                    if (sender.hasPermission("pgm.staff")) message += ", set ${ChatColor.YELLOW}${xpMultiplier.updatedAt.getRelativeTime(null, true)}${ChatColor.GREEN}"
-                    if (sender.hasPermission("pgm.staff") && player != null) message += " by ${ChatColor.YELLOW}${player.name}"
+                    if (sender.hasPermission(Permissions.STAFF)) message += ", set ${ChatColor.YELLOW}${xpMultiplier.updatedAt.getRelativeTime(null, true)}${ChatColor.GREEN}"
+                    if (sender.hasPermission(Permissions.STAFF) && player != null) message += " by ${ChatColor.YELLOW}${player.name}"
 
                     sender.sendMessage(message)
                 } else {
@@ -40,8 +41,7 @@ class AdminCommands {
                     if (multiplier < 1) throw CommandException("XP multiplier cannot be less than one")
                     val events = AdminService.setXPMultiplier(multiplier, if (sender is Player) SimplePlayer(sender.uniqueId, sender.name) else null)
                     val xpMultiplier = events?.xpMultiplier ?: return@async sender.sendMessage("${ChatColor.GREEN}XP multiplier cleared")
-                    sender.sendMessage("${ChatColor.GREEN}XP multiplier has been set to ${ChatColor.YELLOW}${xpMultiplier.value}x")
-                    Bukkit.broadcastMessage("${ChatColor.GREEN}XP multiplier has been set to ${ChatColor.YELLOW}${xpMultiplier.value}x ${ChatColor.GREEN}by ${ChatColor.YELLOW}${sender.name}", "pgm.staff")
+                    Bukkit.broadcast("${ChatColor.GREEN}XP multiplier has been set to ${ChatColor.YELLOW}${xpMultiplier.value}x ${ChatColor.GREEN}by ${ChatColor.YELLOW}${sender.name}", Permissions.STAFF)
                 }
             } catch (e: CommandException) {
                 sender.sendMessage("${ChatColor.RED}${e.message}")
