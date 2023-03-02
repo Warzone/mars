@@ -37,7 +37,7 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/")
 
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://repo.ashcon.app/nexus/content/repositories/snapshots/")
+    maven("maven.pkg.github.com/PGMDev/PGM")
     maven("https://repo.aikar.co/nexus/content/groups/aikar/")
     maven("https://repo.codemc.io/repository/maven-snapshots/")
     maven("https://m2.dv8tion.net/releases/")
@@ -53,7 +53,7 @@ dependencies {
     implementation("net.time4j:time4j-tzdata:5.0-2020a")
 
     compileOnly("app.ashcon:sportpaper:1.8.8-R0.1-SNAPSHOT")
-    implementation("app.ashcon.intake:intake-bukkit:1.2-SNAPSHOT")
+    implementation("app.ashcon.intake:intake-bukkit:1.3-SNAPSHOT")
 
     compileOnly("tc.oc.pgm:core:0.14-SNAPSHOT") {
         exclude(group = "fr.mrmicky", module = "FastBoard")
