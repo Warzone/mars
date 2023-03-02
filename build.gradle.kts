@@ -37,7 +37,7 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/")
 
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("maven.pkg.github.com/PGMDev/PGM")
+    maven("https://maven.pkg.github.com/PGMDev/PGM")
     maven("https://repo.aikar.co/nexus/content/groups/aikar/")
     maven("https://repo.codemc.io/repository/maven-snapshots/")
     maven("https://m2.dv8tion.net/releases/")
