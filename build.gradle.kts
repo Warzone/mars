@@ -44,6 +44,7 @@ repositories {
     maven("https://nexus.scarsz.me/content/groups/public")
     maven("https://libraries.minecraft.net")
     maven("https://repo.pgm.fyi/snapshots")
+    mavenLocal()
 }
 
 dependencies {

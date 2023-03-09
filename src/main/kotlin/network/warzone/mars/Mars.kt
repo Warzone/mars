@@ -1,18 +1,14 @@
 /*
     Warzone Mars - Interface with PGM for the purposes of data persistence & enhancing gameplay with new features
-
     Copyright (C) 2021 Warzone Contributors
-
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
     by the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Affero General Public License for more details.
-
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
@@ -21,6 +17,7 @@ package network.warzone.mars
 import app.ashcon.intake.bukkit.BukkitIntake
 import app.ashcon.intake.bukkit.graph.BasicBukkitCommandGraph
 import kotlinx.coroutines.runBlocking
+import network.warzone.mars.achievement.AchievementManager
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.commands.CommandModule
 import network.warzone.mars.feature.FeatureManager
@@ -59,7 +56,7 @@ class Mars : JavaPlugin() {
     lateinit var matchTabManager: MatchTabManager
 
     override fun onEnable() = runBlocking {
-        println("enabling!")
+        println("MEWTWO IS HERE!")
         instance = this@Mars
 
         this@Mars.saveDefaultConfig()
@@ -69,6 +66,7 @@ class Mars : JavaPlugin() {
         val commandGraph = BasicBukkitCommandGraph(CommandModule)
 
         FeatureManager.registerCommands(commandGraph)
+        AchievementManager
 
         val apiConfigurationSection = config.getConfigurationSection("api")
         ApiClient.loadHttp(apiConfigurationSection)
@@ -89,6 +87,7 @@ class Mars : JavaPlugin() {
         }
 
         this@Mars.matchTabManager.disable()
+        AchievementManager.unload()
     }
 
     private fun overrideDefaultProviders() {
@@ -97,4 +96,3 @@ class Mars : JavaPlugin() {
     }
 
 }
-
