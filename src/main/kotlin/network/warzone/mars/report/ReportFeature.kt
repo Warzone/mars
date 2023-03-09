@@ -19,11 +19,11 @@ object ReportFeature : Feature<Report>(), Listener {
         TODO("Reports are not fetchable")
     }
 
+
     @EventHandler
     fun onReportCreate(event: PlayerReportEvent) = runBlocking {
         val onlineStaff = Bukkit.getOnlinePlayers().filter { it.hasPermission("pgm.staff") }
             .map { SimplePlayer(it.uniqueId, it.name) }.toSet()
-
         ReportService.create(event.player.simple, event.sender.simple, event.reason, onlineStaff)
     }
 

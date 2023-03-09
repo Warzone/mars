@@ -2,6 +2,7 @@ package network.warzone.mars.api.socket
 
 enum class SocketEventType {
     // API-bound
+    ACHIEVEMENT_EARN,
     MATCH_LOAD,
     MATCH_START,
     MATCH_END,

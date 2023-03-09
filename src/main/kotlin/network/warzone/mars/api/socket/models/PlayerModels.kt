@@ -1,5 +1,6 @@
 package network.warzone.mars.api.socket.models
 
+import network.warzone.mars.achievement.Achievement
 import network.warzone.mars.match.models.DeathCause
 import java.util.*
 
@@ -20,3 +21,5 @@ data class PlayerDeathData(
 )
 
 data class KillstreakData(val amount: Int, val player: SimplePlayer, val ended: Boolean)
+
+data class PlayerAchievementData(val achievement: Achievement, val isComplete: Boolean = false)
