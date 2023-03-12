@@ -1,5 +1,15 @@
 package network.warzone.mars.utils
 
+import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.event.HoverEvent
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.time4j.ClockUnit
 import network.warzone.mars.Mars
 import network.warzone.mars.player.feature.LevelColorService
@@ -11,19 +21,14 @@ import network.warzone.mars.punishment.models.PunishmentKind
 import network.warzone.mars.punishment.models.StaffNote
 import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.tag.models.Tag
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.ChatColor.RED
 import org.bukkit.ChatColor.translateAlternateColorCodes
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.JoinConfiguration
-import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.event.ClickEvent
-import net.kyori.adventure.text.event.HoverEvent
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+import org.bukkit.entity.Player
+import tc.oc.pgm.api.PGM
+import tc.oc.pgm.api.match.Match
+import tc.oc.pgm.util.named.NameStyle
 import java.time.Duration
 import java.util.*
 import kotlin.math.abs
@@ -285,6 +290,41 @@ fun String.chunkedWords(size: Int): List<String> {
 // convert friendly name to enum name for valueOf
 fun String.enumify(): String =
     this.toUpperCase().replace(" ", "_")
+
+/**
+ * Returns the formatted player's name.
+ * Default provider is only compatible with [tc.oc.pgm.util.Audience] instances.
+ * Use [tc.oc.pgm.util.Audience.get] to obtain an instance.
+ *
+ * @param player the player to get the name from
+ * @param match the match to get the player from
+ */
+private val DEFAULT_ONLINE_NAME_PROVIDER: (Player, Match) -> Component = { p, m ->
+    val player = m.getPlayer(p)
+    if (player != null) player.getName(NameStyle.FANCY)
+    else text(p.name, NamedTextColor.GRAY)
+}
+
+/**
+ * Returns the styled offline player name.
+ *
+ * @param name the offline player name
+ */
+private val DEFAULT_OFFLINE_NAME_PROVIDER: (String) -> Component = { name ->
+    text(name, NamedTextColor.DARK_AQUA, TextDecoration.ITALIC)
+}
+
+fun getUsername(
+    UUID: UUID,
+    fallback: String,
+    match: Match = PGM.get().matchManager.getMatch(),
+    onlineNameProvider: (Player, Match) -> Component = DEFAULT_ONLINE_NAME_PROVIDER,
+    offlineNameProvider: (String) -> Component = DEFAULT_OFFLINE_NAME_PROVIDER,
+): Component {
+    val player = Bukkit.getPlayer(UUID)
+    return if (player != null) onlineNameProvider(player, match)
+           else offlineNameProvider(fallback)
+}
 
 fun getLevelAsComponent(level: Int): Component {
     return text(
