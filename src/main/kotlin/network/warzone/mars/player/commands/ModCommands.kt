@@ -7,6 +7,7 @@ import app.ashcon.intake.parametric.annotation.Text
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
@@ -15,6 +16,7 @@ import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.utils.*
 import network.warzone.mars.utils.strategy.multiLine
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -64,11 +66,24 @@ class ModCommands {
                     .appendMultiLine { createUncoloredLabelledSingleLine("Alts", if (lookup.alts.isEmpty()) "(None)" else "") }
 
                 lookup.alts.forEach { alt ->
+                    var username = getUsername(alt.player._id, alt.player.name, match, offlineNameProvider = offlineNameProvider)
                     message = message.appendMultiLineComponent(
                         text("-", NamedTextColor.GRAY)
                             .append(space())
-                            .append(getUsername(alt.player._id, alt.player.name, match, offlineNameProvider = offlineNameProvider))
-                    )
+                            .append(
+                                text("[L]", NamedTextColor.YELLOW)
+                                    .clickEvent(ClickEvent.runCommand("/lookup ${alt.player.name}"))
+                                    .hoverEvent(text("Click to /lookup ${alt.player.name}", NamedTextColor.YELLOW))
+                            )
+                            .append(space())
+                            .append(
+                                text("[P]", NamedTextColor.RED)
+                                    .clickEvent(ClickEvent.runCommand("/puns ${alt.player.name}"))
+                                    .hoverEvent(text("Click to /puns ${alt.player.name}", NamedTextColor.YELLOW))
+                            )
+                            .append(space())
+                            .append(username)
+                    ).appendMultiLineComponent(empty())
                 }
 
                 message.deliver()
