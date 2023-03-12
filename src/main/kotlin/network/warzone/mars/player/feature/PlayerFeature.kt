@@ -34,6 +34,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import tc.oc.pgm.api.Permissions
+import tc.oc.pgm.api.integration.Integration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -183,7 +184,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player.matchPlayer
         val join = queuedJoins[player.id] ?: return
-        if (!player.isVanished) {
+        if (!Integration.isVanished(player.bukkit)) {
             Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} joined. ${if (join.isNew) "${ChatColor.LIGHT_PURPLE}[NEW]" else ""}")
             val joinSoundId = join.profile.activeJoinSoundId
             if (joinSoundId != null) {
@@ -210,8 +211,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onPlayerLeave(event: PlayerQuitEvent) {
-        val player = event.player.matchPlayer
-        if (!player.isVanished)
+        if (!Integration.isVanished(event.player))
             Bukkit.broadcastMessage("${ChatColor.GRAY}${event.player.name} left.")
         else
             Bukkit.getOnlinePlayers()

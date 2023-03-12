@@ -32,6 +32,7 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import network.warzone.mars.utils.*
+import tc.oc.pgm.api.integration.Integration
 import tc.oc.pgm.listeners.ChatDispatcher
 import tc.oc.pgm.util.bukkit.OnlinePlayerMapAdapter
 
@@ -130,7 +131,7 @@ class ChatListener : Listener {
             return@runBlocking
         }
         val chatChannel =
-            if (context.matchPlayer.isVanished && context.player.hasPermission(Permissions.ADMINCHAT)) SettingValue.CHAT_ADMIN
+            if (Integration.isVanished(context.player) && context.player.hasPermission(Permissions.ADMINCHAT)) SettingValue.CHAT_ADMIN
             else context.matchPlayer.settings.getValue(SettingKey.CHAT)
 
         val isChatEnabled = Mars.get().config.getBoolean("chat.enabled")
