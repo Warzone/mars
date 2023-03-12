@@ -4,13 +4,11 @@ import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.Feature
-import network.warzone.mars.feature.Resource
+import network.warzone.mars.report.commands.ReportCommands
 import network.warzone.mars.utils.simple
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import tc.oc.pgm.community.events.PlayerReportEvent
-import java.util.*
 
 object ReportFeature : Feature<Report>(), Listener {
     init {
@@ -28,7 +26,7 @@ object ReportFeature : Feature<Report>(), Listener {
 
         ReportService.create(event.player.simple, event.sender.simple, event.reason, onlineStaff)
     }
-}
 
-// Not a real construct
-data class Report(override val _id: UUID = UUID.randomUUID()) : Resource
+    override fun getCommands(): List<Any> = listOf(ReportCommands())
+
+}
