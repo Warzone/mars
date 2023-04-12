@@ -30,8 +30,10 @@ class CombatListener : Listener {
         // If player is observing or if health is negative, don't send message
         if (damaged.matchPlayer.isObserving || health < 0) return
 
-        val name = damaged.matchPlayer.name
-        val component = name.append(text(" • ", NamedTextColor.DARK_GRAY)).append(text("❤ ${decimalFormat.format(health)}", NamedTextColor.RED))
+        val component = text()
+            .append(damaged.matchPlayer.name)
+            .append(text(" • ", NamedTextColor.DARK_GRAY))
+            .append(text("❤ ${decimalFormat.format(health)}", NamedTextColor.RED))
         shooter.matchPlayer.sendActionBar(component)
     }
 }
