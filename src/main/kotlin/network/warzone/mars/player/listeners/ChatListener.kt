@@ -56,7 +56,12 @@ class ChatListener : Listener {
     private val queuedChannels: OnlinePlayerMapAdapter<SettingValue> = OnlinePlayerMapAdapter(Mars.get())
 
     init {
-        DISCORDSRV_ENABLED = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null
+        try {
+            Class.forName("github.scarsz.discordsrv.DiscordSRV")
+            DISCORDSRV_ENABLED = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null
+        } catch (e: ClassNotFoundException) {
+            Mars.get().logger.warning("DiscordSRV could not be found, disabling DiscordSRV integration")
+        }
         LevelColorService
         HandlerList.unregisterAll(ChatDispatcher.get())
     }
