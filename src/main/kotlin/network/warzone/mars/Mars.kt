@@ -17,7 +17,7 @@ package network.warzone.mars
 import app.ashcon.intake.bukkit.BukkitIntake
 import app.ashcon.intake.bukkit.graph.BasicBukkitCommandGraph
 import kotlinx.coroutines.runBlocking
-import network.warzone.mars.achievement.AchievementManager
+import network.warzone.mars.player.achievements.AchievementManager
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.commands.CommandModule
 import network.warzone.mars.feature.FeatureManager
@@ -56,7 +56,7 @@ class Mars : JavaPlugin() {
     lateinit var matchTabManager: MatchTabManager
 
     override fun onEnable() = runBlocking {
-        println("MEWTWO IS HERE!")
+        println("MEWTWO IS HERE HERE HERE HERE HERE HERE!")
         instance = this@Mars
 
         this@Mars.saveDefaultConfig()
@@ -64,6 +64,7 @@ class Mars : JavaPlugin() {
         serverId = config.getString("server.id")
 
         val commandGraph = BasicBukkitCommandGraph(CommandModule)
+
 
         FeatureManager.registerCommands(commandGraph)
         AchievementManager

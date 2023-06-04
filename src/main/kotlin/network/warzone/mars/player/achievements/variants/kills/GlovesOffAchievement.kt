@@ -1,21 +1,8 @@
-package network.warzone.mars.player.achievements.variants
-
-import kotlinx.coroutines.runBlocking
-import net.minecraft.server.v1_8_R3.ItemStack
-import net.minecraft.server.v1_8_R3.Material
-import network.warzone.mars.Mars
-import network.warzone.mars.achievement.Achievement
-import network.warzone.mars.achievement.AchievementAgent
-import network.warzone.mars.achievement.AchievementEmitter
-import network.warzone.mars.player.PlayerManager
-import org.bukkit.event.EventHandler
-import org.bukkit.event.HandlerList
-import org.bukkit.event.Listener
-import tc.oc.pgm.api.match.Match
-import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
+package network.warzone.mars.player.achievements.variants.kills
 
 object GlovesOffAchievement {
-    fun createGlovesOffAchievement(achievement: Achievement, titleName: String) : AchievementAgent =
+    //TODO: I killed this achievement because it was throwing errors when I updated to 0.16 PGM (5/18/23)
+    /**fun createGlovesOffAchievement(achievement: Achievement, titleName: String) : AchievementAgent =
         object : AchievementAgent, Listener {
             override var match: Match? = null
             override val title: String = titleName
@@ -57,11 +44,11 @@ object GlovesOffAchievement {
                     if (!armorSlot.equals(Material.AIR)) return@runBlocking
                 }
 
-                AchievementEmitter.emit(killer.player.get(), achievement)
+                //AchievementEmitter.emit(killer.player.get(), achievement)
             }
 
             override fun unload() {
                 //HandlerList.unregisterAll(this)
             }
-        }
+        }**/
 }

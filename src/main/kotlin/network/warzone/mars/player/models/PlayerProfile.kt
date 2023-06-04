@@ -1,6 +1,5 @@
 package network.warzone.mars.player.models
 
-import network.warzone.mars.achievement.AchievementManager
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.NamedResource
 import network.warzone.mars.punishment.models.StaffNote
@@ -92,7 +91,7 @@ data class PlayerStats(
     val weaponKills: MutableMap<String, Int> = mutableMapOf(),
     val weaponDeaths: MutableMap<String, Int> = mutableMapOf(),
     val killstreaks: MutableMap<Int, Int> = mutableMapOf(5 to 0, 10 to 0, 25 to 0, 50 to 0, 100 to 0),
-    val achievements: AchievementManager = AchievementManager,
+    val achievements: HashSet<String> = hashSetOf()
 ) {
     val level: Int
         get() = floor(((xp + 5000) / 5000).toDouble()).toInt()
