@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
+import network.warzone.mars.player.achievements.AchievementMenu
 import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
@@ -60,6 +61,26 @@ class MiscCommands {
         val ping = player.spigot().ping
         if (player == sender) sender.sendMessage("${ChatColor.GRAY}Your ping is ${ChatColor.AQUA}${ping}ms")
         else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
+    }
+
+    @Command(
+        aliases = ["achievements"],
+        desc = "Open the achievements menu",
+        perms = ["mars.achievements"]
+    )
+    fun onAchievementMenuRequest(
+        @Sender sender: Player,
+    )
+    {
+        /** TODO: An AchievementMenu instance is currently not persistent for each player.
+         *   This means each time /achievements is ran, the menu is created from scratch.
+         *   Idk how big of a deal it is that this menu must be rebuilt each time the
+         *   command is ran, but perhaps a Map<Player, AchievementMenu> variable could
+         *   be used to create persistence if needed.
+         */
+        val menu = AchievementMenu(sender);
+        menu.openMainMenu();
+
     }
 
     @Command(

@@ -42,8 +42,8 @@ class InventoryListener : Listener {
         val inventory = player.inventory
 
         // Remove extra staff items from observer inventory
-        inventory.setItem(1, null)
-        inventory.setItem(4, null)
-        inventory.setItem(6, null)
+        inventory?.setItem(1, null)
+        inventory?.setItem(4, null)
+        inventory?.setItem(6, null)
     }
 }

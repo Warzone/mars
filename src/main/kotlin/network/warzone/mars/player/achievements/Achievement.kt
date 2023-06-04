@@ -1,8 +1,10 @@
-package network.warzone.mars.achievement
+package network.warzone.mars.player.achievements
 
-import network.warzone.mars.player.achievements.variants.*
+import network.warzone.mars.player.achievements.variants.kills.*
+import network.warzone.mars.player.achievements.variants.objectives.WoolCaptureAchievement
 
-enum class Achievement(val agentProvider: () -> AchievementAgent, var isComplete: Boolean = false) {
+
+enum class Achievement(val agentProvider: () -> AchievementAgent) {
     PATH_TO_GENOCIDE_I({ GenocideAchievement.createGenocideAchievement(100, PATH_TO_GENOCIDE_I, "Path to Genocide I") }),
     PATH_TO_GENOCIDE_II({ GenocideAchievement.createGenocideAchievement(250, PATH_TO_GENOCIDE_II, "Path to Genocide II") }),
     PATH_TO_GENOCIDE_III({ GenocideAchievement.createGenocideAchievement(500, PATH_TO_GENOCIDE_III, "Path to Genocide III") }),
@@ -27,5 +29,29 @@ enum class Achievement(val agentProvider: () -> AchievementAgent, var isComplete
 
     BLOOD_GOD({ BloodGodAchievement.createBloodGodAchievement(BLOOD_GOD, "Blood for the Blood God")}),
     BABY_STEPS({ BabyStepsAchievement.createBabyStepsAchievement(BABY_STEPS, "Baby Steps")}),
-    GLOVES_OFF({ GlovesOffAchievement.createGlovesOffAchievement(GLOVES_OFF, "Gloves Off")})
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //TODO: This achievement has been slain temporarily.
+    //GLOVES_OFF({ GlovesOffAchievement.createGlovesOffAchievement(GLOVES_OFF, "Gloves Off")})
+
+
+    //TODO: Create parents for the below achievements.
+    /**WOOL_CAPTURES_I({ WoolCaptureAchievement.createAchievement(100, WOOL_CAPTURES_I, "Woolie Mamoth I")}),
+    WOOL_CAPTURES_II({ WoolCaptureAchievement.createAchievement(200, WOOL_CAPTURES_II, "Woolie Mamoth II")}),
+    WOOL_CAPTURES_III({ WoolCaptureAchievement.createAchievement(300, WOOL_CAPTURES_III, "Woolie Mamoth III")}),
+    WOOL_CAPTURES_IV({ WoolCaptureAchievement.createAchievement(100, WOOL_CAPTURES_IV, "Woolie Mamoth IV")}),
+    WOOL_CAPTURES_V({ WoolCaptureAchievement.createAchievement(100, WOOL_CAPTURES_I, "Woolie Mamoth V")}),**/
+
+    //TODO: Figure out how to determine which event to use for certain achievements.
 }
