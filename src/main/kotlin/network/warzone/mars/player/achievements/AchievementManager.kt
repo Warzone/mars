@@ -39,7 +39,8 @@ object AchievementManager : Listener {
         }
     }
 
-
+    //TODO: Instead of using Achievement.values(), we will be using whatever
+    // is in the API database.
     private fun initializeAgents() {
         for (achievement in Achievement.values()) {
             println("Enabling achievement: $achievement")

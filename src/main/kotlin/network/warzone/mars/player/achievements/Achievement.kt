@@ -1,9 +1,8 @@
 package network.warzone.mars.player.achievements
 
 import network.warzone.mars.player.achievements.variants.kills.*
-import network.warzone.mars.player.achievements.variants.objectives.WoolCaptureAchievement
 
-
+@Deprecated("Achievements will be created and stored via the API rather than this class")
 enum class Achievement(val agentProvider: () -> AchievementAgent) {
     PATH_TO_GENOCIDE_I({ GenocideAchievement.createGenocideAchievement(100, PATH_TO_GENOCIDE_I, "Path to Genocide I") }),
     PATH_TO_GENOCIDE_II({ GenocideAchievement.createGenocideAchievement(250, PATH_TO_GENOCIDE_II, "Path to Genocide II") }),
