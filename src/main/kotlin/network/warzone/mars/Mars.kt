@@ -30,6 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import network.warzone.mars.player.decoration.PrefixDecorationProvider
 import network.warzone.mars.player.feature.PlayerService
 import network.warzone.mars.player.tablist.overrideTabManager
+import org.bukkit.Achievement
 import tc.oc.pgm.api.PGM
 import tc.oc.pgm.tablist.*
 import java.util.*
@@ -49,6 +50,7 @@ class Mars : JavaPlugin() {
         fun get() = instance
 
         fun registerEvents(listener: Listener) = Bukkit.getPluginManager().registerEvents(listener, instance)
+
     }
 
     lateinit var serverId: String

@@ -1,11 +1,15 @@
 package network.warzone.mars.player.achievements.variants.kills
 
 import kotlinx.coroutines.runBlocking
+import network.warzone.mars.Mars
 import network.warzone.mars.player.achievements.Achievement
 import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.achievements.AchievementEmitter
 import network.warzone.mars.player.achievements.AchievementParent
+import network.warzone.mars.utils.simple
 import org.bukkit.event.EventHandler
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.match.Match
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
@@ -21,7 +25,7 @@ object MarksmanAchievement {
             override val id: String = achievement.name
 
             override fun load() {
-                //Mars.registerEvents(this)
+                Mars.registerEvents(this)
             }
 
             // TODO: Instead of listening for MatchPlayerDeathEvent, what if it just listens for when longestProjectileKill is updated?
@@ -32,12 +36,12 @@ object MarksmanAchievement {
                 val profile = context.getPlayerProfile()
 
                 if (profile.stats.records.longestProjectileKill?.distance == bowDistance) {
-                    //AchievementEmitter.emit(killer.player.get(), achievement)
+                    AchievementEmitter.emit(profile, killer.player.get().simple, achievement)
                 }
             }
 
             override fun unload() {
-                //HandlerList.unregisterAll(this)
+                HandlerList.unregisterAll(this)
             }
         }
 }
