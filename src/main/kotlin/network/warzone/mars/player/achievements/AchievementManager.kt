@@ -1,13 +1,12 @@
 package network.warzone.mars.player.achievements
 
 import network.warzone.mars.Mars
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import tc.oc.pgm.api.match.event.MatchStartEvent
-import tc.oc.pgm.api.player.MatchPlayer
 
 object AchievementManager : Listener {
     init {
@@ -17,7 +16,7 @@ object AchievementManager : Listener {
 
     private var initializedAgents = false
     private var initializedParentAgents = false
-    private val achievementAgents: MutableList<AchievementAgent> = mutableListOf()
+    val achievementAgents: MutableList<AchievementAgent> = mutableListOf()
     val achievementParentAgents: MutableMap<AchievementParentAgent, MutableList<AchievementAgent>> = mutableMapOf()
 
     @EventHandler

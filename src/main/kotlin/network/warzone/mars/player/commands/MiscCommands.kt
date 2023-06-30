@@ -11,6 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.player.achievements.AchievementMenu
 import network.warzone.mars.commands.providers.PlayerName
+import network.warzone.mars.player.achievements.AchievementManager
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -70,6 +71,8 @@ class MiscCommands {
     )
     fun onAchievementMenuRequest(
         @Sender sender: Player,
+        audience: Audience,
+        @Nullable arg1: String?
     )
     {
         /** TODO: An AchievementMenu instance is currently not persistent for each player.
@@ -78,8 +81,20 @@ class MiscCommands {
          *   command is ran, but perhaps a Map<Player, AchievementMenu> variable could
          *   be used to create persistence if needed.
          */
-        val menu = AchievementMenu(sender);
-        menu.openMainMenu();
+        if (arg1 == null) {
+            val menu = AchievementMenu(sender);
+            menu.openMainMenu();
+        }
+        else if (arg1 == "agents") {
+            val prefix = text("- ", NamedTextColor.GRAY)
+            audience.sendMessage(text("Active Agents:", NamedTextColor.GRAY))
+            AchievementManager.achievementAgents.forEach() {
+                val message = text(it.title, NamedTextColor.GREEN)
+                audience.sendMessage(text().append(prefix).append(message).build())
+            }
+        }
+
+
 
     }
 
