@@ -7,10 +7,14 @@ import network.warzone.api.database.models.Agent
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.player.achievements.exceptions.AchievementException
+import network.warzone.mars.player.achievements.exceptions.AchievementMissingException
 import network.warzone.mars.punishment.PunishmentService
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.exceptions.RankConflictException
+import network.warzone.mars.rank.exceptions.RankMissingException
+import network.warzone.mars.rank.models.Rank
 import network.warzone.mars.utils.parseHttpException
+import java.util.*
 
 object AchievementService {
     suspend fun create(
@@ -39,6 +43,21 @@ object AchievementService {
         }
 
         throw RuntimeException("Unreachable")
+    }
+
+    suspend fun list(): List<Achievement> {
+        return ApiClient.get("/mc/achievements")
+    }
+
+    suspend fun delete(id: UUID) {
+        val request = parseHttpException { ApiClient.delete<Unit>("/mc/achievements/$id") }
+
+        request.onFailure {
+            when (it.code) {
+                ApiExceptionType.ACHIEVEMENT_MISSING -> throw AchievementMissingException(id.toString())
+                else -> TODO("Unexpected API exception: ${it.code}")
+            }
+        }
     }
 
     data class AchievementCreateRequest(
