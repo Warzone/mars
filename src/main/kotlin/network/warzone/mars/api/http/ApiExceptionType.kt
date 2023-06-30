@@ -2,7 +2,6 @@ package network.warzone.mars.api.http
 
 enum class ApiExceptionType {
     INTERNAL_SERVER_ERROR,
-    ACHIEVEMENT_CONFLICT,
     VALIDATION_ERROR,
     SESSION_INACTIVE,
     PLAYER_MISSING,
@@ -17,5 +16,7 @@ enum class ApiExceptionType {
     MAP_MISSING,
     PUNISHMENT_MISSING,
     PUNISHMENT_ALREADY_REVERTED,
-    NOTE_MISSING
+    NOTE_MISSING,
+    ACHIEVEMENT_CONFLICT,
+    ACHIEVEMENT_MISSING
 }

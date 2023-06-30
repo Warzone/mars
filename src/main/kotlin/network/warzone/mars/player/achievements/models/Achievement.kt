@@ -30,6 +30,8 @@ sealed class AgentParams {
     // add more classes as needed for each type of parameter set
 }
 
+//TODO: Does this class need to be serializable?
+// Do any of the classes in this file need to be serializable?
 @Serializable
 data class Agent(
     val type: AgentType,
@@ -37,10 +39,7 @@ data class Agent(
     val params: AgentParams? = null
 )
 
-@Serializable
 data class Achievement(
-    // TODO: I'm not sure if @Contextual is going to work here
-    @Contextual
     override val _id: UUID,
     override val name: String,
     val description: String,
