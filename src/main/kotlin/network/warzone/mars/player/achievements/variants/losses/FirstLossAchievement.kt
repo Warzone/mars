@@ -13,8 +13,8 @@ object FirstLossAchievement {
         object : AchievementAgent, Listener {
             override var match: Match? = null
             override val title: String = titleName
-            override val description: String = "Insert your achievement description here"
-            override val gamemode: String = "Insert the gamemode here"
+            override val description: String = "Lose a match for the first time."
+            override val gamemode: String = "NONE"
             override val id: String = achievement.name
             override val parent: AchievementParent = AchievementParent.NO_PARENT
 

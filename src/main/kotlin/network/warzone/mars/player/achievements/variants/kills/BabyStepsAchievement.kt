@@ -2,11 +2,8 @@ package network.warzone.mars.player.achievements.variants.kills
 
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
-import network.warzone.mars.player.achievements.Achievement
-import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.PlayerManager
-import network.warzone.mars.player.achievements.AchievementEmitter
-import network.warzone.mars.player.achievements.AchievementParent
+import network.warzone.mars.player.achievements.*
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.utils.simple
 import org.bukkit.event.EventHandler
@@ -21,7 +18,7 @@ object BabyStepsAchievement {
         object : AchievementAgent, Listener {
             override var match: Match? = null
             override val title: String = titleName
-            override val description: String = "You've killed your first player!"
+            override val description: String = "Kill a player for the first time in any match."
             override val gamemode: String = "NONE"
             override val id: String = achievement.name
 
@@ -29,23 +26,17 @@ object BabyStepsAchievement {
                 Mars.registerEvents(this)
             }
             
-            @EventHandler(priority = EventPriority.HIGHEST)
+            @EventHandler
             fun onPlayerDeath(event: MatchPlayerDeathEvent) = runBlocking {
+                AchievementManager.sendDebugMessage(achievement.name + ".onPlayerDeath called")
                 val killer = event.killer ?: return@runBlocking
                 val context = PlayerManager.getPlayer(killer.id) ?: return@runBlocking
-                val playerName = context.player.name.toString();
-                val profile = PlayerFeature.fetch(playerName)
+                val profile = PlayerFeature.fetch(context.player.name) ?: return@runBlocking;
 
-                println("context.player.name.toString() = " + context.player.name.toString());
-
-                context.matchPlayer.simple
-
-                if (profile != null) {
-                    println("profile.stats.kills = " + profile.stats.kills);
-                    if (profile.stats.kills != 0) {
-                        AchievementEmitter.emit(profile, context.matchPlayer.simple, achievement)
-                    }
+                if (profile.stats.kills != 0) {
+                    AchievementEmitter.emit(profile, killer.simple, achievement)
                 }
+                AchievementManager.sendDebugMessage(achievement.name + ".onPlayerDeath finished")
             }
 
             override fun unload() {

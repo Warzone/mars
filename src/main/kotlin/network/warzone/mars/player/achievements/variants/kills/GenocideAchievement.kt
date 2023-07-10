@@ -27,22 +27,16 @@ object GenocideAchievement {
                 Mars.registerEvents(this)
             }
 
-            @EventHandler(priority = EventPriority.HIGHEST)
+            @EventHandler
             fun onPlayerDeath(event: MatchPlayerDeathEvent) = runBlocking {
-                println("onPlayerDeath triggered by " + achievement.name)
                 val killer = event.killer ?: return@runBlocking
                 val context = PlayerManager.getPlayer(killer.id) ?: return@runBlocking
-                val playerName = context.player.name.toString();
-                val profile = PlayerFeature.fetch(playerName);
+                val profile = PlayerFeature.fetch(context.player.name) ?: return@runBlocking;
 
-                println("    profile.stats.kills = " + profile?.stats?.kills)
-                println("    targetKIlls = " + targetKills)
-
-                if (profile != null) {
-                    if (profile.stats.kills >= targetKills) {
-                        AchievementEmitter.emit(profile, killer.player.get().simple, achievement)
-                    }
+                if (profile.stats.kills >= targetKills) {
+                    AchievementEmitter.emit(profile, killer.simple, achievement)
                 }
+
             }
 
             override fun unload() {

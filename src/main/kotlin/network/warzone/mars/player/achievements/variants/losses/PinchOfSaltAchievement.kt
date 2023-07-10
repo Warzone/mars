@@ -13,8 +13,8 @@ object PinchOfSaltAchievement {
         object : AchievementAgent, Listener {
             override var match: Match? = null
             override val title: String = titleName
-            override val description: String = "Insert your achievement description here"
-            override val gamemode: String = "Insert the gamemode here"
+            override val description: String = "Lose a DTW match with only one enemy wool left to break."
+            override val gamemode: String = "DTW"
             override val id: String = achievement.name
             override val parent: AchievementParent = AchievementParent.NO_PARENT
 
