@@ -1,6 +1,10 @@
 package network.warzone.mars.player.achievements
 
 import network.warzone.mars.player.achievements.variants.kills.*
+import network.warzone.mars.player.achievements.variants.deaths.*
+import network.warzone.mars.player.achievements.variants.objectives.*
+import network.warzone.mars.player.achievements.variants.wins.*
+import network.warzone.mars.player.achievements.variants.losses.*
 
 @Deprecated("Achievements will be created and stored via the API rather than this class")
 enum class Achievement(val agentProvider: () -> AchievementAgent) {
@@ -26,31 +30,24 @@ enum class Achievement(val agentProvider: () -> AchievementAgent) {
     BLOOD_BATH_IV({ BloodBathAchievement.createBloodBathAchievement(75, BLOOD_BATH_IV, "Blood Bath IV")}),
     BLOOD_BATH_V({ BloodBathAchievement.createBloodBathAchievement(100, BLOOD_BATH_V, "Blood Bath V")}),
 
-    BLOOD_GOD({ BloodGodAchievement.createBloodGodAchievement(BLOOD_GOD, "Blood for the Blood God")}),
-    BABY_STEPS({ BabyStepsAchievement.createBabyStepsAchievement(BABY_STEPS, "Baby Steps")}),
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //TODO: This achievement has been slain temporarily.
-    //GLOVES_OFF({ GlovesOffAchievement.createGlovesOffAchievement(GLOVES_OFF, "Gloves Off")})
-
-
-    //TODO: Create parents for the below achievements.
-    /**WOOL_CAPTURES_I({ WoolCaptureAchievement.createAchievement(100, WOOL_CAPTURES_I, "Woolie Mamoth I")}),
+    WOOL_CAPTURES_I({ WoolCaptureAchievement.createAchievement(100, WOOL_CAPTURES_I, "Woolie Mamoth I")}),
     WOOL_CAPTURES_II({ WoolCaptureAchievement.createAchievement(200, WOOL_CAPTURES_II, "Woolie Mamoth II")}),
     WOOL_CAPTURES_III({ WoolCaptureAchievement.createAchievement(300, WOOL_CAPTURES_III, "Woolie Mamoth III")}),
-    WOOL_CAPTURES_IV({ WoolCaptureAchievement.createAchievement(100, WOOL_CAPTURES_IV, "Woolie Mamoth IV")}),
-    WOOL_CAPTURES_V({ WoolCaptureAchievement.createAchievement(100, WOOL_CAPTURES_I, "Woolie Mamoth V")}),**/
+    WOOL_CAPTURES_IV({ WoolCaptureAchievement.createAchievement(400, WOOL_CAPTURES_IV, "Woolie Mamoth IV")}),
+    WOOL_CAPTURES_V({ WoolCaptureAchievement.createAchievement(500, WOOL_CAPTURES_V, "Woolie Mamoth V")}),
 
-    //TODO: Figure out how to determine which event to use for certain achievements.
+    KILL_STREAK_I({ KillstreakAchievement.createAchievement(5, KILL_STREAK_I, "Penta-kill")}),
+    KILL_STREAK_II({ KillstreakAchievement.createAchievement(10, KILL_STREAK_II, "Juggernaut")}),
+    KILL_STREAK_III({ KillstreakAchievement.createAchievement(25, KILL_STREAK_III, "Untouchable")}),
+    KILL_STREAK_IV({ KillstreakAchievement.createAchievement(50, KILL_STREAK_IV, "50-50")}),
+    KILL_STREAK_V({ KillstreakAchievement.createAchievement(75, KILL_STREAK_V, "Harbinger")}),
+    KILL_STREAK_VI({ KillstreakAchievement.createAchievement(100, KILL_STREAK_VI, "Plot Armor")}),
+
+    BLOOD_GOD({ BloodGodAchievement.createBloodGodAchievement(BLOOD_GOD, "Blood God")}),
+    BABY_STEPS({ BabyStepsAchievement.createBabyStepsAchievement(BABY_STEPS, "Baby Steps")}),
+    FALLEN_FIGHTER({ FallenFighterAchievement.createAchievement(FALLEN_FIGHTER, "Fallen Fighter")}),
+    FIRE_DEATH({ FireDeathAchievement.createAchievement(FIRE_DEATH, "Burnt Toast")}),
+    FIRST_DEATH({ FirstDeathAchievement.createAchievement(FIRST_DEATH, "Oof!")}),
+    GOLDEN_APPLE_DEATH({ GoldenAppleDeathAchievement.createAchievement(GOLDEN_APPLE_DEATH, "None for All")}),
+    SELF_DEATH({ SelfDeathAchievement.createAchievement(SELF_DEATH, "My Own Worst Enemy")}),
 }

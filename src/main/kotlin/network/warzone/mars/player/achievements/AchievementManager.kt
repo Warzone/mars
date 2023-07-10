@@ -2,6 +2,8 @@ package network.warzone.mars.player.achievements
 
 import network.warzone.mars.Mars
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
@@ -14,6 +16,9 @@ object AchievementManager : Listener {
         println("Achievement Manager HAS BEEN ENABLED THIS IS ENABLED.")
     }
 
+    val debugPrefix: String = ChatColor.DARK_GRAY.toString() + "[@] " + ChatColor.GRAY.toString()
+    val MewTwoKing: Player?
+        get() = Bukkit.getPlayer("MewTwoKing")
     private var initializedAgents = false
     private var initializedParentAgents = false
     val achievementAgents: MutableList<AchievementAgent> = mutableListOf()
@@ -29,6 +34,7 @@ object AchievementManager : Listener {
     @EventHandler
     private fun onMatchStart(event: MatchStartEvent) {
         println("A MATCH HAS STARTED OMG OMG OMG")
+        sendDebugMessage("AchievementManager.onMatchStart called")
         if (!initializedAgents) {
             initializeAgents()
         }
@@ -36,11 +42,13 @@ object AchievementManager : Listener {
         if (!initializedParentAgents) {
             initializeParentAgents()
         }
+        sendDebugMessage("AchievementManager.onMatchStart finished")
     }
 
     //TODO: Instead of using Achievement.values(), we will be using whatever
     // is in the API database.
     private fun initializeAgents() {
+        sendDebugMessage("AchievementManager.initializeAgents() called")
         for (achievement in Achievement.values()) {
             println("Enabling achievement: $achievement")
             val agent = achievement.agentProvider()
@@ -49,14 +57,17 @@ object AchievementManager : Listener {
             achievementAgents += agent
         }
         initializedAgents = true
+        sendDebugMessage("AchievementManager.initializeAgents() finished")
     }
 
     private fun initializeParentAgents() {
+        sendDebugMessage("AchievementManager.initializeParentAgents() called")
         for (achievement in Achievement.values()) {
             val parent = achievement.agentProvider().parent
             achievementParentAgents.getOrPut(parent.agent) { mutableListOf() }.add(achievement.agentProvider())
         }
         initializedParentAgents = true
+        sendDebugMessage("AchievementManager.initializeParentAgents() finished")
     }
 
     fun unload() {
@@ -72,5 +83,9 @@ object AchievementManager : Listener {
         catch (e: IllegalArgumentException) {
             throw InvalidGamemodeException(gamemode)
         }
+    }
+
+    fun sendDebugMessage(message: String) {
+        MewTwoKing?.sendMessage(debugPrefix + message)
     }
 }

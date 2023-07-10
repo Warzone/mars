@@ -13,8 +13,8 @@ object CaptureNoSprintAchievement {
         object : AchievementAgent, Listener {
             override var match: Match? = null
             override val title: String = titleName
-            override val description: String = "Insert your achievement description here"
-            override val gamemode: String = "Insert the gamemode here"
+            override val description: String = "Capture a wool objective in CTW without sprinting."
+            override val gamemode: String = "CTW"
             override val id: String = achievement.name
             override val parent: AchievementParent = AchievementParent.NO_PARENT
 

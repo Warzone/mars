@@ -93,6 +93,9 @@ class MiscCommands {
                 audience.sendMessage(text().append(prefix).append(message).build())
             }
         }
+        else {
+            audience.sendMessage(text("Invalid argument \"$arg1\".", NamedTextColor.RED))
+        }
 
 
 
