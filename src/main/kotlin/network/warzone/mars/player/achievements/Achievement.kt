@@ -43,11 +43,15 @@ enum class Achievement(val agentProvider: () -> AchievementAgent) {
     KILL_STREAK_V({ KillstreakAchievement.createAchievement(75, KILL_STREAK_V, "Harbinger")}),
     KILL_STREAK_VI({ KillstreakAchievement.createAchievement(100, KILL_STREAK_VI, "Plot Armor")}),
 
-    BLOOD_GOD({ BloodGodAchievement.createBloodGodAchievement(BLOOD_GOD, "Blood God")}),
+    ALL_FOR_NOTHING({ AllForNothingAchievement.createAchievement(ALL_FOR_NOTHING, "All for Nothing")}),
     BABY_STEPS({ BabyStepsAchievement.createBabyStepsAchievement(BABY_STEPS, "Baby Steps")}),
+    BLOOD_GOD({ BloodGodAchievement.createBloodGodAchievement(BLOOD_GOD, "Blood God")}),
     FALLEN_FIGHTER({ FallenFighterAchievement.createAchievement(FALLEN_FIGHTER, "Fallen Fighter")}),
     FIRE_DEATH({ FireDeathAchievement.createAchievement(FIRE_DEATH, "Burnt Toast")}),
     FIRST_DEATH({ FirstDeathAchievement.createAchievement(FIRST_DEATH, "Oof!")}),
+    FIRST_LOSS({ FirstLossAchievement.createAchievement(FIRST_LOSS, "My Stats!")}),
     GOLDEN_APPLE_DEATH({ GoldenAppleDeathAchievement.createAchievement(GOLDEN_APPLE_DEATH, "None for All")}),
+    PINCH_OF_SALT({ PinchOfSaltAchievement.createAchievement(PINCH_OF_SALT, "Pinch of Salt")}),
     SELF_DEATH({ SelfDeathAchievement.createAchievement(SELF_DEATH, "My Own Worst Enemy")}),
+
 }

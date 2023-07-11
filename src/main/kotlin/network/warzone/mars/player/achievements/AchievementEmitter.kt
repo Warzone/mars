@@ -42,6 +42,13 @@ object AchievementEmitter {
             achievement.name
             )
         )
+    }
 
+    // Assumes "profiles" and "players" are of equal size.
+    // Also assumes each list is indexed per player.
+    fun emit(profiles: MutableList<PlayerProfile>, players: MutableList<SimplePlayer>, achievement: Achievement) {
+        for (i in 0 until profiles.size) {
+            emit(profiles[i], players[i], achievement)
+        }
     }
 }
