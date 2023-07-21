@@ -72,8 +72,20 @@ object AchievementFeature : CachedFeature<Achievement>() {
     }
 
     suspend fun list(): List<Achievement> {
+        println("<!><!><!> LIST FEATURE CALLED <!><!><!>")
         val achievements = AchievementService.list()
         if (achievements.isNotEmpty()) AchievementFeature.clear()
+        println("<!><!><!> LIST FEATURE FINISHING <!><!><!>")
         return achievements.onEach { AchievementFeature.add(it) }
+
+    }
+
+    suspend fun printAchievements() {
+        println("<!><!><!> PRINT ACHIEVEMENTS CALLED <!><!><!>")
+        val achievements = list()
+        achievements.forEach { achievement ->
+            println("Achievement: ${achievement.name}, Description: ${achievement.description}")
+        }
+        println("<!><!><!> PRINT ACHIEVEMENTS FINISHED <!><!><!>")
     }
 }

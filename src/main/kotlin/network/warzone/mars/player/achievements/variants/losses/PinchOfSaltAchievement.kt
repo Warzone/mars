@@ -35,7 +35,7 @@ object PinchOfSaltAchievement {
             override val parent: AchievementParent = AchievementParent.NO_PARENT
 
             override fun load() {
-                Mars.registerEvents(this)
+                //Mars.registerEvents(this)
             }
 
             private var brokenWools = mutableMapOf<Competitor, Int>()
@@ -81,7 +81,7 @@ object PinchOfSaltAchievement {
             }
 
             override fun unload() {
-                HandlerList.unregisterAll(this)
+                //HandlerList.unregisterAll(this)
             }
     }
 }

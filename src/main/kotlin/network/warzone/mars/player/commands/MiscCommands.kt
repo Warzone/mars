@@ -3,6 +3,9 @@ package network.warzone.mars.player.commands
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
@@ -11,6 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.player.achievements.AchievementMenu
 import network.warzone.mars.commands.providers.PlayerName
+import network.warzone.mars.player.achievements.AchievementFeature.printAchievements
 import network.warzone.mars.player.achievements.AchievementManager
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.Bukkit
@@ -64,6 +68,7 @@ class MiscCommands {
         else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Command(
         aliases = ["achievements"],
         desc = "Open the achievements menu",
@@ -93,12 +98,14 @@ class MiscCommands {
                 audience.sendMessage(text().append(prefix).append(message).build())
             }
         }
+        else if (arg1 == "print") {
+            GlobalScope.launch {
+                printAchievements()
+            }
+        }
         else {
             audience.sendMessage(text("Invalid argument \"$arg1\".", NamedTextColor.RED))
         }
-
-
-
     }
 
     @Command(

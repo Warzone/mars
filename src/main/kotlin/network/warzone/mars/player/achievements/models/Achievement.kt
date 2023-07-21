@@ -35,7 +35,7 @@ sealed class AgentParams {
 @Serializable
 data class Agent(
     val type: AgentType,
-    @Contextual
+    @Serializable
     val params: AgentParams? = null
 )
 
