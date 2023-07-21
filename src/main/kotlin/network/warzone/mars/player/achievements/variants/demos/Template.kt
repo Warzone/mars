@@ -1,12 +1,15 @@
-package network.warzone.mars.player.achievements.variants
+package network.warzone.mars.player.achievements.variants.demos
 
+import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import network.warzone.mars.player.achievements.Achievement
 import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementParent
+import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.match.Match
+import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 
 object Template {
     fun createTemplateAchievement(achievement: Achievement, titleName: String) : AchievementAgent =

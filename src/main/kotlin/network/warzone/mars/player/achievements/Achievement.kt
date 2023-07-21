@@ -3,8 +3,8 @@ package network.warzone.mars.player.achievements
 import network.warzone.mars.player.achievements.variants.kills.*
 import network.warzone.mars.player.achievements.variants.deaths.*
 import network.warzone.mars.player.achievements.variants.objectives.*
-import network.warzone.mars.player.achievements.variants.wins.*
 import network.warzone.mars.player.achievements.variants.losses.*
+import network.warzone.mars.player.achievements.variants.demos.*
 
 @Deprecated("Achievements will be created and stored via the API rather than this class")
 enum class Achievement(val agentProvider: () -> AchievementAgent) {
@@ -54,4 +54,6 @@ enum class Achievement(val agentProvider: () -> AchievementAgent) {
     PINCH_OF_SALT({ PinchOfSaltAchievement.createAchievement(PINCH_OF_SALT, "Pinch of Salt")}),
     SELF_DEATH({ SelfDeathAchievement.createAchievement(SELF_DEATH, "My Own Worst Enemy")}),
 
+    CORE_DESTROY({ CoreDestroyAchievement.createAchievement(1, CORE_DESTROY, "Leak the Evidence")}),
+    GOAL_DEMO({ GoalDemoAchievement.createGoalDemoAchievement(GOAL_DEMO, "Demo of goal events")})
 }

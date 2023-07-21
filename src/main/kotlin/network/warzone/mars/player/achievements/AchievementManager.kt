@@ -52,7 +52,7 @@ object AchievementManager : Listener {
         for (achievement in Achievement.values()) {
             println("Enabling achievement: $achievement")
             val agent = achievement.agentProvider()
-            if (!isValidGamemode(agent.gamemode)) return;
+            //if (!isValidGamemode(agent.gamemode)) return;
             agent.load()
             achievementAgents += agent
         }
@@ -87,5 +87,13 @@ object AchievementManager : Listener {
 
     fun sendDebugMessage(message: String) {
         MewTwoKing?.sendMessage(debugPrefix + message)
+    }
+
+    fun sendDebugStartMessage(achievement: Achievement, functionName: String) {
+        MewTwoKing?.sendMessage(debugPrefix + "\\u00A7e" + achievement.name + "." + functionName + " started.")
+    }
+
+    fun sendDebugFinishMessage(achievement: Achievement, functionName: String) {
+        MewTwoKing?.sendMessage(debugPrefix + "\\u00A7e" + achievement.name + "." + functionName + " finished.")
     }
 }

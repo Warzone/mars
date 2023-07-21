@@ -46,7 +46,10 @@ object AchievementService {
     }
 
     suspend fun list(): List<Achievement> {
-        return ApiClient.get("/mc/achievements")
+        println("<!><!><!> LIST SERVICE CALLED <!><!><!>")
+        val achievements: List<Achievement> = ApiClient.get("/mc/achievements")
+        println("<!><!><!> LIST SERVICE FINISHING <!><!><!>")
+        return achievements
     }
 
     suspend fun delete(id: UUID) {
