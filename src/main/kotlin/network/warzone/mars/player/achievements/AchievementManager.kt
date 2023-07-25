@@ -9,20 +9,17 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.match.event.MatchFinishEvent
 
-object AchievementManager : Listener {
+object AchievementManager : Listener, AchievementDebugger {
     private val achievements : MutableList<Achievement> = mutableListOf()
     private val activeAgents : MutableList<AchievementAgent> = mutableListOf()
     fun load() {
         Mars.registerEvents(this)
-        Mars.async {
-            achievements += AchievementFeature.list()
-            activeAgents += achievements.map(::findAgentForAchievement)
-            activeAgents.forEach { agent -> agent.load() }
-        }
+        fetchNewAchievements()
     }
 
     @EventHandler
     fun onMatchFinish(event: MatchFinishEvent) {
+        fetchNewAchievements()
         //activeAgents.forEach { agent -> agent.onMatchFinish()  }
     }
 
@@ -43,6 +40,26 @@ object AchievementManager : Listener {
             // ...
 
             else -> throw IllegalArgumentException("Unknown AgentParams for achievement ${achievement.name}")
+        }
+    }
+
+    private fun fetchNewAchievements() {
+        Mars.async {
+            // Fetch the current achievements from the API
+            val currentAchievements = AchievementFeature.list()
+
+            // Find the achievements that are not in the currently loaded achievements
+            val newAchievements = currentAchievements.filter { it !in achievements }
+
+            // If there are new achievements, add them to the list and activate their agents
+            if (newAchievements.isNotEmpty()) {
+                achievements += newAchievements
+                activeAgents += newAchievements.map(::findAgentForAchievement).onEach { it.load() }
+
+                sendDebugMessage("Achievements updated via fetchNewAchievements()")
+                sendConsoleMessage("Achievements updated via fetchNewAchievements()")
+                AchievementFeature.printAchievements()
+            }
         }
     }
 }

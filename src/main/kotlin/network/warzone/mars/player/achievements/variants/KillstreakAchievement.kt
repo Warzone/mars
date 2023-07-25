@@ -15,10 +15,6 @@ import org.bukkit.event.Listener
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 
 class KillstreakAchievement (val params: AgentParams.KillStreakAgentParams, val achievement: Achievement) : AchievementAgent, Listener {
-    override fun load() {
-        Mars.registerEvents(this)
-    }
-
     @EventHandler
     fun onPlayerDeath(event: MatchPlayerDeathEvent) = runBlocking {
         val killer = event.killer ?: return@runBlocking
@@ -28,9 +24,5 @@ class KillstreakAchievement (val params: AgentParams.KillStreakAgentParams, val 
         if (profile.stats.killstreaks.containsKey(params.targetStreak)) {
             AchievementEmitter.emit(profile, killer.simple, achievement)
         }
-    }
-
-    override fun unload() {
-        HandlerList.unregisterAll(this)
     }
 }
