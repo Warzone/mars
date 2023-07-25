@@ -13,6 +13,7 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.Mars
 import network.warzone.mars.api.events.ApiConnectedEvent
 import network.warzone.mars.api.socket.*
@@ -49,6 +50,10 @@ object ApiClient {
                 registerTypeAdapter(Date::class.java, JsonSerializer<Date> { date, _, _ ->
                     JsonPrimitive(date.time)
                 })
+                registerTypeAdapter(
+                    AgentParams::class.java,
+                    ClosedPolymorphicArrayDeserializer.createFromSealedClass(AgentParams::class)
+                )
             }
         }
 

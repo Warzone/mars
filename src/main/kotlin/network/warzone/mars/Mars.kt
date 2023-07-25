@@ -69,7 +69,7 @@ class Mars : JavaPlugin() {
 
 
         FeatureManager.registerCommands(commandGraph)
-        AchievementManager
+        AchievementManager.load()
 
         val apiConfigurationSection = config.getConfigurationSection("api")
         ApiClient.loadHttp(apiConfigurationSection)

@@ -10,7 +10,7 @@ import java.util.*
 enum class AgentType {
     TOTAL_KILLS_AGENT,
     KILL_STREAK_AGENT,
-    COMPOSITE_AGENT
+    //COMPOSITE_AGENT
 }
 
 @Serializable
@@ -30,8 +30,6 @@ sealed class AgentParams {
     // add more classes as needed for each type of parameter set
 }
 
-//TODO: Does this class need to be serializable?
-// Do any of the classes in this file need to be serializable?
 @Serializable
 data class Agent(
     val type: AgentType,
