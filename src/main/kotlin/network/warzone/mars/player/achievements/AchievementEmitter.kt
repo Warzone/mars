@@ -1,11 +1,6 @@
 package network.warzone.mars.player.achievements
 
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.TextComponent
 import network.warzone.api.database.models.Achievement
-import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.models.PlayerAchievementData

@@ -16,10 +16,6 @@ import org.bukkit.event.Listener
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 
 class TotalKillsAchievement (val params: AgentParams.TotalKillsAgentParams, val achievement: Achievement) : AchievementAgent, Listener {
-    override fun load() {
-        Mars.registerEvents(this)
-    }
-
     @EventHandler
     fun onPlayerDeath(event: MatchPlayerDeathEvent) = runBlocking {
         val killer = event.killer ?: return@runBlocking
@@ -29,9 +25,5 @@ class TotalKillsAchievement (val params: AgentParams.TotalKillsAgentParams, val 
         if (profile.stats.kills >= params.targetKills) {
             AchievementEmitter.emit(profile, killer.simple, achievement)
         }
-    }
-
-    override fun unload() {
-        HandlerList.unregisterAll(this)
     }
 }
