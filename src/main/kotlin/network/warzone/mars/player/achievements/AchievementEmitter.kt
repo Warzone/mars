@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TextComponent
+import network.warzone.api.database.models.Achievement
+import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.models.PlayerAchievementData
@@ -13,42 +15,20 @@ import network.warzone.mars.player.models.PlayerProfile
 
 object AchievementEmitter {
     fun emit(profile: PlayerProfile, player: SimplePlayer, achievement: Achievement) {
-
-        //TODO: Remove this later.
-        //-----------------------------------
-        val msg1 = TextComponent("Achievement emission called by: ")
-        msg1.color = ChatColor.GREEN
-
-        val msg2 = TextComponent(achievement.name)
-        msg2.color = ChatColor.GOLD
-
-        msg1.addExtra(msg2)
-
-        PlayerManager.getPlayer(player.id)?.player?.spigot()?.sendMessage(msg1)
-            ?: println("Error: Could not notify player of an achievement emission")
-        //----------------------------------------
-
+        // Check if player already has achievement.
         if (profile.stats.achievements.contains(achievement.name)) return;
 
+        // Print achievement earn to player and console.
         PlayerManager.getPlayer(player.id)?.player?.sendMessage("You've earned an achievement: " + achievement.name)
             ?: println("Error: Could not notify player of achievement");
+        println("Achievement " + achievement.name + " earned by " + player.name);
 
-        println("Achievement " + achievement.agentProvider().title + " earned by " + player.name);
-
-
+        // Emit achievement completion to the database.
         ApiClient.emit(
             OutboundEvent.PlayerAchievement, PlayerAchievementData(
             player,
             achievement.name
             )
         )
-    }
-
-    // Assumes "profiles" and "players" are of equal size.
-    // Also assumes each list is indexed per player.
-    fun emit(profiles: MutableList<PlayerProfile>, players: MutableList<SimplePlayer>, achievement: Achievement) {
-        for (i in 0 until profiles.size) {
-            emit(profiles[i], players[i], achievement)
-        }
     }
 }

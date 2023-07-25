@@ -1,20 +1,76 @@
 package network.warzone.mars.player.achievements
 
+import network.warzone.api.database.models.Achievement
+import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.Mars
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.entity.Player
+import network.warzone.mars.player.achievements.variants.KillstreakAchievement
+import network.warzone.mars.player.achievements.variants.TotalKillsAchievement
 import org.bukkit.event.EventHandler
-import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerJoinEvent
-import tc.oc.pgm.api.match.event.MatchStartEvent
+import tc.oc.pgm.api.match.event.MatchFinishEvent
 
 object AchievementManager : Listener {
-    init {
+    private val achievements : MutableList<Achievement> = mutableListOf()
+    private val activeAgents : MutableList<AchievementAgent> = mutableListOf()
+    fun load() {
         Mars.registerEvents(this)
-        println("Achievement Manager HAS BEEN ENABLED THIS IS ENABLED.")
+        Mars.async {
+            achievements += AchievementFeature.list()
+            activeAgents += achievements.map(::findAgentForAchievement)
+            activeAgents.forEach { agent -> agent.load() }
+        }
     }
+
+    @EventHandler
+    fun onMatchFinish(event: MatchFinishEvent) {
+        //activeAgents.forEach { agent -> agent.onMatchFinish()  }
+    }
+
+    fun unload() {
+        activeAgents.forEach { agent -> agent.unload() }
+        activeAgents.clear()
+        achievements.clear()
+    }
+
+    private fun findAgentForAchievement(achievement: Achievement) : AchievementAgent {
+        return when (val agentParams = achievement.agent.params) {
+            is AgentParams.KillStreakAgentParams -> {
+                KillstreakAchievement(agentParams, achievement)
+            }
+            is AgentParams.TotalKillsAgentParams -> {
+                TotalKillsAchievement(agentParams, achievement)
+            }
+            // ...
+
+            else -> throw IllegalArgumentException("Unknown AgentParams for achievement ${achievement.name}")
+        }
+    }
+}
+/**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     val debugPrefix: String = ChatColor.DARK_GRAY.toString() + "[@] " + ChatColor.GRAY.toString()
     val MewTwoKing: Player?
@@ -24,16 +80,10 @@ object AchievementManager : Listener {
     val achievementAgents: MutableList<AchievementAgent> = mutableListOf()
     val achievementParentAgents: MutableMap<AchievementParentAgent, MutableList<AchievementAgent>> = mutableMapOf()
 
-    @EventHandler
-    private fun onPlayerJoin(event: PlayerJoinEvent) {
-        println("MEWTWOKING HAS JOINED THE SERVER OMG OMG OMG")
-    }
-
     // TODO: Achievement parents for the GUI are currently initialized once a player joins for the first time.
     //  This may need to be changed to a different event.
     @EventHandler
     private fun onMatchStart(event: MatchStartEvent) {
-        println("A MATCH HAS STARTED OMG OMG OMG")
         sendDebugMessage("AchievementManager.onMatchStart called")
         if (!initializedAgents) {
             initializeAgents()
@@ -48,7 +98,6 @@ object AchievementManager : Listener {
     //TODO: Instead of using Achievement.values(), we will be using whatever
     // is in the API database.
     private fun initializeAgents() {
-        sendDebugMessage("AchievementManager.initializeAgents() called")
         for (achievement in Achievement.values()) {
             println("Enabling achievement: $achievement")
             val agent = achievement.agentProvider()
@@ -57,7 +106,6 @@ object AchievementManager : Listener {
             achievementAgents += agent
         }
         initializedAgents = true
-        sendDebugMessage("AchievementManager.initializeAgents() finished")
     }
 
     private fun initializeParentAgents() {
@@ -96,4 +144,4 @@ object AchievementManager : Listener {
     fun sendDebugFinishMessage(achievement: Achievement, functionName: String) {
         MewTwoKing?.sendMessage(debugPrefix + "\\u00A7e" + achievement.name + "." + functionName + " finished.")
     }
-}
+}**/

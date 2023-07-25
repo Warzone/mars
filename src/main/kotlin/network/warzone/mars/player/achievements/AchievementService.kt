@@ -8,7 +8,6 @@ import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.player.achievements.exceptions.AchievementException
 import network.warzone.mars.player.achievements.exceptions.AchievementMissingException
-import network.warzone.mars.punishment.PunishmentService
 import network.warzone.mars.punishment.models.Punishment
 import network.warzone.mars.rank.exceptions.RankConflictException
 import network.warzone.mars.rank.exceptions.RankMissingException
@@ -46,10 +45,7 @@ object AchievementService {
     }
 
     suspend fun list(): List<Achievement> {
-        println("<!><!><!> LIST SERVICE CALLED <!><!><!>")
-        val achievements: List<Achievement> = ApiClient.get("/mc/achievements")
-        println("<!><!><!> LIST SERVICE FINISHING <!><!><!>")
-        return achievements
+        return ApiClient.get("/mc/achievements")
     }
 
     suspend fun delete(id: UUID) {

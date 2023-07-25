@@ -12,7 +12,6 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
-import network.warzone.mars.player.achievements.AchievementMenu
 import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.player.achievements.AchievementFeature.printAchievements
 import network.warzone.mars.player.achievements.AchievementManager
@@ -68,7 +67,6 @@ class MiscCommands {
         else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     @Command(
         aliases = ["achievements"],
         desc = "Open the achievements menu",
@@ -86,6 +84,7 @@ class MiscCommands {
          *   command is ran, but perhaps a Map<Player, AchievementMenu> variable could
          *   be used to create persistence if needed.
          */
+        /**
         if (arg1 == null) {
             val menu = AchievementMenu(sender);
             menu.openMainMenu();
@@ -99,13 +98,13 @@ class MiscCommands {
             }
         }
         else if (arg1 == "print") {
-            GlobalScope.launch {
+            Mars.async {
                 printAchievements()
             }
         }
         else {
             audience.sendMessage(text("Invalid argument \"$arg1\".", NamedTextColor.RED))
-        }
+        }**/
     }
 
     @Command(
