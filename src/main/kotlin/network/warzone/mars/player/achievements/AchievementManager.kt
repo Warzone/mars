@@ -3,8 +3,7 @@ package network.warzone.mars.player.achievements
 import network.warzone.api.database.models.Achievement
 import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.Mars
-import network.warzone.mars.player.achievements.variants.KillstreakAchievement
-import network.warzone.mars.player.achievements.variants.TotalKillsAchievement
+import network.warzone.mars.player.achievements.variants.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.match.event.MatchFinishEvent
@@ -20,7 +19,7 @@ object AchievementManager : Listener, AchievementDebugger {
     @EventHandler
     fun onMatchFinish(event: MatchFinishEvent) {
         fetchNewAchievements()
-        //activeAgents.forEach { agent -> agent.onMatchFinish()  }
+        activeAgents.forEach { agent -> agent.onMatchFinish(event)  }
     }
 
     fun unload() {
@@ -37,6 +36,12 @@ object AchievementManager : Listener, AchievementDebugger {
             is AgentParams.TotalKillsAgentParams -> {
                 TotalKillsAchievement(agentParams, achievement)
             }
+            is AgentParams.FireDeathAgentParams -> {
+                FireDeathAchievement(achievement)
+            }
+            is AgentParams.CaptureNoSprintAgentParams -> {
+                CaptureNoSprintAchievement(achievement)
+            }
             // ...
 
             else -> throw IllegalArgumentException("Unknown AgentParams for achievement ${achievement.name}")
@@ -48,16 +53,24 @@ object AchievementManager : Listener, AchievementDebugger {
             // Fetch the current achievements from the API
             val currentAchievements = AchievementFeature.list()
 
+
+
             // Find the achievements that are not in the currently loaded achievements
             val newAchievements = currentAchievements.filter { it !in achievements }
 
             // If there are new achievements, add them to the list and activate their agents
             if (newAchievements.isNotEmpty()) {
+
                 achievements += newAchievements
                 activeAgents += newAchievements.map(::findAgentForAchievement).onEach { it.load() }
 
                 sendDebugMessage("Achievements updated via fetchNewAchievements()")
                 sendConsoleMessage("Achievements updated via fetchNewAchievements()")
+                sendConsoleMessage("New Achievements added: ")
+                newAchievements.forEach { sendConsoleMessage("- ${it.name}")}
+                sendConsoleMessage("Current Achievements: ")
+                currentAchievements.forEach { sendConsoleMessage("- ${it.name}")}
+                sendConsoleMessage("Existing database achievements: ")
                 AchievementFeature.printAchievements()
             }
         }

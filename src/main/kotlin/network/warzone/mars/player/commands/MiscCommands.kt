@@ -84,27 +84,14 @@ class MiscCommands {
          *   command is ran, but perhaps a Map<Player, AchievementMenu> variable could
          *   be used to create persistence if needed.
          */
-        /**
-        if (arg1 == null) {
-            val menu = AchievementMenu(sender);
-            menu.openMainMenu();
-        }
-        else if (arg1 == "agents") {
-            val prefix = text("- ", NamedTextColor.GRAY)
-            audience.sendMessage(text("Active Agents:", NamedTextColor.GRAY))
-            AchievementManager.achievementAgents.forEach() {
-                val message = text(it.title, NamedTextColor.GREEN)
-                audience.sendMessage(text().append(prefix).append(message).build())
-            }
-        }
-        else if (arg1 == "print") {
+        if (arg1 == "print") {
             Mars.async {
                 printAchievements()
             }
         }
         else {
             audience.sendMessage(text("Invalid argument \"$arg1\".", NamedTextColor.RED))
-        }**/
+        }
     }
 
     @Command(
