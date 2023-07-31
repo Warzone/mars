@@ -17,16 +17,19 @@ import org.bukkit.event.Listener
 import tc.oc.pgm.api.match.Match
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 
-class TotalKillsAchievement (val params: AgentParams.TotalKillsAgentParams, val achievement: Achievement) : AchievementAgent, Listener {
+class TotalKillsAchievement(
+    val params: AgentParams.TotalKillsAgentParams,
+    override val emitter: AchievementEmitter
+) : AchievementAgent, Listener {
     @EventHandler
     fun onPlayerDeath(event: MatchPlayerDeathEvent) = runBlocking {
-
         val killer = event.killer ?: return@runBlocking
+        val killerPlayer = killer.player.orElse(null)?.player?.bukkit ?: return@runBlocking
         val context = PlayerManager.getPlayer(killer.id) ?: return@runBlocking
         val profile = PlayerFeature.fetch(context.player.name) ?: return@runBlocking;
 
         if (profile.stats.kills >= params.targetKills) {
-            AchievementEmitter.emit(profile, killer.simple, achievement)
+            emitter.emit(killerPlayer)
         }
     }
 }

@@ -1,21 +1,42 @@
 package network.warzone.mars.utils
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.TypeAdapter
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageAdapter
+import network.warzone.api.database.models.AgentParams
+import network.warzone.mars.api.socket.models.PlayerUpdateData
 import okio.Buffer
 import java.io.OutputStreamWriter
 import java.io.StringReader
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets.UTF_8
+import java.util.*
 
-val GSON = GsonBuilder()
-    .create()!!
+val GSON_CFG : GsonBuilder.() -> Unit = {
+    registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
+        Date(json.asJsonPrimitive.asLong)
+    })
+    registerTypeAdapter(Date::class.java, JsonSerializer<Date> { date, _, _ ->
+        JsonPrimitive(date.time)
+    })
+    registerTypeAdapter(
+        AgentParams::class.java,
+        ClosedPolymorphismDeserializer.createFromSealedClass(AgentParams::class)
+    )
+    registerTypeAdapter(
+        PlayerUpdateData::class.java,
+        ClosedPolymorphismDeserializer.createFromSealedClass(PlayerUpdateData::class)
+    )
+}
+
+val GSON = run {
+    val gsonBuilder = GsonBuilder()
+    gsonBuilder.GSON_CFG()
+    gsonBuilder.create()!!
+}
 
 /**
  * A [message adapter][MessageAdapter] that uses Gson.

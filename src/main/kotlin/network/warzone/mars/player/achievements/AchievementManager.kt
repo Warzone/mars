@@ -29,21 +29,24 @@ object AchievementManager : Listener, AchievementDebugger {
     }
 
     private fun findAgentForAchievement(achievement: Achievement) : AchievementAgent {
+        val emitter = AchievementEmitter(achievement)
         return when (val agentParams = achievement.agent.params) {
             is AgentParams.KillStreakAgentParams -> {
-                KillstreakAchievement(agentParams, achievement)
+                KillstreakAchievement(agentParams, emitter)
             }
             is AgentParams.TotalKillsAgentParams -> {
-                TotalKillsAchievement(agentParams, achievement)
+                TotalKillsAchievement(agentParams, emitter)
             }
             is AgentParams.FireDeathAgentParams -> {
-                FireDeathAchievement(achievement)
+                FireDeathAchievement(emitter)
             }
             is AgentParams.CaptureNoSprintAgentParams -> {
-                CaptureNoSprintAchievement(achievement)
+                CaptureNoSprintAchievement(emitter)
+            }
+            is AgentParams.ChatMessageAgentParams -> {
+                ChatMessageAchievement(agentParams.message, emitter)
             }
             // ...
-
             else -> throw IllegalArgumentException("Unknown AgentParams for achievement ${achievement.name}")
         }
     }
