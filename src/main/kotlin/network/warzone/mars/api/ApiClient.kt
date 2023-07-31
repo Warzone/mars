@@ -1,8 +1,5 @@
 package network.warzone.mars.api
 
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
@@ -13,14 +10,12 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.Mars
 import network.warzone.mars.api.events.ApiConnectedEvent
-import network.warzone.mars.api.socket.*
-import network.warzone.mars.api.socket.models.MessageData
-import network.warzone.mars.api.socket.models.MessageEvent
-import network.warzone.mars.api.socket.models.PlayerChatData
-import network.warzone.mars.api.socket.models.PlayerChatEvent
+import network.warzone.mars.api.socket.OutboundEvent
+import network.warzone.mars.api.socket.SocketEventType
+import network.warzone.mars.api.socket.WarzoneService
+import network.warzone.mars.api.socket.models.*
 import network.warzone.mars.match.tracker.ForceMatchEndEvent
 import network.warzone.mars.match.tracker.PlayerXPGainData
 import network.warzone.mars.match.tracker.PlayerXPGainEvent
@@ -30,7 +25,6 @@ import network.warzone.mars.utils.*
 import okhttp3.OkHttpClient
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
-import java.util.*
 import java.util.logging.Level
 
 data class Packet<T>(
@@ -43,18 +37,7 @@ object ApiClient {
     private val logger = createLogger(this::class)
     val client: HttpClient = HttpClient(CIO) {
         install(JsonFeature) {
-            serializer = GsonSerializer {
-                registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
-                    Date(json.asJsonPrimitive.asLong)
-                })
-                registerTypeAdapter(Date::class.java, JsonSerializer<Date> { date, _, _ ->
-                    JsonPrimitive(date.time)
-                })
-                registerTypeAdapter(
-                    AgentParams::class.java,
-                    ClosedPolymorphicArrayDeserializer.createFromSealedClass(AgentParams::class)
-                )
-            }
+            serializer = GsonSerializer(GSON_CFG)
         }
 
         defaultRequest {
@@ -166,6 +149,10 @@ object ApiClient {
                     SocketEventType.DISCONNECT_PLAYER -> {
                         val data = GSON.fromJson(json, DisconnectPlayerData::class.java)
                         DisconnectPlayerEvent(data).callEvent()
+                    }
+                    SocketEventType.PLAYER_UPDATE -> {
+                        val data = GSON.fromJson(json, PlayerUpdate::class.java)
+                        PlayerUpdateEvent(data).callEvent()
                     }
                 }
             }

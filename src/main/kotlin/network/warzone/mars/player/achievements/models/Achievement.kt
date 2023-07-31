@@ -9,6 +9,7 @@ enum class AgentType {
     TOTAL_KILLS_AGENT,
     KILL_STREAK_AGENT,
     FIRE_DEATH_AGENT,
+    CHAT_MESSAGE_AGENT
     //COMPOSITE_AGENT
 }
 
@@ -34,6 +35,9 @@ sealed class AgentParams {
     @SerialName("CompositeAgentParams")
     data class CompositeAgentParams(val agents: List<Agent>) : AgentParams()
 
+    @Serializable
+    @SerialName("ChatMessageAgentParams")
+    data class ChatMessageAgentParams(val message: String) : AgentParams()
     // add more classes as needed for each type of parameter set
 }
 

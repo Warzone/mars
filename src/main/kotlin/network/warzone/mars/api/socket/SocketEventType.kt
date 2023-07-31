@@ -31,5 +31,6 @@ enum class SocketEventType {
     PLAYER_XP_GAIN,
     FORCE_MATCH_END,
     MESSAGE,
-    DISCONNECT_PLAYER
+    DISCONNECT_PLAYER,
+    PLAYER_UPDATE
 }

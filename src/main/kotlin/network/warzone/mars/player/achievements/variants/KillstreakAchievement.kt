@@ -1,28 +1,24 @@
 package network.warzone.mars.player.achievements.variants
 
-import kotlinx.coroutines.runBlocking
-import network.warzone.api.database.models.Achievement
 import network.warzone.api.database.models.AgentParams
-import network.warzone.mars.Mars
-import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.api.socket.models.PlayerUpdateData
+import network.warzone.mars.api.socket.models.PlayerUpdateEvent
+import network.warzone.mars.api.socket.models.PlayerUpdateReason
 import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementEmitter
-import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.utils.simple
 import org.bukkit.event.EventHandler
-import org.bukkit.event.HandlerList
-import org.bukkit.event.Listener
-import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 
-class KillstreakAchievement (val params: AgentParams.KillStreakAgentParams, val achievement: Achievement) : AchievementAgent, Listener {
+class KillstreakAchievement(
+    val params: AgentParams.KillStreakAgentParams,
+    override val emitter: AchievementEmitter) : AchievementAgent {
     @EventHandler
-    fun onPlayerDeath(event: MatchPlayerDeathEvent) = runBlocking {
-        val killer = event.killer ?: return@runBlocking
-        val context = PlayerManager.getPlayer(killer.id) ?: return@runBlocking
-        val profile = PlayerFeature.fetch(context.player.name) ?: return@runBlocking
-
-        if (profile.stats.killstreaks.containsKey(params.targetStreak)) {
-            AchievementEmitter.emit(profile, killer.simple, achievement)
+    fun onProfileUpdate(event: PlayerUpdateEvent) {
+        if (event.update.reason != PlayerUpdateReason.KILLSTREAK) return
+        val killstreakData = event.update.data as PlayerUpdateData.KillstreakUpdateData
+        val killerProfile = event.update.updated
+        if (killstreakData.amount == this.params.targetStreak
+            && killerProfile.stats.killstreaks.getOrDefault(this.params.targetStreak, 0) == 1) {
+            emitter.emit(killerProfile)
         }
     }
 }

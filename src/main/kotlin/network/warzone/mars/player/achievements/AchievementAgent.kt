@@ -7,6 +7,7 @@ import org.bukkit.event.Listener
 import tc.oc.pgm.api.match.event.MatchFinishEvent
 
 interface AchievementAgent : Listener, AchievementDebugger {
+    val emitter : AchievementEmitter
     fun load() {
         Mars.registerEvents(this)
     }

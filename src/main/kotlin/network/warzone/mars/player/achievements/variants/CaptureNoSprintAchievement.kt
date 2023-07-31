@@ -21,16 +21,14 @@ import java.util.*
 
 // TODO: This currently just emits the achievement for players who finish a match without sprinting,
 //  regardless of whether they captured a wool or not.
-class CaptureNoSprintAchievement(val achievement: Achievement) : AchievementAgent, Listener {
+class CaptureNoSprintAchievement(override val emitter: AchievementEmitter) : AchievementAgent, Listener {
     var playersWhoSprinted: MutableList<UUID> = emptyList<UUID>().toMutableList()
 
     override fun onMatchFinish(event: MatchFinishEvent) = runBlocking {
         event.match.participants.forEach { matchPlayer ->
             if (matchPlayer.player?.id !in playersWhoSprinted) {
                 val player = matchPlayer ?: return@forEach
-                val context = PlayerManager.getPlayer(player.id) ?: return@forEach
-                val profile = PlayerFeature.fetch(context.player.name) ?: return@forEach
-                AchievementEmitter.emit(profile, player.simple, achievement)
+                emitter.emit(player.bukkit)
             }
         }
         playersWhoSprinted.clear()
