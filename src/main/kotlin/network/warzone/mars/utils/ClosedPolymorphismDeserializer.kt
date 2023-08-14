@@ -17,15 +17,17 @@ object ClosedPolymorphismDeserializer {
         return JsonDeserializer<T> { jsonElement, _, ctx ->
             val tag : String
             val data: JsonElement
+
             if (jsonElement.isJsonObject) {
                 val obj = jsonElement.asJsonObject
                 tag = obj.get("type").asString
-                data = run {
+                /**data = run {
                     val copy = deepCopy(obj)
                     copy.remove("type")
                     copy
-                }
-//                data = if (obj.has("data")) obj.get("data") else JsonObject()
+                }**/
+                obj.remove("type")
+                data = obj
             } else if (jsonElement.isJsonArray) {
                 val arr = jsonElement.asJsonArray
                 tag = arr.get(0).asString
@@ -33,6 +35,8 @@ object ClosedPolymorphismDeserializer {
             } else {
                 throw JsonParseException("Unknown format, original payload: $jsonElement")
             }
+            println("tag: " + tag)
+            println("data: " + data)
             val relevantMapping = mappings.firstOrNull { mapping -> mapping.first == tag }
                 ?: throw JsonParseException("Invalid class tag")
             val relevantClazz = relevantMapping.second
@@ -49,7 +53,7 @@ private fun deepCopy(jsonObject: JsonObject): JsonObject {
         } else if (entry.value.isJsonArray) {
             result.add(entry.key, deepCopy(entry.value.asJsonArray))
         } else if (entry.value.isJsonPrimitive) {
-            result.add(entry.key, JsonPrimitive(entry.value.asString))
+            result.add(entry.key, entry.value)
         }
     }
     return result
@@ -63,7 +67,7 @@ private fun deepCopy(jsonArray: JsonArray): JsonArray {
         } else if (jsonElement.isJsonArray) {
             result.add(deepCopy(jsonElement.asJsonArray))
         } else if (jsonElement.isJsonPrimitive) {
-            result.add(JsonPrimitive(jsonElement.asString))
+            result.add(jsonElement)
         }
     }
     return result

@@ -3,9 +3,6 @@ package network.warzone.mars.player.commands
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
@@ -15,7 +12,9 @@ import network.warzone.mars.Mars
 import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.player.achievements.AchievementFeature.printAchievements
 import network.warzone.mars.player.achievements.AchievementManager
+import network.warzone.mars.player.achievements.gui.AchievementMenu
 import network.warzone.mars.utils.matchPlayer
+import network.warzone.mars.utils.menu.open
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
@@ -88,6 +87,9 @@ class MiscCommands {
             Mars.async {
                 printAchievements()
             }
+        }
+        else if (arg1 == "menu") {
+            sender.open(AchievementMenu(sender).openMainMenu())
         }
         else {
             audience.sendMessage(text("Invalid argument \"$arg1\".", NamedTextColor.RED))

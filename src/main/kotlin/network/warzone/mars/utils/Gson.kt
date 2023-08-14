@@ -8,7 +8,10 @@ import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageAdapter
 import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.api.socket.models.PlayerUpdateData
+import network.warzone.mars.match.tracker.PlayerBlocks
+import network.warzone.mars.player.achievements.models.AchievementParent
 import okio.Buffer
+import org.bukkit.Material
 import java.io.OutputStreamWriter
 import java.io.StringReader
 import java.lang.reflect.Type
@@ -29,6 +32,30 @@ val GSON_CFG : GsonBuilder.() -> Unit = {
     registerTypeAdapter(
         PlayerUpdateData::class.java,
         ClosedPolymorphismDeserializer.createFromSealedClass(PlayerUpdateData::class)
+    )
+    registerTypeAdapter(
+        AchievementParent::class.java,
+        ClosedPolymorphismDeserializer.createFromSealedClass(AchievementParent::class)
+    )
+    registerTypeAdapter(
+        PlayerBlocks::class.java,
+        JsonDeserializer { json, _, ctx ->
+            val obj = json.asJsonObject
+            val convertToEnumMap = { elem: JsonElement? ->
+                val map : Map<String, Int> =
+                    if (elem != null) ctx.deserialize(elem, object : TypeToken<Map<String, Int>>() {}.type)
+                    else mapOf()
+                val enumMap : EnumMap<Material, Int> = EnumMap(Material::class.java)
+                val entries = map.entries.map { entry -> Material.valueOf(entry.key) to entry.value }
+                enumMap.putAll(entries)
+                enumMap
+            }
+            val blocksPlaced = if (obj.has("blocksPlaced")) obj.get("blocksPlaced") else null
+            val blocksBroken = if (obj.has("blocksBroken")) obj.get("blocksBroken") else null
+            val blocksPlacedMap = convertToEnumMap(blocksPlaced)
+            val blocksBrokenMap = convertToEnumMap(blocksBroken)
+            PlayerBlocks(blocksPlacedMap, blocksBrokenMap)
+        }
     )
 }
 

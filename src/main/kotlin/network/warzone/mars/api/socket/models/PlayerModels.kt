@@ -2,8 +2,8 @@ package network.warzone.mars.api.socket.models
 
 import network.warzone.mars.match.models.DeathCause
 import java.util.UUID
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import network.warzone.mars.match.tracker.PlayerLevelUpData
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.KEvent
 
@@ -73,6 +73,8 @@ sealed class PlayerUpdateData {
     data class MonumentDropUpdateData(val heldTime: Long) : PlayerUpdateData()
     @SerialName("ControlPointCaptureUpdateData")
     data class ControlPointCaptureUpdateData(val contributors: Int) : PlayerUpdateData()
+    @SerialName("LevelUpUpdateData")
+    data class LevelUpUpdateData(val data: PlayerLevelUpData) : PlayerUpdateData()
     @SerialName("NoArgs")
     object NoArgs : PlayerUpdateData()
 }

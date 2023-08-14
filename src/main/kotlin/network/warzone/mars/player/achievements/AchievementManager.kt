@@ -3,6 +3,7 @@ package network.warzone.mars.player.achievements
 import network.warzone.api.database.models.Achievement
 import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.Mars
+import network.warzone.mars.player.achievements.models.AchievementParent
 import network.warzone.mars.player.achievements.variants.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -11,9 +12,22 @@ import tc.oc.pgm.api.match.event.MatchFinishEvent
 object AchievementManager : Listener, AchievementDebugger {
     private val achievements : MutableList<Achievement> = mutableListOf()
     private val activeAgents : MutableList<AchievementAgent> = mutableListOf()
+
     fun load() {
         Mars.registerEvents(this)
         fetchNewAchievements()
+    }
+
+    fun getParentsFromAchievements(achievements: List<Achievement>) : List<AchievementParent> {
+        return achievements.mapNotNull { it.parent }.distinct()
+    }
+
+    fun getAchievementsForCategory(category: String): List<Achievement> {
+        return achievements.filter { it.parent?.category == category }
+    }
+
+    fun filterAchievementsWithParent(parent: AchievementParent, achievements: List<Achievement>) : List<Achievement>{
+        return achievements.filter { it.parent == parent }
     }
 
     @EventHandler
@@ -38,13 +52,21 @@ object AchievementManager : Listener, AchievementDebugger {
                 TotalKillsAchievement(agentParams, emitter)
             }
             is AgentParams.FireDeathAgentParams -> {
-                FireDeathAchievement(emitter)
+                FireDeathAchievement(agentParams, emitter)
             }
             is AgentParams.CaptureNoSprintAgentParams -> {
                 CaptureNoSprintAchievement(emitter)
             }
+            //TODO: Refactor all single-parameter achievements to just
+            // pass the parameter, like how it's being done here.
             is AgentParams.ChatMessageAgentParams -> {
                 ChatMessageAchievement(agentParams.message, emitter)
+            }
+            is AgentParams.LevelUpAgentParams -> {
+                LevelUpAchievement(agentParams.level, emitter)
+            }
+            is AgentParams.CaptureWoolAgentParams -> {
+                CaptureWoolAchievement(agentParams.captures, emitter)
             }
             // ...
             else -> throw IllegalArgumentException("Unknown AgentParams for achievement ${achievement.name}")
