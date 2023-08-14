@@ -3,13 +3,16 @@ package network.warzone.api.database.models
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import network.warzone.mars.feature.NamedResource
+import network.warzone.mars.player.achievements.models.AchievementParent
 import java.util.*
 
 enum class AgentType {
     TOTAL_KILLS_AGENT,
     KILL_STREAK_AGENT,
     FIRE_DEATH_AGENT,
-    CHAT_MESSAGE_AGENT
+    CHAT_MESSAGE_AGENT,
+    LEVEL_UP_AGENT,
+    CAPTURE_WOOL_AGENT,
     //COMPOSITE_AGENT
 }
 
@@ -38,6 +41,14 @@ sealed class AgentParams {
     @Serializable
     @SerialName("ChatMessageAgentParams")
     data class ChatMessageAgentParams(val message: String) : AgentParams()
+
+    @Serializable
+    @SerialName("LevelUpAgentParams")
+    data class LevelUpAgentParams(val level: Int) : AgentParams()
+
+    @Serializable
+    @SerialName("CaptureWoolAgentParams")
+    data class CaptureWoolAgentParams(val captures: Int) : AgentParams()
     // add more classes as needed for each type of parameter set
 }
 
@@ -52,6 +63,8 @@ data class Achievement(
     override val _id: UUID,
     override val name: String,
     val description: String,
+    @Serializable
+    val parent: AchievementParent? = null,
     val agent: Agent,
 ) : NamedResource {
 

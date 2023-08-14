@@ -1,6 +1,8 @@
 package network.warzone.mars.utils.menu
 
 import org.bukkit.Material
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
@@ -39,4 +41,16 @@ class Item(
         set(value) {
             stack.amount = value
         }
+
+    // Add enchantment to the item
+    fun enchant(enchantment: Enchantment, level: Int = 1) {
+        stack.addUnsafeEnchantment(enchantment, level)
+    }
+
+    // Add item flags to the item
+    fun flags(vararg itemFlags: ItemFlag) {
+        meta {
+            addItemFlags(*itemFlags)
+        }
+    }
 }

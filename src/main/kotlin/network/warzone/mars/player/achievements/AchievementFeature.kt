@@ -4,15 +4,9 @@ import network.warzone.api.database.models.Achievement
 import network.warzone.api.database.models.Agent
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.feature.CachedFeature
-import network.warzone.mars.feature.Feature
-import network.warzone.mars.feature.NamedCachedFeature
-import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.achievements.models.AchievementParent
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.rank.RankAttachments
-import network.warzone.mars.rank.RankFeature
-import network.warzone.mars.rank.RankService
-import network.warzone.mars.rank.exceptions.RankConflictException
-import network.warzone.mars.rank.models.Rank
+import network.warzone.mars.utils.capitalizeFirst
 import java.util.*
 
 object AchievementFeature : CachedFeature<Achievement>() {
@@ -40,12 +34,14 @@ object AchievementFeature : CachedFeature<Achievement>() {
     suspend fun create(
         name: String,
         description: String,
+        parent: AchievementParent,
         agent: Agent
     ): Achievement {
         // Requests the creation of a new achievement. Adds the created achievement to the cache.
         return AchievementService.create(
             name = name,
             description = description,
+            parent = parent,
             agent = agent
         ).also { AchievementFeature.add(it) }
     }
