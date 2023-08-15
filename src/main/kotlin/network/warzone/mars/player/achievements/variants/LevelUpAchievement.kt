@@ -1,25 +1,23 @@
 package network.warzone.mars.player.achievements.variants
 
-import network.warzone.api.database.models.AgentParams
-import network.warzone.mars.api.socket.models.PlayerUpdateData
-import network.warzone.mars.api.socket.models.PlayerUpdateEvent
-import network.warzone.mars.api.socket.models.PlayerUpdateReason
+import network.warzone.mars.match.tracker.PlayerLevelUpEvent
 import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementEmitter
 import org.bukkit.event.EventHandler
 
-//TODO: Ask tank about this later.
 class LevelUpAchievement(
     val level: Int,
     override val emitter: AchievementEmitter
 ) : AchievementAgent
 {
     @EventHandler
-    fun onProfileUpdate(event: PlayerUpdateEvent) {
-        val xpData = event.update.data as PlayerUpdateData.LevelUpUpdateData
-        val playerProfile = event.update.updated
-        if (xpData.data.level == level) {
-            emitter.emit(playerProfile)
+    fun onProfileUpdate(event: PlayerLevelUpEvent) {
+        //TODO: If a player has already passed the target level, they can never obtain
+        // this achievement as long as "==" is used instead of ">=". However, using
+        // the latter operation would cause excessive profile fetching every time
+        // a player levels up.
+        if (event.data.level >= level) {
+            emitter.emit(event.data.player)
         }
     }
 }

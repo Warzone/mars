@@ -65,8 +65,23 @@ object AchievementManager : Listener, AchievementDebugger {
             is AgentParams.LevelUpAgentParams -> {
                 LevelUpAchievement(agentParams.level, emitter)
             }
-            is AgentParams.CaptureWoolAgentParams -> {
-                CaptureWoolAchievement(agentParams.captures, emitter)
+            is AgentParams.WoolCapturesAgentParams -> {
+                WoolCapturesAchievement(agentParams.captures, emitter)
+            }
+            is AgentParams.FirstBloodAgentParams -> {
+                FirstBloodAchievement(agentParams.target, emitter)
+            }
+            is AgentParams.BowDistanceAgentParams -> {
+                BowDistanceAchievement(agentParams.distance, emitter)
+            }
+            is AgentParams.FlagCapturesAgentParams -> {
+                FlagCapturesAchievement(agentParams.captures, emitter)
+            }
+            is AgentParams.FlagDefendsAgentParams -> {
+                FlagDefendsAchievement(agentParams.defends, emitter)
+            }
+            is AgentParams.WoolDefendsAgentParams -> {
+                WoolDefendsAchievement(agentParams.defends, emitter)
             }
             // ...
             else -> throw IllegalArgumentException("Unknown AgentParams for achievement ${achievement.name}")

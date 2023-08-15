@@ -1,22 +1,14 @@
 package network.warzone.mars.player.achievements.variants
 
 import kotlinx.coroutines.runBlocking
-import network.warzone.api.database.models.Achievement
-import network.warzone.api.database.models.AgentParams
-import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementEmitter
-import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.utils.matchPlayer
-import network.warzone.mars.utils.simple
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerToggleSprintEvent
 import tc.oc.pgm.api.match.event.MatchFinishEvent
 import tc.oc.pgm.api.match.event.MatchStartEvent
-import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import java.util.*
 
 // TODO: This currently just emits the achievement for players who finish a match without sprinting,
