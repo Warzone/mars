@@ -8,18 +8,18 @@ import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementEmitter
 import org.bukkit.event.EventHandler
 
-class KillstreakAchievement(
-    val params: AgentParams.KillStreakAgentParams,
+class BowDistanceAchievement(
+    val target: Long,
     override val emitter: AchievementEmitter) : AchievementAgent
 {
     @EventHandler
     fun onProfileUpdate(event: PlayerUpdateEvent) {
-        sendDebugMessage("event.update.reason.name = " + event.update.reason.name)
-        if (event.update.reason != PlayerUpdateReason.KILLSTREAK) return
-        val killstreakData = event.update.data as PlayerUpdateData.KillstreakUpdateData
+        if (event.update.reason != PlayerUpdateReason.KILL) return
+        val killData = event.update.data as PlayerUpdateData.KillUpdateData
+        sendDebugMessage("weapon: " + killData.data.weapon)
+        if (killData.data.weapon != "bow") return
         val killerProfile = event.update.updated
-        if (   killstreakData.amount == this.params.targetStreak
-            && killerProfile.stats.killstreaks.getOrDefault(this.params.targetStreak, 0) >= 1) {
+        if (killData.data.distance!! >= target) {
             emitter.emit(killerProfile)
         }
     }

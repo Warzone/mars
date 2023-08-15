@@ -47,9 +47,29 @@ sealed class AgentParams {
     data class LevelUpAgentParams(val level: Int) : AgentParams()
 
     @Serializable
-    @SerialName("CaptureWoolAgentParams")
-    data class CaptureWoolAgentParams(val captures: Int) : AgentParams()
+    @SerialName("WoolCapturesAgentParams")
+    data class WoolCapturesAgentParams(val captures: Int) : AgentParams()
+
+    @Serializable
+    @SerialName("FirstBloodAgentParams")
+    data class FirstBloodAgentParams(val target: Int) : AgentParams()
     // add more classes as needed for each type of parameter set
+
+    @Serializable
+    @SerialName("BowDistanceAgentParams")
+    data class BowDistanceAgentParams(val distance: Long) : AgentParams()
+
+    @Serializable
+    @SerialName("FlagCapturesAgentParams")
+    data class FlagCapturesAgentParams(val captures: Int) : AgentParams()
+
+    @Serializable
+    @SerialName("FlagDefendsAgentParams")
+    data class FlagDefendsAgentParams(val defends: Int) : AgentParams()
+
+    @Serializable
+    @SerialName("WoolDefendsAgentParams")
+    data class WoolDefendsAgentParams(val defends: Int) : AgentParams()
 }
 
 @Serializable
