@@ -6,7 +6,7 @@ import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementEmitter
 import org.bukkit.event.EventHandler
 
-class WoolCapturesAchievement(
+class WoolCaptureAchievement(
     val captures: Int,
     override val emitter: AchievementEmitter) : AchievementAgent
 {

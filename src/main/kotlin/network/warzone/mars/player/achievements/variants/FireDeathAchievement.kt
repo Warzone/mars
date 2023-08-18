@@ -10,7 +10,6 @@ import network.warzone.mars.player.achievements.AchievementEmitter
 import org.bukkit.event.EventHandler
 
 class FireDeathAchievement(
-    val params: AgentParams.FireDeathAgentParams,
     override val emitter: AchievementEmitter) : AchievementAgent
 {
     @EventHandler

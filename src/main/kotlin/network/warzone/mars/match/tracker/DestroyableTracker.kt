@@ -8,7 +8,6 @@ import network.warzone.mars.api.socket.models.DestroyableDestroyData
 import network.warzone.mars.match.models.Contribution
 import network.warzone.mars.utils.KEvent
 import org.bukkit.Bukkit
-import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.scheduler.BukkitTask
@@ -16,6 +15,7 @@ import tc.oc.pgm.api.match.event.MatchStartEvent
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.player.ParticipantState
 import tc.oc.pgm.destroyable.Destroyable
+import tc.oc.pgm.destroyable.DestroyableHealthChange
 import tc.oc.pgm.destroyable.DestroyableHealthChangeEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -30,6 +30,7 @@ class DestroyableTracker : Listener {
 
     internal class DestroyableDamageBatch(
         val destroyable: Destroyable,
+        val change: DestroyableHealthChange,
         var count: Int
     )
 
@@ -54,7 +55,7 @@ class DestroyableTracker : Listener {
 
         val destroyableBatch = batchList.find { it.destroyable == event.destroyable }
         if (destroyableBatch == null) {
-            batchList.add(DestroyableDamageBatch(event.destroyable, 1))
+            batchList.add(DestroyableDamageBatch(event.destroyable, change, 1))
             val task = Bukkit.getScheduler().runTaskLaterAsynchronously(Mars.get(), {
                 val batch = batchList.find { it.destroyable == event.destroyable } ?: return@runTaskLaterAsynchronously
 
@@ -79,6 +80,7 @@ class DestroyableTracker : Listener {
                 OutboundEvent.DestroyableDestroy,
                 DestroyableDestroyData(
                     event.destroyable.id,
+                    change.oldState.material.name,
                     event.destroyable
                         .contributions
                         .map { Contribution(it.playerState.id, it.percentage.toFloat(), it.blocks) }
@@ -92,6 +94,7 @@ class DestroyableTracker : Listener {
             OutboundEvent.DestroyableDamage,
             DestroyableDamageData(
                 batch.destroyable.id,
+                batch.change.oldState.material.name,
                 player.id,
                 batch.count
             )

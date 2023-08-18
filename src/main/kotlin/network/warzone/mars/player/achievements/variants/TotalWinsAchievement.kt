@@ -6,15 +6,15 @@ import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementEmitter
 import org.bukkit.event.EventHandler
 
-class WoolDefendsAchievement(
-    val defends: Int,
+class TotalWinsAchievement(
+    val wins: Int,
     override val emitter: AchievementEmitter) : AchievementAgent
 {
     @EventHandler
     fun onProfileUpdate(event: PlayerUpdateEvent) {
-        if (event.update.reason != PlayerUpdateReason.WOOL_DEFEND) return
+        if (event.update.reason != PlayerUpdateReason.MATCH_END) return
         val playerProfile = event.update.updated
-        if (playerProfile.stats.objectives.woolDefends >= defends) {
+        if (playerProfile.stats.wins >= wins) {
             emitter.emit(playerProfile)
         }
     }

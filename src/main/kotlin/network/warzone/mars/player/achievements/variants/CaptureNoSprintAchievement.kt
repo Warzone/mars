@@ -1,6 +1,8 @@
 package network.warzone.mars.player.achievements.variants
 
 import kotlinx.coroutines.runBlocking
+import network.warzone.mars.api.socket.models.PlayerUpdateEvent
+import network.warzone.mars.api.socket.models.PlayerUpdateReason
 import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementEmitter
 import network.warzone.mars.utils.matchPlayer
@@ -32,11 +34,15 @@ class CaptureNoSprintAchievement(override val emitter: AchievementEmitter) : Ach
     }
 
     @EventHandler
+    fun onProfileUpdate(event: PlayerUpdateEvent) {
+        if (event.update.reason != PlayerUpdateReason.WOOL_PICKUP) return
+    }
+
+    @EventHandler
     fun onPlayerToggleSprint(event: PlayerToggleSprintEvent) = runBlocking {
         val playerId = event.player.matchPlayer.id
         if (!playersWhoSprinted.contains(playerId)) {
             playersWhoSprinted.add(playerId)
-            sendDebugMessage("Player " + event.player.name + " has sprinted.")
         }
     }
 }

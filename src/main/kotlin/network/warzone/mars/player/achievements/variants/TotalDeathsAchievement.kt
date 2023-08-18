@@ -6,15 +6,15 @@ import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementEmitter
 import org.bukkit.event.EventHandler
 
-class FlagCapturesAchievement(
-    val captures: Int,
+class TotalDeathsAchievement(
+    val deaths: Int,
     override val emitter: AchievementEmitter) : AchievementAgent
 {
     @EventHandler
     fun onProfileUpdate(event: PlayerUpdateEvent) {
-        if (event.update.reason != PlayerUpdateReason.FLAG_PLACE) return
+        if (event.update.reason != PlayerUpdateReason.DEATH) return
         val playerProfile = event.update.updated
-        if (playerProfile.stats.objectives.flagCaptures >= captures) {
+        if (playerProfile.stats.deaths >= deaths) {
             emitter.emit(playerProfile)
         }
     }

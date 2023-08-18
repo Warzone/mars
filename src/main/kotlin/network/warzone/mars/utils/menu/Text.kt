@@ -1,6 +1,5 @@
 package network.warzone.mars.utils.menu
 
-// todo: use this
 fun wrap(text: String, max: Int = 32) = text.split("\n").flatMap {
     val list = mutableListOf<String>()
     val words = it.split(" ")

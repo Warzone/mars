@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
+@Deprecated("Remove this")
 interface AchievementDebugger {
     val debugPrefix: String
         get() = ChatColor.DARK_GRAY.toString() + "[@] " + ChatColor.GRAY.toString()
