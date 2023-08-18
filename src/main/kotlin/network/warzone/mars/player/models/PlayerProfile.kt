@@ -60,7 +60,6 @@ data class PlayerProfile(
 }
 
 data class PlayerStats(
-    var test: Int = 999,
     var xp: Int = 0,
     var serverPlaytime: Long = 0,
     var gamePlaytime: Long = 0,
