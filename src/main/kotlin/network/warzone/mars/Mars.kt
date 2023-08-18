@@ -58,7 +58,6 @@ class Mars : JavaPlugin() {
     lateinit var matchTabManager: MatchTabManager
 
     override fun onEnable() = runBlocking {
-        println("MEWTWO IS HERE HERE HERE HERE HERE HERE!")
         instance = this@Mars
 
         this@Mars.saveDefaultConfig()

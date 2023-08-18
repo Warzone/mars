@@ -21,11 +21,6 @@ object ClosedPolymorphismDeserializer {
             if (jsonElement.isJsonObject) {
                 val obj = jsonElement.asJsonObject
                 tag = obj.get("type").asString
-                /**data = run {
-                    val copy = deepCopy(obj)
-                    copy.remove("type")
-                    copy
-                }**/
                 obj.remove("type")
                 data = obj
             } else if (jsonElement.isJsonArray) {
@@ -35,8 +30,6 @@ object ClosedPolymorphismDeserializer {
             } else {
                 throw JsonParseException("Unknown format, original payload: $jsonElement")
             }
-            println("tag: " + tag)
-            println("data: " + data)
             val relevantMapping = mappings.firstOrNull { mapping -> mapping.first == tag }
                 ?: throw JsonParseException("Invalid class tag")
             val relevantClazz = relevantMapping.second

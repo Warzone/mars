@@ -12,10 +12,6 @@ class LevelUpAchievement(
 {
     @EventHandler
     fun onProfileUpdate(event: PlayerLevelUpEvent) {
-        //TODO: If a player has already passed the target level, they can never obtain
-        // this achievement as long as "==" is used instead of ">=". However, using
-        // the latter operation would cause excessive profile fetching every time
-        // a player levels up.
         if (event.data.level >= level) {
             emitter.emit(event.data.player)
         }

@@ -7,13 +7,36 @@ import network.warzone.mars.player.achievements.models.AchievementParent
 import java.util.*
 
 enum class AgentType {
-    TOTAL_KILLS_AGENT,
-    KILL_STREAK_AGENT,
-    FIRE_DEATH_AGENT,
-    CHAT_MESSAGE_AGENT,
-    LEVEL_UP_AGENT,
-    CAPTURE_WOOL_AGENT,
+    TOTAL_KILLS_AGENT, /** WORKS **/
+    TOTAL_DEATHS_AGENT, /** WORKS **/
+    TOTAL_WINS_AGENT, /** WORKS **/
+    TOTAL_LOSSES_AGENT, /** WORKS **/
+    KILL_STREAK_AGENT, /** WORKS **/
+    FIRE_DEATH_AGENT, /** WORKS **/
+    CHAT_MESSAGE_AGENT, /** WORKS **/
+    LEVEL_UP_AGENT, /** WORKS **/
+    CAPTURE_NO_SPRINT_AGENT, /** DOESN'T WORK **/
+    WOOL_CAPTURE_AGENT, /** WORKS **/
+    FIRST_BLOOD_AGENT, /** WORKS **/
+    BOW_DISTANCE_AGENT, /** WORKS **/
+    FLAG_CAPTURE_AGENT, /** WORKS **/
+    FLAG_DEFEND_AGENT, /** WORKS **/
+    WOOL_DEFEND_AGENT, /** DOESN'T WORK **/
+    MONUMENT_DAMAGE_AGENT, /** WORKS **/
+    KILL_CONSECUTIVE_AGENT, /** WORKS **/
+    PLAY_TIME_AGENT, /** WORKS **/
+    RECORD_AGENT, /** DOESN'T WORK **/
+    CONTROL_POINT_CAPTURE_AGENT, /** WORKS **/
     //COMPOSITE_AGENT
+}
+enum class RecordType {
+    LONGEST_SESSION,
+    LONGEST_PROJECTILE_KILL,
+    FASTEST_WOOL_CAPTURE,
+    FASTEST_FLAG_CAPTURE,
+    FASTEST_FIRST_BLOOD,
+    KILLS_IN_MATCH,
+    DEATHS_IN_MATCH
 }
 
 @Serializable
@@ -47,29 +70,60 @@ sealed class AgentParams {
     data class LevelUpAgentParams(val level: Int) : AgentParams()
 
     @Serializable
-    @SerialName("WoolCapturesAgentParams")
-    data class WoolCapturesAgentParams(val captures: Int) : AgentParams()
+    @SerialName("WoolCaptureAgentParams")
+    data class WoolCaptureAgentParams(val captures: Int) : AgentParams()
 
     @Serializable
     @SerialName("FirstBloodAgentParams")
     data class FirstBloodAgentParams(val target: Int) : AgentParams()
-    // add more classes as needed for each type of parameter set
 
     @Serializable
     @SerialName("BowDistanceAgentParams")
     data class BowDistanceAgentParams(val distance: Long) : AgentParams()
 
     @Serializable
-    @SerialName("FlagCapturesAgentParams")
-    data class FlagCapturesAgentParams(val captures: Int) : AgentParams()
+    @SerialName("FlagCaptureAgentParams")
+    data class FlagCaptureAgentParams(val captures: Int) : AgentParams()
 
     @Serializable
-    @SerialName("FlagDefendsAgentParams")
-    data class FlagDefendsAgentParams(val defends: Int) : AgentParams()
+    @SerialName("FlagDefendAgentParams")
+    data class FlagDefendAgentParams(val defends: Int) : AgentParams()
 
     @Serializable
-    @SerialName("WoolDefendsAgentParams")
-    data class WoolDefendsAgentParams(val defends: Int) : AgentParams()
+    @SerialName("WoolDefendAgentParams")
+    data class WoolDefendAgentParams(val defends: Int) : AgentParams()
+
+    @Serializable
+    @SerialName("MonumentDamageAgentParams")
+    data class MonumentDamageAgentParams(val breaks: Int) : AgentParams()
+
+    @Serializable
+    @SerialName("KillConsecutiveAgentParams")
+    data class KillConsecutiveAgentParams(val seconds: Long, val kills: Int, val allWithin: Boolean) : AgentParams()
+
+    @Serializable
+    @SerialName("PlayTimeAgentParams")
+    data class PlayTimeAgentParams(val hours: Long) : AgentParams()
+
+    @Serializable
+    @SerialName("RecordAgentParams")
+    data class RecordAgentParams<T : Number>(val recordType: RecordType, val threshold: T) : AgentParams()
+
+    @Serializable
+    @SerialName("ControlPointCaptureAgentParams")
+    data class ControlPointCaptureAgentParams(val captures: Int) : AgentParams()
+
+    @Serializable
+    @SerialName("TotalWinsAgentParams")
+    data class TotalWinsAgentParams(val wins: Int) : AgentParams()
+
+    @Serializable
+    @SerialName("TotalDeathsAgentParams")
+    data class TotalDeathsAgentParams(val deaths: Int) : AgentParams()
+
+    @Serializable
+    @SerialName("TotalLossesAgentParams")
+    data class TotalLossesAgentParams(val losses: Int) : AgentParams()
 }
 
 @Serializable

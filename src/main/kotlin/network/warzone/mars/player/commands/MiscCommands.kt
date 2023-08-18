@@ -67,7 +67,7 @@ class MiscCommands {
     }
 
     @Command(
-        aliases = ["achievements"],
+        aliases = ["achievements", "menu"],
         desc = "Open the achievements menu",
         perms = ["mars.achievements"]
     )
@@ -77,23 +77,7 @@ class MiscCommands {
         @Nullable arg1: String?
     )
     {
-        /** TODO: An AchievementMenu instance is currently not persistent for each player.
-         *   This means each time /achievements is ran, the menu is created from scratch.
-         *   Idk how big of a deal it is that this menu must be rebuilt each time the
-         *   command is ran, but perhaps a Map<Player, AchievementMenu> variable could
-         *   be used to create persistence if needed.
-         */
-        if (arg1 == "print") {
-            Mars.async {
-                printAchievements()
-            }
-        }
-        else if (arg1 == "menu") {
-            sender.open(AchievementMenu(sender).openMainMenu())
-        }
-        else {
-            audience.sendMessage(text("Invalid argument \"$arg1\".", NamedTextColor.RED))
-        }
+        sender.open(AchievementMenu(sender).openMainMenu())
     }
 
     @Command(

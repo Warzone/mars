@@ -6,15 +6,15 @@ import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.AchievementEmitter
 import org.bukkit.event.EventHandler
 
-class FlagDefendsAchievement(
-    val defends: Int,
+class MonumentDamageAchievement(
+    val breaks: Int,
     override val emitter: AchievementEmitter) : AchievementAgent
 {
     @EventHandler
     fun onProfileUpdate(event: PlayerUpdateEvent) {
-        if (event.update.reason != PlayerUpdateReason.FLAG_DEFEND) return
+        if (event.update.reason != PlayerUpdateReason.DESTROYABLE_DAMAGE) return
         val playerProfile = event.update.updated
-        if (playerProfile.stats.objectives.flagDefends >= defends) {
+        if (playerProfile.stats.objectives.destroyableBlockDestroys >= breaks) {
             emitter.emit(playerProfile)
         }
     }
