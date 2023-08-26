@@ -1,7 +1,7 @@
 package network.warzone.mars.player.achievements.gui
 
+import net.md_5.bungee.api.ChatColor
 import network.warzone.api.database.models.Achievement
-import network.warzone.mars.player.achievements.AchievementDebugger
 import network.warzone.mars.player.achievements.AchievementManager.filterAchievementsWithParent
 import network.warzone.mars.player.achievements.AchievementManager.getAchievementsForCategory
 import network.warzone.mars.player.achievements.AchievementManager.getParentsFromAchievements
@@ -17,17 +17,20 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemFlag
 import kotlin.math.min
 
-class AchievementMenu(private val player: Player) : Listener, AchievementDebugger {
+// A class that handles the GUI aspect of achievements.
+class AchievementMenu(player: Player) : Listener {
+    // Reference to the cached player profile.
     private val profile: PlayerProfile = PlayerFeature.getCached(player.name)!!
 
+    // Creates and opens a main-menu GUI, which contains the six categories of achievements.
     fun openMainMenu(): GUI {
-        return gui("§6§lAchievements", 1) {
+        return gui("${ChatColor.GOLD}${ChatColor.BOLD}Achievements", 1) {
             val categories = listOf("Kills", "Losses", "Wins", "Deaths", "Objectives", "Misc")
             for ((index, category) in categories.withIndex()) {
                 slot(index) {
                     item = item(Material.BOOKSHELF) {
-                        name = "§b$category"
-                        lore = wrap("§7Click to view this category.", 40)
+                        name = "${ChatColor.AQUA}$category"
+                        lore = wrap("${ChatColor.GRAY}Click to view this category.", 40)
                     }
                     onclick = { player ->
                         player.open(openCategory(category))
@@ -37,8 +40,9 @@ class AchievementMenu(private val player: Player) : Listener, AchievementDebugge
         }
     }
 
-    fun openCategory(categoryName: String, page: Int = 1): GUI {
-        return gui("§b§l$categoryName", 6) {
+    // Creates and opens a category GUI, which contains all achievement parents of the specified category.
+    private fun openCategory(categoryName: String, page: Int = 1): GUI {
+        return gui("${ChatColor.AQUA}${ChatColor.BOLD}$categoryName", 6) {
             val achievements = getAchievementsForCategory(categoryName)
             val parents = getParentsFromAchievements(achievements)
 
@@ -47,8 +51,8 @@ class AchievementMenu(private val player: Player) : Listener, AchievementDebugge
             for ((index, parent) in parents.subList(nonEdgeStart, nonEdgeEnd).withIndex()) {
                 slot(getSlotFromNonEdgeIndex(index)) {
                     item = item(Material.BOOK) {
-                        name = "§a${parent.displayName}"
-                        lore = wrap("§7${parent.description}", 40)
+                        name = "${ChatColor.GREEN}${parent.displayName}"
+                        lore = wrap("${ChatColor.GRAY}${parent.description}", 40)
                     }
 
                     onclick = { player ->
@@ -80,15 +84,16 @@ class AchievementMenu(private val player: Player) : Listener, AchievementDebugge
             }
             slot(4) {
                 item = item(Material.BOOKSHELF) {
-                    name = "§b$categoryName"
-                    lore = wrap("§7This menu lists achievements of the §b${categoryName} §7category type.", 30)
+                    name = "${ChatColor.AQUA}$categoryName"
+                    lore = wrap("${ChatColor.GRAY}This menu lists achievements of the ${ChatColor.AQUA}${categoryName} ${ChatColor.GRAY}category type.", 30)
                 }
             }
         }
     }
 
-    fun openAchievementDetails(parent: AchievementParent, achievements: List<Achievement>, page: Int = 1): GUI {
-        return gui("§a§l${parent.displayName}", 6) {
+    // Creates and opens an achievement details GUI, which contains all achievements of a specified parent.
+    private fun openAchievementDetails(parent: AchievementParent, achievements: List<Achievement>, page: Int = 1): GUI {
+        return gui("${ChatColor.GREEN}${ChatColor.BOLD}${parent.displayName}", 6) {
             val matchingAchievements = filterAchievementsWithParent(parent, achievements)
 
             val (nonEdgeStart, nonEdgeEnd) = calculateNonEdgeIndices(matchingAchievements.size, page)
@@ -96,8 +101,8 @@ class AchievementMenu(private val player: Player) : Listener, AchievementDebugge
             for ((index, achievement) in matchingAchievements.subList(nonEdgeStart, nonEdgeEnd).withIndex()) {
                 slot(getSlotFromNonEdgeIndex(index)) {
                     item = item(Material.PAPER) {
-                        name = "§d${achievement.name}"
-                        lore = wrap("§7${achievement.description}", 40)
+                        name = "${ChatColor.LIGHT_PURPLE}${achievement.name}"
+                        lore = wrap("${ChatColor.GRAY}${achievement.description}", 40)
 
                         // Check if the player has the achievement
                         if (profile.stats.achievements.contains(achievement.name)) {
@@ -131,45 +136,46 @@ class AchievementMenu(private val player: Player) : Listener, AchievementDebugge
             }
             slot(4) {
                 item = item(Material.BOOK) {
-                    name = "§a${parent.displayName}"
-                    lore = wrap("§7This menu lists milestones for the current achievement.", 40)
+                    name = "${ChatColor.GREEN}${parent.displayName}"
+                    lore = wrap("${ChatColor.GRAY}This menu lists milestones for the current achievement.", 40)
                 }
             }
         }
     }
 
+    // Navigate the player up the menu hierarchy.
     private fun createBackArrow(action: suspend InventoryClickEvent.(Player) -> Unit): GUI.Slot.() -> Unit {
         return {
             item = item(Material.ARROW) {
-                name = "§7Back"
+                name = "${ChatColor.GRAY}Back"
             }
             onclick = action
         }
     }
 
+    // Navigate the player to the next page of a paginated GUI.
     private fun createNextPageArrow(currentPage: Int, action: suspend InventoryClickEvent.(Player) -> Unit): GUI.Slot.() -> Unit {
         return {
             item = item(Material.ARROW) {
-                name = "§7Next Page"
+                name = "${ChatColor.GRAY}Next Page"
                 amount = currentPage + 1
             }
             onclick = action
         }
     }
 
+    // Navigate the player to the previous page of a paginated GUI.
     private fun createPreviousPageArrow(currentPage: Int, action: suspend InventoryClickEvent.(Player) -> Unit): GUI.Slot.() -> Unit {
         return {
             item = item(Material.ARROW) {
-                name = "§7Previous Page"
+                name = "${ChatColor.GRAY}Previous Page"
                 amount = currentPage - 1
             }
             onclick = action
         }
     }
 
-    /**
-     * Get non-edge slot indices for achievements based on the current page.
-     */
+    // Get non-edge slot indices for achievements based on the current page.
     private fun calculateNonEdgeIndices(totalSize: Int, page: Int): Pair<Int, Int> {
         val nonEdgeSlotsPerPage = 4 * 7 // 4 rows * 7 columns
         val startIndex = (page - 1) * nonEdgeSlotsPerPage
@@ -177,9 +183,7 @@ class AchievementMenu(private val player: Player) : Listener, AchievementDebugge
         return startIndex to endIndex
     }
 
-    /**
-     * Calculate the GUI slot position based on non-edge index.
-     */
+    // Calculate the GUI slot position based on non-edge index.
     private fun getSlotFromNonEdgeIndex(index: Int): Int {
         val row = index / 7 + 1 // 1 is added to skip the first row
         val col = index % 7 + 1 // 1 is added to skip the first column

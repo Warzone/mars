@@ -3,6 +3,7 @@ package network.warzone.api.database.models
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import network.warzone.mars.feature.NamedResource
+import network.warzone.mars.player.achievements.AchievementAgent
 import network.warzone.mars.player.achievements.models.AchievementParent
 import java.util.*
 
@@ -130,7 +131,7 @@ sealed class AgentParams {
 data class Agent(
     val type: AgentType,
     @Serializable
-    val params: AgentParams? = null
+    val params: AgentParams? = null,
 )
 
 data class Achievement(

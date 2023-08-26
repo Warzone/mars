@@ -6,6 +6,7 @@ import network.warzone.mars.Mars
 import network.warzone.mars.api.events.ApiConnectedEvent
 import network.warzone.mars.broadcast.BroadcastFeature
 import network.warzone.mars.map.MapFeature
+import network.warzone.mars.player.achievements.AchievementFeature
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.punishment.PunishmentFeature
 import network.warzone.mars.rank.RankFeature
@@ -20,6 +21,7 @@ object FeatureManager : Listener {
     }
 
     private val features = mapOf<ResourceType<*>, Feature<*>>(
+        ResourceType.Achievement to AchievementFeature,
         ResourceType.Tag to TagFeature,
         ResourceType.Map to MapFeature,
         ResourceType.Player to PlayerFeature,

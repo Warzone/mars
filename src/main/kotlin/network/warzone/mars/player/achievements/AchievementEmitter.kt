@@ -10,9 +10,12 @@ import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
+// A class for adding completed achievements to a player's profile.
 class AchievementEmitter(private val achievement: Achievement) {
+    // Fetch a player profile as needed.
     fun emit(player: Player) {
         Mars.async {
             val profile = PlayerFeature.fetch(player.name)!!
@@ -20,13 +23,14 @@ class AchievementEmitter(private val achievement: Achievement) {
         }
     }
 
+    // Add an achievement to the specified profile.
     fun emit(profile: PlayerProfile) {
-        if (profile.stats.achievements.contains(achievement.name)) return
+        if (profile.stats.achievements.contains(achievement.name)) return // Player already has achievement.
 
         // Print achievement earn to player and console.
         val player = Bukkit.getPlayer(profile._id)
         if (player != null) {
-            player.sendMessage("You've earned an achievement: " + achievement.name)
+            player.sendMessage("${ChatColor.GRAY}You've earned an achievement: ${ChatColor.AQUA}" + achievement.name + "${ChatColor.GRAY}!")
             println("Achievement " + achievement.name + " earned by " + player.name)
         }
 
@@ -34,7 +38,7 @@ class AchievementEmitter(private val achievement: Achievement) {
         ApiClient.emit(
             OutboundEvent.PlayerAchievement, PlayerAchievementData(
                 SimplePlayer(profile._id, profile.name),
-                achievement.name
+                achievement._id
             )
         )
     }

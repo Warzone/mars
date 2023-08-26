@@ -3,6 +3,10 @@ package network.warzone.mars.player.achievements.models
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+//TODO: Change this to be defined via the API rather than hard-coded.
+
+// A class for defining achievement parents, which are used solely to categorize
+// achievements within the GUI.
 @Serializable
 sealed class AchievementParent {
     abstract val category: String

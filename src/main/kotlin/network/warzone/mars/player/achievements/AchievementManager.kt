@@ -3,51 +3,53 @@ package network.warzone.mars.player.achievements
 import network.warzone.api.database.models.Achievement
 import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.Mars
-import network.warzone.mars.match.MatchManager
 import network.warzone.mars.player.achievements.models.AchievementParent
 import network.warzone.mars.player.achievements.variants.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import tc.oc.pgm.api.map.Gamemode
 import tc.oc.pgm.api.match.event.MatchFinishEvent
 
-object AchievementManager : Listener, AchievementDebugger {
-    private val achievements : MutableList<Achievement> = mutableListOf()
-    private val activeAgents : MutableList<AchievementAgent> = mutableListOf()
+// A class for managing various achievement-related functionalities.
+object AchievementManager : Listener {
+    private val achievementToAgent: MutableMap<Achievement, AchievementAgent> = mutableMapOf()
 
     fun load() {
         Mars.registerEvents(this)
         fetchNewAchievements()
     }
 
+    // Input a list of achievements, return a list of distinct achievement parents amongst those achievements.
     fun getParentsFromAchievements(achievements: List<Achievement>) : List<AchievementParent> {
         return achievements.mapNotNull { it.parent }.distinct()
     }
 
+    // Input a category, return a list of achievements with parents of that category.
     fun getAchievementsForCategory(category: String): List<Achievement> {
-        return achievements.filter { it.parent?.category == category }
+        return achievementToAgent.keys.filter { it.parent?.category == category }
     }
 
+    // Input an achievement parent and a list of achievements, return the achievements containing that parent.
     fun filterAchievementsWithParent(parent: AchievementParent, achievements: List<Achievement>) : List<Achievement>{
         return achievements.filter { it.parent == parent }
 
     }
 
+    // Update achievements every time a match ends.
     @EventHandler
     fun onMatchFinish(event: MatchFinishEvent) {
         fetchNewAchievements()
-        activeAgents.forEach { agent -> agent.onMatchFinish(event)  }
     }
 
     fun unload() {
-        activeAgents.forEach { agent -> agent.unload() }
-        activeAgents.clear()
-        achievements.clear()
+        achievementToAgent.values.forEach { it.unload() }
+        achievementToAgent.clear()
     }
 
-    private fun findAgentForAchievement(achievement: Achievement) : AchievementAgent {
+    // Create an achievement agent based on an achievement's agent params, and return a reference
+    // to the newly created agent.
+    private fun createAgentForAchievement(achievement: Achievement) : AchievementAgent {
         val emitter = AchievementEmitter(achievement)
-        return when (val agentParams = achievement.agent.params) {
+        val agent = when (val agentParams = achievement.agent.params) {
             is AgentParams.KillStreakAgentParams -> {
                 KillstreakAchievement(agentParams.targetStreak, emitter)
             }
@@ -111,21 +113,38 @@ object AchievementManager : Listener, AchievementDebugger {
             // ...
             else -> throw IllegalArgumentException("Unknown AgentParams for achievement ${achievement.name}")
         }
+        achievementToAgent[achievement] = agent
+        return agent
     }
 
-    //TODO: Deleting an achievement currently requires a restart for it to completely go away.
+    // Activates/deactivates achievements based on certain conditions.
+    // Also used to initialize achievements when the server starts.
     private fun fetchNewAchievements() {
         Mars.async {
-            // Fetch the current achievements from the API
+            // Fetch the current achievements from the API database
             val currentAchievements = AchievementFeature.list()
 
-            // Find the achievements that are not in the currently loaded achievements
-            val newAchievements = currentAchievements.filter { it !in achievements }
+            // Find achievements from the database that are currently not loaded on the server.
+            val newAchievements = currentAchievements.filter { it !in achievementToAgent.keys }
 
-            // If there are new achievements, add them to the list and activate their agents
+            // Find achievements that are currently loaded on the server, but no longer in the database.
+            val achievementsToRemove = achievementToAgent.keys.filter { it !in currentAchievements }
+
+            // Add new achievements (if any).
             if (newAchievements.isNotEmpty()) {
-                achievements += newAchievements
-                activeAgents += newAchievements.map(::findAgentForAchievement).onEach { it.load() }
+                newAchievements.forEach { achievement ->
+                    val agent = createAgentForAchievement(achievement)
+                    agent.load()
+                    achievementToAgent[achievement] = agent
+                }
+            }
+
+            // Disable and remove deleted achievements (if any).
+            if (achievementsToRemove.isNotEmpty()) {
+                achievementsToRemove.forEach { achievement ->
+                    achievementToAgent[achievement]?.unload()
+                    achievementToAgent.remove(achievement)
+                }
             }
         }
     }

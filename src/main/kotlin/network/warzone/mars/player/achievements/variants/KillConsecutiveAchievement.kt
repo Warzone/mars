@@ -61,7 +61,7 @@ class KillConsecutiveAchievement(
     }
 
     @EventHandler
-    override fun onMatchFinish(event: MatchFinishEvent) {
+    fun onMatchFinish(event: MatchFinishEvent) {
         playerKillsTimestamps.clear()
     }
 }

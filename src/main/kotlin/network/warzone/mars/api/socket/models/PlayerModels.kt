@@ -25,7 +25,7 @@ data class PlayerDeathData(
 
 data class KillstreakData(val amount: Int, val player: SimplePlayer, val ended: Boolean)
 
-data class PlayerAchievementData(val player: SimplePlayer, val achievement: String)
+data class PlayerAchievementData(val player: SimplePlayer, val achievement: UUID)
 
 enum class PlayerUpdateReason {
     KILL,
@@ -73,8 +73,6 @@ sealed class PlayerUpdateData {
     data class MonumentDropUpdateData(val heldTime: Long) : PlayerUpdateData()
     @SerialName("ControlPointCaptureUpdateData")
     data class ControlPointCaptureUpdateData(val contributors: Int) : PlayerUpdateData()
-    @SerialName("LevelUpUpdateData")
-    data class LevelUpUpdateData(val data: PlayerLevelUpData) : PlayerUpdateData()
     @SerialName("NoArgs")
     object NoArgs : PlayerUpdateData()
 }

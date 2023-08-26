@@ -18,7 +18,8 @@ import java.util.*
 class CaptureNoSprintAchievement(override val emitter: AchievementEmitter) : AchievementAgent, Listener {
     var playersWhoSprinted: MutableList<UUID> = emptyList<UUID>().toMutableList()
 
-    override fun onMatchFinish(event: MatchFinishEvent) = runBlocking {
+    @EventHandler
+    fun onMatchFinish(event: MatchFinishEvent) = runBlocking {
         event.match.participants.forEach { matchPlayer ->
             if (matchPlayer.player?.id !in playersWhoSprinted) {
                 val player = matchPlayer ?: return@forEach
