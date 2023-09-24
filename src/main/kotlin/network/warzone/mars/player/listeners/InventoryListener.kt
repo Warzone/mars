@@ -39,7 +39,7 @@ class InventoryListener : Listener {
     fun onObserverKitApply(event: ObserverKitApplyEvent) {
         val player = event.player
 
-        val inventory = player.inventory
+        val inventory = player.inventory ?: return
 
         // Remove extra staff items from observer inventory
         inventory.setItem(1, null)
