@@ -28,6 +28,7 @@ import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.events.PlayerJoinPartyEvent
 import tc.oc.pgm.events.PlayerLeavePartyEvent
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import tc.oc.pgm.util.named.NameStyle
@@ -96,7 +97,7 @@ class PlayerTracker : Listener {
         if (event.isEnemyKill) {
             pendingFirstBlood = false
             event.match.sendMessage(
-                killer.getName(NameStyle.COLOR).append(Component.text(" drew first blood!", NamedTextColor.RED))
+                text().append(killer.getName(NameStyle.COLOR)).append(Component.text(" drew first blood!", NamedTextColor.RED))
             )
         }
     }
