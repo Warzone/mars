@@ -11,6 +11,7 @@ import org.bukkit.event.Listener
 import tc.oc.pgm.api.player.ParticipantState
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import tc.oc.pgm.util.named.NameStyle
@@ -73,21 +74,26 @@ object KillstreakTracker : Listener {
         }
     }
 
-    private fun createKillstreakMessage(killer: ParticipantState, count: Int): Component {
+    private fun createKillstreakMessage(killer: ParticipantState, count: Int): ComponentLike {
         val killerComp = killer.getName(NameStyle.COLOR)
-        val countComp =
-            Component.text(count, trackedKillstreaks[count]).decorate(TextDecoration.BOLD)
-        return killerComp.append(Component.text(" is on a killstreak of ", NamedTextColor.GRAY)).append(countComp)
-            .append(Component.text("!", NamedTextColor.GRAY))
+        val countComp = Component.text(count, trackedKillstreaks[count]).decorate(TextDecoration.BOLD)
+        return Component.text()
+                .append(killerComp)
+                .append(Component.text(" is on a killstreak of ", NamedTextColor.GRAY))
+                .append(countComp)
+                .append(Component.text("!", NamedTextColor.GRAY))
     }
 
-    private fun createKillstreakEndMessage(ender: ParticipantState, ended: ParticipantState, count: Int): Component {
+    private fun createKillstreakEndMessage(ender: ParticipantState, ended: ParticipantState, count: Int): ComponentLike {
         val enderComp = ender.getName(NameStyle.COLOR)
         val endedComp = ended.getName(NameStyle.COLOR)
         val nearestColor = getNearestTrackedKillstreak(count).second
-        val countComp =
-            Component.text(count, nearestColor).decorate(TextDecoration.BOLD)
-        return enderComp.append(Component.text(" ended ", NamedTextColor.GRAY)).append(endedComp)
-            .append(Component.text("'s killstreak of ", NamedTextColor.GRAY)).append(countComp)
+        val countComp = Component.text(count, nearestColor).decorate(TextDecoration.BOLD)
+        return Component.text()
+            .append(enderComp)
+            .append(Component.text(" ended ", NamedTextColor.GRAY))
+            .append(endedComp)
+            .append(Component.text("'s killstreak of ", NamedTextColor.GRAY))
+            .append(countComp)
     }
 }
