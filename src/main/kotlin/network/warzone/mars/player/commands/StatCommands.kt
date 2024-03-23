@@ -59,7 +59,7 @@ class StatCommands {
     private fun viewStats(sender: MatchPlayer, profile: PlayerProfile) {
         val stats = profile.stats
         val outline = text("-------------------------------", NamedTextColor.BLUE, TextDecoration.STRIKETHROUGH)
-        //sender.sendMessage(outline)
+        sender.sendMessage(outline)
         val component =
             sender.multiLine()
                 .appendMultiLine { outline }
