@@ -46,10 +46,4 @@ class AchievementEmitter(private val achievement: Achievement) {
             )
         )
     }
-
-    private fun getDate(): String {
-        val currentDateTime = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        return currentDateTime.format(formatter)
-    }
 }

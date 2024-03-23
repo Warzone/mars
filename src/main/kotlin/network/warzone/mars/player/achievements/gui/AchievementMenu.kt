@@ -1,6 +1,5 @@
 package network.warzone.mars.player.achievements.gui
 
-import net.md_5.bungee.api.ChatColor
 import network.warzone.api.database.models.Achievement
 import network.warzone.mars.player.achievements.AchievementManager.filterAchievementsWithCategory
 import network.warzone.mars.player.achievements.AchievementManager.getAchievementsForCategory
@@ -9,6 +8,7 @@ import network.warzone.mars.player.achievements.models.AchievementCategory
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.menu.*
+import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemFlag
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
 import kotlin.math.min
 
 // A class that handles the GUI aspect of achievements.
