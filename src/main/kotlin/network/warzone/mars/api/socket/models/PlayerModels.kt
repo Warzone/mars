@@ -25,7 +25,7 @@ data class PlayerDeathData(
 
 data class KillstreakData(val amount: Int, val player: SimplePlayer, val ended: Boolean)
 
-data class PlayerAchievementData(val player: SimplePlayer, val achievement: UUID, val completionTime: Long)
+data class PlayerAchievementData(val player: SimplePlayer, val achievementId: UUID, val completionTime: Long)
 
 enum class PlayerUpdateReason {
     KILL,
