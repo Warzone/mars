@@ -3,8 +3,7 @@ package network.warzone.api.database.models
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import network.warzone.mars.feature.NamedResource
-import network.warzone.mars.player.achievements.AchievementAgent
-import network.warzone.mars.player.achievements.models.AchievementParent
+import network.warzone.mars.player.achievements.models.AchievementCategory
 import java.util.*
 
 enum class AgentType {
@@ -30,6 +29,11 @@ enum class AgentType {
     CONTROL_POINT_CAPTURE_AGENT, /** WORKS **/
     //COMPOSITE_AGENT
 }
+
+data class AchievementStatistic(
+    val completionTime: Long
+)
+
 enum class RecordType {
     LONGEST_SESSION,
     LONGEST_PROJECTILE_KILL,
@@ -139,7 +143,7 @@ data class Achievement(
     override val name: String,
     val description: String,
     @Serializable
-    val parent: AchievementParent? = null,
+    val category: AchievementCategory? = null,
     val agent: Agent,
 ) : NamedResource {
 

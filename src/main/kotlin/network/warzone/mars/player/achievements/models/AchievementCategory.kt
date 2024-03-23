@@ -5,201 +5,203 @@ import kotlinx.serialization.Serializable
 
 //TODO: Change this to be defined via the API rather than hard-coded.
 
-// A class for defining achievement parents, which are used solely to categorize
+// A class for defining achievement categories, which are used solely to categorize
 // achievements within the GUI.
 @Serializable
-sealed class AchievementParent {
+sealed class AchievementCategory {
     abstract val category: String
     abstract val displayName: String
     abstract val description: String
 
+    // Note: Explicit SerialName is used because default class path
+    // may not match API package.
     @Serializable
-    @SerialName("NoParent")
-    data class NoParent(
+    @SerialName("NoCategory")
+    data class NoCategory(
         override val category: String = "Misc",
         override val displayName: String = "No Display Name",
         override val description: String = "No Description",
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Obtain a killstreak of "x"
     @Serializable
-    @SerialName("BloodBathParent")
-    data class BloodBathParent(
+    @SerialName("BloodBathCategory")
+    data class BloodBathCategory(
         override val category: String = "Kills",
         override val displayName: String = "Blood Bath",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Capture "x" wools
     @Serializable
-    @SerialName("WoolieMammothParent")
-    data class WoolieMammothParent(
+    @SerialName("WoolieMammothCategory")
+    data class WoolieMammothCategory(
         override val category: String = "Objectives",
         override val displayName: String = "Woolie Mammoth",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Obtain "x" total kills
     @Serializable
-    @SerialName("PathToGenocideParent")
-    data class PathToGenocideParent(
+    @SerialName("PathToGenocideCategory")
+    data class PathToGenocideCategory(
         override val category: String = "Kills",
         override val displayName: String = "Path to Genocide",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Shoot and kill a player from "x" blocks away
     @Serializable
-    @SerialName("MarksmanParent")
-    data class MarksmanParent(
+    @SerialName("MarksmanCategory")
+    data class MarksmanCategory(
         override val category: String = "Kills",
         override val displayName: String = "Marksman",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Kill "x" players within a span of "y" seconds.
     @Serializable
-    @SerialName("MercilessParent")
-    data class MercilessParent(
+    @SerialName("MercilessCategory")
+    data class MercilessCategory(
         override val category: String = "Kills",
         override val displayName: String = "Merciless",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Kill "x" players within "y" seconds of each kill.
     @Serializable
-    @SerialName("WomboComboParent")
-    data class WomboComboParent(
+    @SerialName("WomboComboCategory")
+    data class WomboComboCategory(
         override val category: String = "Kills",
         override val displayName: String = "Wombo Combo",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Die to a source of fire.
     @Serializable
-    @SerialName("BurntToastParent")
-    data class BurntToastParent(
+    @SerialName("BurntToastCategory")
+    data class BurntToastCategory(
         override val category: String = "Deaths",
         override val displayName: String = "Burnt Toast",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Obtain your first first-blood kill.
     @Serializable
-    @SerialName("BloodGodParent")
-    data class BloodGodParent(
+    @SerialName("BloodGodCategory")
+    data class BloodGodCategory(
         override val category: String = "Kills",
         override val displayName: String = "Blood God",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Obtain "x" first-blood kills.
     @Serializable
-    @SerialName("TotalFirstBloodsParent")
-    data class TotalFirstBloodsParent(
+    @SerialName("TotalFirstBloodsCategory")
+    data class TotalFirstBloodsCategory(
         override val category: String = "Kills",
         override val displayName: String = "Swift as the Wind",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Damage "x" monument blocks overall.
     @Serializable
-    @SerialName("PillarsOfSandParent")
-    data class PillarsOfSandParent(
+    @SerialName("PillarsOfSandCategory")
+    data class PillarsOfSandCategory(
         override val category: String = "Objectives",
         override val displayName: String = "Pillars of Sand",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Capture "x" flags overall.
     @Serializable
-    @SerialName("TouchdownParent")
-    data class TouchdownParent(
+    @SerialName("TouchdownCategory")
+    data class TouchdownCategory(
         override val category: String = "Objectives",
         override val displayName: String = "Touchdown",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Stop "x" flag holders from capturing the flag.
     @Serializable
-    @SerialName("PassInterferenceParent")
-    data class PassInterferenceParent(
+    @SerialName("PassInterferenceCategory")
+    data class PassInterferenceCategory(
         override val category: String = "Objectives",
         override val displayName: String = "Pass Interference",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Capture "x" control-point objectives overall.
     @Serializable
-    @SerialName("TerritorialDisputeParent")
-    data class TerritorialDisputeParent(
+    @SerialName("TerritorialDisputeCategory")
+    data class TerritorialDisputeCategory(
         override val category: String = "Objectives",
         override val displayName: String = "Territorial Dispute",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Win "x" matches overall.
     @Serializable
-    @SerialName("VictoryScreechParent")
-    data class VictoryScreechParent(
+    @SerialName("VictoryScreechCategory")
+    data class VictoryScreechCategory(
         override val category: String = "Wins",
         override val displayName: String = "Victory Screech",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Reach level "x".
     @Serializable
-    @SerialName("ChampionRoadParent")
-    data class ChampionRoadParent(
+    @SerialName("ChampionRoadCategory")
+    data class ChampionRoadCategory(
         override val category: String = "Misc",
         override val displayName: String = "Champion Road",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Play for "x" hours in matches overall.
     @Serializable
-    @SerialName("TouchGrassParent")
-    data class TouchGrassParent(
+    @SerialName("TouchGrassCategory")
+    data class TouchGrassCategory(
         override val category: String = "Misc",
         override val displayName: String = "Touch Grass",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Win your first match.
     @Serializable
-    @SerialName("FirstWinParent")
-    data class FirstWinParent(
+    @SerialName("FirstWinCategory")
+    data class FirstWinCategory(
         override val category: String = "Wins",
         override val displayName: String = "Mom, Get the Camera!",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Obtain your first kill.
     @Serializable
-    @SerialName("FirstKillParent")
-    data class FirstKillParent(
+    @SerialName("FirstKillCategory")
+    data class FirstKillCategory(
         override val category: String = "Kills",
         override val displayName: String = "Baby Steps",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Obtain your first loss.
     @Serializable
-    @SerialName("FirstLossParent")
-    data class FirstLossParent(
+    @SerialName("FirstLossCategory")
+    data class FirstLossCategory(
         override val category: String = "Losses",
         override val displayName: String = "My Stats!",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // Obtain your first death.
     @Serializable
-    @SerialName("FirstDeathParent")
-    data class FirstDeathParent(
+    @SerialName("FirstDeathCategory")
+    data class FirstDeathCategory(
         override val category: String = "Deaths",
         override val displayName: String = "Oof!",
         override val description: String = "Click here to view this achievement."
-    ) : AchievementParent()
+    ) : AchievementCategory()
 
     // ... other subclasses here ...
 }

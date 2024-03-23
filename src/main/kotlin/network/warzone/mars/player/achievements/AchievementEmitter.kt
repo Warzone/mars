@@ -6,12 +6,15 @@ import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.models.PlayerAchievementData
 import network.warzone.mars.api.socket.models.SimplePlayer
-import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+
 
 // A class for adding completed achievements to a player's profile.
 class AchievementEmitter(private val achievement: Achievement) {
@@ -25,7 +28,7 @@ class AchievementEmitter(private val achievement: Achievement) {
 
     // Add an achievement to the specified profile.
     fun emit(profile: PlayerProfile) {
-        if (profile.stats.achievements.contains(achievement.name)) return // Player already has achievement.
+        if (profile.stats.achievements.containsKey(achievement._id.toString())) return // Player already has achievement.
 
         // Print achievement earn to player and console.
         val player = Bukkit.getPlayer(profile._id)
@@ -38,8 +41,15 @@ class AchievementEmitter(private val achievement: Achievement) {
         ApiClient.emit(
             OutboundEvent.PlayerAchievement, PlayerAchievementData(
                 SimplePlayer(profile._id, profile.name),
-                achievement._id
+                achievement._id,
+                Date().time
             )
         )
+    }
+
+    private fun getDate(): String {
+        val currentDateTime = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        return currentDateTime.format(formatter)
     }
 }

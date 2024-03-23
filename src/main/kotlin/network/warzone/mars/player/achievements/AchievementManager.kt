@@ -3,7 +3,7 @@ package network.warzone.mars.player.achievements
 import network.warzone.api.database.models.Achievement
 import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.Mars
-import network.warzone.mars.player.achievements.models.AchievementParent
+import network.warzone.mars.player.achievements.models.AchievementCategory
 import network.warzone.mars.player.achievements.variants.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,19 +18,19 @@ object AchievementManager : Listener {
         fetchNewAchievements()
     }
 
-    // Input a list of achievements, return a list of distinct achievement parents amongst those achievements.
-    fun getParentsFromAchievements(achievements: List<Achievement>) : List<AchievementParent> {
-        return achievements.mapNotNull { it.parent }.distinct()
+    // Input a list of achievements, return a list of distinct achievement categories amongst those achievements.
+    fun getCategoriesFromAchievements(achievements: List<Achievement>) : List<AchievementCategory> {
+        return achievements.mapNotNull { it.category }.distinct()
     }
 
-    // Input a category, return a list of achievements with parents of that category.
+    // Input a category, return a list of achievements of that category.
     fun getAchievementsForCategory(category: String): List<Achievement> {
-        return achievementToAgent.keys.filter { it.parent?.category == category }
+        return achievementToAgent.keys.filter { it.category?.category == category }
     }
 
-    // Input an achievement parent and a list of achievements, return the achievements containing that parent.
-    fun filterAchievementsWithParent(parent: AchievementParent, achievements: List<Achievement>) : List<Achievement>{
-        return achievements.filter { it.parent == parent }
+    // Input an achievement category and a list of achievements, return the achievements containing that category.
+    fun filterAchievementsWithCategory(category: AchievementCategory, achievements: List<Achievement>) : List<Achievement>{
+        return achievements.filter { it.category == category }
 
     }
 

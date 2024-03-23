@@ -90,8 +90,8 @@ class StatCommands {
                 .appendMultiLine { createLabelledStat("Wins", stats.wins, StatType.POSITIVE) }
                 .appendMultiLine { createLabelledStat("Losses", stats.losses, StatType.NEGATIVE) }
                 .appendMultiLine { createLabelledStat("Win %", stats.winPercentage, StatType.NEUTRAL) }
-                //.appendMultiLine { empty() }
-                //.appendMultiLine { createLabelledStat("Achievements", stats.achievements.size, StatType.NEUTRAL) }
+                .appendMultiLine { empty() }
+                .appendMultiLine { createLabelledStat("Achievements", stats.achievements.size, StatType.NEUTRAL) }
                 .appendMultiLine { outline }
 
         component.deliver()

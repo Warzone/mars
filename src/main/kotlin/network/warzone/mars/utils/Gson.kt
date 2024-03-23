@@ -9,7 +9,7 @@ import com.tinder.scarlet.MessageAdapter
 import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.api.socket.models.PlayerUpdateData
 import network.warzone.mars.match.tracker.PlayerBlocks
-import network.warzone.mars.player.achievements.models.AchievementParent
+import network.warzone.mars.player.achievements.models.AchievementCategory
 import okio.Buffer
 import org.bukkit.Material
 import java.io.OutputStreamWriter
@@ -34,8 +34,8 @@ val GSON_CFG : GsonBuilder.() -> Unit = {
         ClosedPolymorphismDeserializer.createFromSealedClass(PlayerUpdateData::class)
     )
     registerTypeAdapter(
-        AchievementParent::class.java,
-        ClosedPolymorphismDeserializer.createFromSealedClass(AchievementParent::class)
+        AchievementCategory::class.java,
+        ClosedPolymorphismDeserializer.createFromSealedClass(AchievementCategory::class)
     )
     registerTypeAdapter(
         PlayerBlocks::class.java,

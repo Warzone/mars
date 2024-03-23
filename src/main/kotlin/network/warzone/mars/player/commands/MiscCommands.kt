@@ -10,8 +10,6 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.commands.providers.PlayerName
-import network.warzone.mars.player.achievements.AchievementFeature.printAchievements
-import network.warzone.mars.player.achievements.AchievementManager
 import network.warzone.mars.player.achievements.gui.AchievementMenu
 import network.warzone.mars.utils.matchPlayer
 import network.warzone.mars.utils.menu.open

@@ -4,9 +4,8 @@ import network.warzone.api.database.models.Achievement
 import network.warzone.api.database.models.Agent
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.feature.CachedFeature
-import network.warzone.mars.player.achievements.models.AchievementParent
+import network.warzone.mars.player.achievements.models.AchievementCategory
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.utils.capitalizeFirst
 import java.util.*
 
 object AchievementFeature : CachedFeature<Achievement>() {
@@ -34,14 +33,14 @@ object AchievementFeature : CachedFeature<Achievement>() {
     suspend fun create(
         name: String,
         description: String,
-        parent: AchievementParent,
+        category: AchievementCategory,
         agent: Agent
     ): Achievement {
         // Requests the creation of a new achievement. Adds the created achievement to the cache.
         return AchievementService.create(
             name = name,
             description = description,
-            parent = parent,
+            category = category,
             agent = agent
         ).also { AchievementFeature.add(it) }
     }
@@ -72,12 +71,5 @@ object AchievementFeature : CachedFeature<Achievement>() {
         if (achievements.isNotEmpty()) AchievementFeature.clear()
         return achievements.onEach { AchievementFeature.add(it) }
 
-    }
-
-    suspend fun printAchievements() {
-        val achievements = list()
-        achievements.forEach { achievement ->
-            println("Achievement: ${achievement.name}, Description: ${achievement.description}")
-        }
     }
 }

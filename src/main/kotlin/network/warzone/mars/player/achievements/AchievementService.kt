@@ -8,7 +8,7 @@ import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.player.achievements.exceptions.AchievementException
 import network.warzone.mars.player.achievements.exceptions.AchievementMissingException
-import network.warzone.mars.player.achievements.models.AchievementParent
+import network.warzone.mars.player.achievements.models.AchievementCategory
 import network.warzone.mars.utils.parseHttpException
 import java.util.*
 
@@ -16,7 +16,7 @@ object AchievementService {
     suspend fun create(
         name: String,
         description: String,
-        parent: AchievementParent,
+        category: AchievementCategory,
         agent: Agent
     ): Achievement {
         val request = parseHttpException {
@@ -24,7 +24,7 @@ object AchievementService {
                 "/mc/achievements", AchievementCreateRequest(
                     name,
                     description,
-                    parent,
+                    category,
                     agent
                 )
             )
@@ -61,7 +61,7 @@ object AchievementService {
     data class AchievementCreateRequest(
         val name: String,
         val description: String,
-        val parent: AchievementParent,
+        val category: AchievementCategory,
         val agent: Agent
     )
 }

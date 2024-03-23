@@ -19,6 +19,7 @@ object ClosedPolymorphismDeserializer {
             val data: JsonElement
 
             if (jsonElement.isJsonObject) {
+
                 val obj = jsonElement.asJsonObject
                 tag = obj.get("type").asString
                 obj.remove("type")

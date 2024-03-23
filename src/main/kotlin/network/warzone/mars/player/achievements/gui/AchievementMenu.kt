@@ -2,10 +2,10 @@ package network.warzone.mars.player.achievements.gui
 
 import net.md_5.bungee.api.ChatColor
 import network.warzone.api.database.models.Achievement
-import network.warzone.mars.player.achievements.AchievementManager.filterAchievementsWithParent
+import network.warzone.mars.player.achievements.AchievementManager.filterAchievementsWithCategory
 import network.warzone.mars.player.achievements.AchievementManager.getAchievementsForCategory
-import network.warzone.mars.player.achievements.AchievementManager.getParentsFromAchievements
-import network.warzone.mars.player.achievements.models.AchievementParent
+import network.warzone.mars.player.achievements.AchievementManager.getCategoriesFromAchievements
+import network.warzone.mars.player.achievements.models.AchievementCategory
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.menu.*
@@ -15,6 +15,10 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemFlag
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.*
 import kotlin.math.min
 
 // A class that handles the GUI aspect of achievements.
@@ -40,23 +44,23 @@ class AchievementMenu(player: Player) : Listener {
         }
     }
 
-    // Creates and opens a category GUI, which contains all achievement parents of the specified category.
+    // Creates and opens a category GUI, which contains all achievements of the specified category.
     private fun openCategory(categoryName: String, page: Int = 1): GUI {
         return gui("${ChatColor.AQUA}${ChatColor.BOLD}$categoryName", 6) {
             val achievements = getAchievementsForCategory(categoryName)
-            val parents = getParentsFromAchievements(achievements)
+            val categories = getCategoriesFromAchievements(achievements)
 
-            val (nonEdgeStart, nonEdgeEnd) = calculateNonEdgeIndices(parents.size, page)
+            val (nonEdgeStart, nonEdgeEnd) = calculateNonEdgeIndices(categories.size, page)
 
-            for ((index, parent) in parents.subList(nonEdgeStart, nonEdgeEnd).withIndex()) {
+            for ((index, category) in categories.subList(nonEdgeStart, nonEdgeEnd).withIndex()) {
                 slot(getSlotFromNonEdgeIndex(index)) {
                     item = item(Material.BOOK) {
-                        name = "${ChatColor.GREEN}${parent.displayName}"
-                        lore = wrap("${ChatColor.GRAY}${parent.description}", 40)
+                        name = "${ChatColor.GREEN}${category.displayName}"
+                        lore = wrap("${ChatColor.GRAY}${category.description}", 40)
                     }
 
                     onclick = { player ->
-                        player.open(openAchievementDetails(parent, achievements))
+                        player.open(openAchievementDetails(category, achievements))
                     }
                 }
             }
@@ -69,7 +73,7 @@ class AchievementMenu(player: Player) : Listener {
                 }
             }
             // Next Page Arrow
-            if ((parents.size - 1) / 36 + 1 > page) {
+            if ((categories.size - 1) / 36 + 1 > page) {
                 slot(53) {
                     createNextPageArrow(page) { player ->
                         player.open(openCategory(categoryName, page + 1))
@@ -91,10 +95,10 @@ class AchievementMenu(player: Player) : Listener {
         }
     }
 
-    // Creates and opens an achievement details GUI, which contains all achievements of a specified parent.
-    private fun openAchievementDetails(parent: AchievementParent, achievements: List<Achievement>, page: Int = 1): GUI {
-        return gui("${ChatColor.GREEN}${ChatColor.BOLD}${parent.displayName}", 6) {
-            val matchingAchievements = filterAchievementsWithParent(parent, achievements)
+    // Creates and opens an achievement details GUI, which contains all achievements of a specified category.
+    private fun openAchievementDetails(category: AchievementCategory, achievements: List<Achievement>, page: Int = 1): GUI {
+        return gui("${ChatColor.GREEN}${ChatColor.BOLD}${category.displayName}", 6) {
+            val matchingAchievements = filterAchievementsWithCategory(category, achievements)
 
             val (nonEdgeStart, nonEdgeEnd) = calculateNonEdgeIndices(matchingAchievements.size, page)
 
@@ -105,9 +109,16 @@ class AchievementMenu(player: Player) : Listener {
                         lore = wrap("${ChatColor.GRAY}${achievement.description}", 40)
 
                         // Check if the player has the achievement
-                        if (profile.stats.achievements.contains(achievement.name)) {
+                        if (profile.stats.achievements.containsKey(achievement._id.toString())) {
                             enchant(Enchantment.DURABILITY)
                             flags(ItemFlag.HIDE_ENCHANTS)
+
+                            val completionDate = profile.stats.achievements[achievement._id.toString()]?.completionTime?.let {
+                                formatDate(it)
+                            }
+
+                            lore = wrap("${ChatColor.GRAY}${achievement.description}" +
+                                "\n\n${ChatColor.AQUA}Completed: $completionDate", 40)
                         }
                     }
                 }
@@ -116,7 +127,7 @@ class AchievementMenu(player: Player) : Listener {
             if (page > 1) {
                 slot(45) {
                     createPreviousPageArrow(page) { player ->
-                        player.open(openAchievementDetails(parent, achievements, page - 1))
+                        player.open(openAchievementDetails(category, achievements, page - 1))
                     }()
                 }
             }
@@ -124,19 +135,19 @@ class AchievementMenu(player: Player) : Listener {
             if ((matchingAchievements.size - 1) / 36 + 1 > page) {
                 slot(53) {
                     createNextPageArrow(page) { player ->
-                        player.open(openAchievementDetails(parent, achievements, page + 1))
+                        player.open(openAchievementDetails(category, achievements, page + 1))
                     }()
                 }
             }
             // Back Arrow
             slot(49) {
                 createBackArrow { player ->
-                    player.open(openCategory(parent.category, 1))
+                    player.open(openCategory(category.category, 1))
                 }()
             }
             slot(4) {
                 item = item(Material.BOOK) {
-                    name = "${ChatColor.GREEN}${parent.displayName}"
+                    name = "${ChatColor.GREEN}${category.displayName}"
                     lore = wrap("${ChatColor.GRAY}This menu lists milestones for the current achievement.", 40)
                 }
             }
@@ -188,5 +199,12 @@ class AchievementMenu(player: Player) : Listener {
         val row = index / 7 + 1 // 1 is added to skip the first row
         val col = index % 7 + 1 // 1 is added to skip the first column
         return row * 9 + col // 9 columns in a row
+    }
+
+    private fun formatDate(epochMillis: Long): String {
+        val formatter = DateTimeFormatter.ofPattern("MM/dd/yy")
+        val instant = Instant.ofEpochMilli(epochMillis)
+        val date = instant.atZone(ZoneId.systemDefault()).toLocalDate()
+        return date.format(formatter)
     }
 }
