@@ -2,7 +2,6 @@ package network.warzone.mars.utils
 
 import com.google.gson.*
 import kotlinx.serialization.SerialName
-import network.warzone.mars.api.socket.models.PlayerUpdateData
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 

@@ -1,6 +1,5 @@
 package network.warzone.mars.player.achievements.variants
 
-import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.api.socket.models.PlayerUpdateData
 import network.warzone.mars.api.socket.models.PlayerUpdateEvent
 import network.warzone.mars.api.socket.models.PlayerUpdateReason

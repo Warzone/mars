@@ -2,6 +2,10 @@ package network.warzone.mars.player.listeners
 
 import github.scarsz.discordsrv.DiscordSRV
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.text.Component.space
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.ChatChannel
 import network.warzone.mars.api.socket.models.MessageEvent
@@ -10,6 +14,7 @@ import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.punishment.models.PunishmentKind
+import network.warzone.mars.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor.*
 import org.bukkit.Sound
@@ -22,17 +27,12 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import tc.oc.pgm.api.PGM
 import tc.oc.pgm.api.Permissions
+import tc.oc.pgm.api.integration.Integration
 import tc.oc.pgm.api.match.Match
 import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
-import net.kyori.adventure.text.Component.space
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextColor
-import network.warzone.mars.utils.*
-import tc.oc.pgm.api.integration.Integration
 import tc.oc.pgm.listeners.ChatDispatcher
 import tc.oc.pgm.util.bukkit.OnlinePlayerMapAdapter
 

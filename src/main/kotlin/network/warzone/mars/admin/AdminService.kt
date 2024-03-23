@@ -1,6 +1,5 @@
 package network.warzone.mars.admin
 
-import com.github.kittinunf.result.getOrNull
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import network.warzone.mars.api.ApiClient

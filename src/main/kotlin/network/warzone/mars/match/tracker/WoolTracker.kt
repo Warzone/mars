@@ -8,7 +8,6 @@ import network.warzone.mars.utils.hasMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.map.Gamemode
-import tc.oc.pgm.api.match.Match
 import tc.oc.pgm.api.match.event.MatchStartEvent
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.events.PlayerParticipationStopEvent

@@ -3,6 +3,10 @@ package network.warzone.mars.player.commands
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import network.warzone.mars.Mars
 import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.match.tracker.KillstreakTracker
@@ -10,15 +14,11 @@ import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.matchPlayer
+import network.warzone.mars.utils.strategy.multiLine
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.player.MatchPlayer
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
-import network.warzone.mars.utils.strategy.multiLine
 import javax.annotation.Nullable
 
 

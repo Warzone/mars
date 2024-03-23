@@ -1,26 +1,21 @@
 package network.warzone.mars.player.tablist
 
-import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import network.warzone.mars.Mars
-import network.warzone.mars.player.PlayerContext
-import network.warzone.mars.player.PlayerManager
-import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.player.feature.PlayerFeature
-import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.getLevelAsComponent
 import network.warzone.mars.utils.getPlayerLevelAsComponent
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.PGM
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import tc.oc.pgm.tablist.*
 import tc.oc.pgm.teams.Team
 import tc.oc.pgm.util.named.NameDecorationProvider
 import tc.oc.pgm.util.named.NameStyle
+import tc.oc.pgm.util.player.PlayerComponent
 import tc.oc.pgm.util.tablist.PlayerTabEntry
 import tc.oc.pgm.util.tablist.TabView
-import tc.oc.pgm.util.player.PlayerComponent
 
 class TeamTabEntryImpl(team: Team) : TeamTabEntry(team) // TeamTabEntry's constructor is protected
 

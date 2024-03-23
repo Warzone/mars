@@ -4,7 +4,6 @@ import app.ashcon.intake.Command
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.utils.menu.open
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 class PerkCommands {

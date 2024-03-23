@@ -1,7 +1,6 @@
 package network.warzone.mars.punishment.models
 
 import kotlinx.serialization.Serializable
-import java.util.*
 
 @Serializable
 data class PunishmentType(

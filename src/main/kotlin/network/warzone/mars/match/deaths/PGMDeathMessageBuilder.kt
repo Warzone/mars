@@ -1,5 +1,6 @@
 package network.warzone.mars.match.deaths
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.EntityType
@@ -8,7 +9,6 @@ import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.player.ParticipantState
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.api.tracker.info.*
-import net.kyori.adventure.text.Component
 import tc.oc.pgm.tracker.Trackers
 import tc.oc.pgm.tracker.info.*
 import tc.oc.pgm.util.material.Materials

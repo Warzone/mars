@@ -10,8 +10,6 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import tc.oc.pgm.api.Permissions
-import tc.oc.pgm.lib.cloud.commandframework.exceptions.NoPermissionException
 import javax.annotation.Nullable
 
 const val XP_MULTIPLIER_VIEW_PERMISSION = "mars.xpmultiplier.view"

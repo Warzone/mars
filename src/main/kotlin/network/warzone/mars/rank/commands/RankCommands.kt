@@ -5,6 +5,9 @@ import app.ashcon.intake.CommandException
 import app.ashcon.intake.parametric.annotation.Default
 import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.player.feature.PlayerFeature
@@ -14,9 +17,6 @@ import network.warzone.mars.utils.FeatureException
 import network.warzone.mars.utils.asTextComponent
 import org.bukkit.ChatColor.*
 import org.bukkit.command.CommandSender
-import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import javax.annotation.Nullable
 
 class RankCommands {

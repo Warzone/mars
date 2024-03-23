@@ -1,6 +1,5 @@
 package network.warzone.mars.player.achievements.variants
 
-import network.warzone.api.database.models.AgentParams
 import network.warzone.mars.api.socket.models.PlayerUpdateEvent
 import network.warzone.mars.api.socket.models.PlayerUpdateReason
 import network.warzone.mars.player.achievements.AchievementAgent
@@ -13,8 +12,6 @@ class TotalKillsAchievement(
 {
     @EventHandler
     fun onProfileUpdate(event: PlayerUpdateEvent) {
-        //sendDebugMessage("onProfileUpdate called by TotalKillsAchievement")
-        //sendDebugMessage("event.update.reason.name = " + event.update.reason.name)
         if (event.update.reason != PlayerUpdateReason.KILL) return
         val killerProfile = event.update.updated
         if (killerProfile.stats.kills >= targetKills) {

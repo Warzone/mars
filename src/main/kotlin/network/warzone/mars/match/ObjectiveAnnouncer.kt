@@ -1,5 +1,8 @@
 package network.warzone.mars.match
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.match.tracker.DestroyableDamageEvent
 import network.warzone.mars.match.tracker.WoolTracker
 import network.warzone.mars.utils.hasMode
@@ -10,14 +13,8 @@ import tc.oc.pgm.api.map.Gamemode
 import tc.oc.pgm.api.party.Competitor
 import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
-import tc.oc.pgm.flag.event.FlagStateChangeEvent
-import tc.oc.pgm.flag.state.Carried
-import tc.oc.pgm.flag.state.Dropped
-import tc.oc.pgm.goals.events.GoalTouchEvent
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.JoinConfiguration
-import net.kyori.adventure.text.format.NamedTextColor
 import tc.oc.pgm.goals.ShowOption
+import tc.oc.pgm.goals.events.GoalTouchEvent
 import tc.oc.pgm.wool.MonumentWool
 
 class ObjectiveAnnouncer : Listener {

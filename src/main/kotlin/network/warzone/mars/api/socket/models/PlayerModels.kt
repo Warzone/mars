@@ -1,11 +1,10 @@
 package network.warzone.mars.api.socket.models
 
-import network.warzone.mars.match.models.DeathCause
-import java.util.UUID
 import kotlinx.serialization.SerialName
-import network.warzone.mars.match.tracker.PlayerLevelUpData
+import network.warzone.mars.match.models.DeathCause
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.KEvent
+import java.util.*
 
 data class SimplePlayer(val id: UUID, val name: String)
 
