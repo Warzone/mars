@@ -19,7 +19,6 @@ import kotlin.reflect.KClass
 object MatchManager {
 
     val trackers: List<Listener> = listOf(
-        MapPoolTracker(),
         CoreTracker(),
         MatchTracker(),
         PlayerTracker(),
