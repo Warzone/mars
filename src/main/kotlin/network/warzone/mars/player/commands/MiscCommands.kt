@@ -65,7 +65,7 @@ class MiscCommands {
     }
 
     @Command(
-        aliases = ["achievements", "menu"],
+        aliases = ["achievements"],
         desc = "Open the achievements menu",
         perms = ["mars.achievements"]
     )
