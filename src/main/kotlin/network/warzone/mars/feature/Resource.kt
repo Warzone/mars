@@ -2,6 +2,7 @@ package network.warzone.mars.feature
 
 import network.warzone.mars.broadcast.BroadcastFeature
 import network.warzone.mars.map.MapFeature
+import network.warzone.mars.player.achievements.AchievementFeature
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.punishment.PunishmentFeature
 import network.warzone.mars.rank.RankFeature
@@ -11,6 +12,7 @@ import java.util.*
 import kotlin.reflect.KClass
 
 sealed class ResourceType<out T : Feature<*>>(type: KClass<T>) {
+    object Achievement : ResourceType<AchievementFeature>(AchievementFeature::class)
     object Tag : ResourceType<TagFeature>(TagFeature::class)
     object Map : ResourceType<MapFeature>(MapFeature::class)
     object Player : ResourceType<PlayerFeature>(PlayerFeature::class)

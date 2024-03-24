@@ -66,7 +66,7 @@ dependencies {
 
     compileOnly("net.kyori:adventure-api:4.8.1")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.8.1")
-    implementation("net.kyori:adventure-platform-bukkit:4.0.0") {
+    implementation("net.kyori:adventure-platform-bukkit:4.3.0") {
         exclude(group = "org.spigotmc", module = "spigot-api")
     }
 

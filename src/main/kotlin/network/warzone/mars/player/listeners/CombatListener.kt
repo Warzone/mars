@@ -1,5 +1,7 @@
 package network.warzone.mars.player.listeners
 
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -7,8 +9,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor
 import java.text.DecimalFormat
 
 class CombatListener : Listener {

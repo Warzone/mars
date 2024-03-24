@@ -5,13 +5,11 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
-import tc.oc.pgm.api.match.event.MatchFinishEvent
 import tc.oc.pgm.api.match.event.MatchLoadEvent
 import tc.oc.pgm.events.PlayerJoinMatchEvent
 import tc.oc.pgm.events.PlayerLeaveMatchEvent
 import tc.oc.pgm.stats.StatsMatchModule
 import java.util.*
-import kotlin.collections.HashMap
 
 
 data class PlayerBlocks(

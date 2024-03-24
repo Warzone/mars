@@ -1,21 +1,69 @@
 package network.warzone.mars.utils
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.TypeAdapter
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageAdapter
+import network.warzone.api.database.models.AgentParams
+import network.warzone.mars.api.socket.models.PlayerUpdateData
+import network.warzone.mars.match.tracker.PlayerBlocks
+import network.warzone.mars.player.achievements.models.AchievementCategory
 import okio.Buffer
+import org.bukkit.Material
 import java.io.OutputStreamWriter
 import java.io.StringReader
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets.UTF_8
+import java.util.*
 
-val GSON = GsonBuilder()
-    .create()!!
+val GSON_CFG : GsonBuilder.() -> Unit = {
+    registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
+        Date(json.asJsonPrimitive.asLong)
+    })
+    registerTypeAdapter(Date::class.java, JsonSerializer<Date> { date, _, _ ->
+        JsonPrimitive(date.time)
+    })
+    registerTypeAdapter(
+        AgentParams::class.java,
+        ClosedPolymorphismDeserializer.createFromSealedClass(AgentParams::class)
+    )
+    registerTypeAdapter(
+        PlayerUpdateData::class.java,
+        ClosedPolymorphismDeserializer.createFromSealedClass(PlayerUpdateData::class)
+    )
+    registerTypeAdapter(
+        AchievementCategory::class.java,
+        ClosedPolymorphismDeserializer.createFromSealedClass(AchievementCategory::class)
+    )
+    registerTypeAdapter(
+        PlayerBlocks::class.java,
+        JsonDeserializer { json, _, ctx ->
+            val obj = json.asJsonObject
+            val convertToEnumMap = { elem: JsonElement? ->
+                val map : Map<String, Int> =
+                    if (elem != null) ctx.deserialize(elem, object : TypeToken<Map<String, Int>>() {}.type)
+                    else mapOf()
+                val enumMap : EnumMap<Material, Int> = EnumMap(Material::class.java)
+                val entries = map.entries.map { entry -> Material.valueOf(entry.key) to entry.value }
+                enumMap.putAll(entries)
+                enumMap
+            }
+            val blocksPlaced = if (obj.has("blocksPlaced")) obj.get("blocksPlaced") else null
+            val blocksBroken = if (obj.has("blocksBroken")) obj.get("blocksBroken") else null
+            val blocksPlacedMap = convertToEnumMap(blocksPlaced)
+            val blocksBrokenMap = convertToEnumMap(blocksBroken)
+            PlayerBlocks(blocksPlacedMap, blocksBrokenMap)
+        }
+    )
+}
+
+val GSON = run {
+    val gsonBuilder = GsonBuilder()
+    gsonBuilder.GSON_CFG()
+    gsonBuilder.create()!!
+}
 
 /**
  * A [message adapter][MessageAdapter] that uses Gson.

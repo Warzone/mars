@@ -5,6 +5,12 @@ import app.ashcon.intake.CommandException
 import app.ashcon.intake.bukkit.parametric.annotation.Sender
 import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.wesjd.anvilgui.AnvilGUI
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
@@ -19,7 +25,10 @@ import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.PunishmentFeature
 import network.warzone.mars.punishment.models.*
 import network.warzone.mars.utils.*
-import network.warzone.mars.utils.menu.*
+import network.warzone.mars.utils.menu.GUI
+import network.warzone.mars.utils.menu.gui
+import network.warzone.mars.utils.menu.item
+import network.warzone.mars.utils.menu.open
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
@@ -27,12 +36,6 @@ import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.event.ClickEvent
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import java.time.Duration
 import java.util.*
 import javax.annotation.Nullable

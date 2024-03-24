@@ -2,7 +2,6 @@ package network.warzone.mars.punishment.models
 
 import kotlinx.serialization.Serializable
 import network.warzone.mars.utils.format
-import org.bukkit.ChatColor
 import java.time.Duration
 
 @Serializable

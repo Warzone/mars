@@ -1,18 +1,14 @@
 /*
     Warzone Mars - Interface with PGM for the purposes of data persistence & enhancing gameplay with new features
-
     Copyright (C) 2021 Warzone Contributors
-
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
     by the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Affero General Public License for more details.
-
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
@@ -26,15 +22,15 @@ import network.warzone.mars.commands.CommandModule
 import network.warzone.mars.feature.FeatureManager
 import network.warzone.mars.match.MatchManager
 import network.warzone.mars.player.PlayerManager
-import org.bukkit.Bukkit
-import org.bukkit.event.Listener
-import org.bukkit.plugin.java.JavaPlugin
-
+import network.warzone.mars.player.achievements.AchievementManager
 import network.warzone.mars.player.decoration.PrefixDecorationProvider
 import network.warzone.mars.player.feature.PlayerService
 import network.warzone.mars.player.tablist.overrideTabManager
+import org.bukkit.Bukkit
+import org.bukkit.event.Listener
+import org.bukkit.plugin.java.JavaPlugin
 import tc.oc.pgm.api.PGM
-import tc.oc.pgm.tablist.*
+import tc.oc.pgm.tablist.MatchTabManager
 import java.util.*
 
 class Mars : JavaPlugin() {
@@ -52,6 +48,7 @@ class Mars : JavaPlugin() {
         fun get() = instance
 
         fun registerEvents(listener: Listener) = Bukkit.getPluginManager().registerEvents(listener, instance)
+
     }
 
     lateinit var serverId: String
@@ -59,7 +56,6 @@ class Mars : JavaPlugin() {
     lateinit var matchTabManager: MatchTabManager
 
     override fun onEnable() = runBlocking {
-        println("enabling!")
         instance = this@Mars
 
         this@Mars.saveDefaultConfig()
@@ -68,7 +64,9 @@ class Mars : JavaPlugin() {
 
         val commandGraph = BasicBukkitCommandGraph(CommandModule)
 
+
         FeatureManager.registerCommands(commandGraph)
+        AchievementManager.load()
 
         val apiConfigurationSection = config.getConfigurationSection("api")
         ApiClient.loadHttp(apiConfigurationSection)
@@ -89,6 +87,7 @@ class Mars : JavaPlugin() {
         }
 
         this@Mars.matchTabManager.disable()
+        AchievementManager.unload()
     }
 
     private fun overrideDefaultProviders() {
@@ -97,4 +96,3 @@ class Mars : JavaPlugin() {
     }
 
 }
-

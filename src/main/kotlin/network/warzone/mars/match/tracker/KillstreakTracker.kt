@@ -1,5 +1,9 @@
 package network.warzone.mars.match.tracker
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.models.KillstreakData
@@ -10,10 +14,6 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.player.ParticipantState
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentLike
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import tc.oc.pgm.util.named.NameStyle
 import java.util.*
 

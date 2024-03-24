@@ -10,7 +10,9 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.commands.providers.PlayerName
+import network.warzone.mars.player.achievements.gui.AchievementMenu
 import network.warzone.mars.utils.matchPlayer
+import network.warzone.mars.utils.menu.open
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
@@ -60,6 +62,20 @@ class MiscCommands {
         val ping = player.spigot().ping
         if (player == sender) sender.sendMessage("${ChatColor.GRAY}Your ping is ${ChatColor.AQUA}${ping}ms")
         else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
+    }
+
+    @Command(
+        aliases = ["achievements"],
+        desc = "Open the achievements menu",
+        perms = ["mars.achievements"]
+    )
+    fun onAchievementMenuRequest(
+        @Sender sender: Player,
+        audience: Audience,
+        @Nullable arg1: String?
+    )
+    {
+        sender.open(AchievementMenu(sender).openMainMenu())
     }
 
     @Command(

@@ -3,18 +3,16 @@ package network.warzone.mars.tag.commands
 import app.ashcon.intake.Command
 import app.ashcon.intake.CommandException
 import app.ashcon.intake.parametric.annotation.Switch
-import network.warzone.mars.Mars
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import network.warzone.mars.Mars
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.tag.TagFeature
 import network.warzone.mars.tag.models.Tag
 import network.warzone.mars.utils.FeatureException
 import network.warzone.mars.utils.asTextComponent
-import org.bukkit.ChatColor.GREEN
-import org.bukkit.ChatColor.RED
-import org.bukkit.ChatColor.ITALIC
+import org.bukkit.ChatColor.*
 import org.bukkit.command.CommandSender
 import javax.annotation.Nullable
 

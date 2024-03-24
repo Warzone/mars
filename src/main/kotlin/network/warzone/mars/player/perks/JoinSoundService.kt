@@ -7,7 +7,6 @@ import network.warzone.mars.Mars
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.player.PlayerContext
-import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.ItemUtils

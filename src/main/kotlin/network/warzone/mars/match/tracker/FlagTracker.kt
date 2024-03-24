@@ -8,7 +8,6 @@ import network.warzone.mars.api.socket.models.FlagDropData
 import network.warzone.mars.api.socket.models.FlagPickupData
 import network.warzone.mars.utils.hasMode
 import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import tc.oc.pgm.api.map.Gamemode
 import tc.oc.pgm.api.match.event.MatchStartEvent

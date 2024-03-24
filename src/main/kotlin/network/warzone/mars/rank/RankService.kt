@@ -1,7 +1,6 @@
 package network.warzone.mars.rank
 
 import com.github.kittinunf.result.getOrNull
-import com.github.kittinunf.result.isFailure
 import com.github.kittinunf.result.onFailure
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionType

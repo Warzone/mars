@@ -8,6 +8,7 @@ import tc.oc.pgm.api.match.Match
 import kotlin.reflect.KClass
 
 object MatchManager {
+
     val trackers: List<Listener> = listOf(
         CoreTracker(),
         MatchTracker(),

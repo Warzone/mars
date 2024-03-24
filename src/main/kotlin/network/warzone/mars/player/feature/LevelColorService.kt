@@ -2,11 +2,9 @@ package network.warzone.mars.player.feature
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import network.warzone.mars.api.ApiClient
-import network.warzone.mars.feature.Resource
-import network.warzone.mars.utils.colorFromName
 import net.kyori.adventure.text.format.NamedTextColor
-import java.util.*
+import network.warzone.mars.api.ApiClient
+import network.warzone.mars.utils.colorFromName
 
 @Serializable
 data class LevelColor(

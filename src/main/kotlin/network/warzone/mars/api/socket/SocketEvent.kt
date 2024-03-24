@@ -33,4 +33,6 @@ open class OutboundEvent<T : Any>(event: SocketEventType) : SocketEvent<T>(event
     object WoolCapture : OutboundEvent<WoolDropData>(SocketEventType.WOOL_CAPTURE)
     object WoolDrop : OutboundEvent<WoolDropData>(SocketEventType.WOOL_DROP)
     object WoolDefend : OutboundEvent<WoolData>(SocketEventType.WOOL_DEFEND)
+
+    object PlayerAchievement : OutboundEvent<PlayerAchievementData>(SocketEventType.ACHIEVEMENT_EARN)
 }
