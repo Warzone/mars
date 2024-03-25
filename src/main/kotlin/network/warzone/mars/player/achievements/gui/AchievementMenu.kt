@@ -27,7 +27,7 @@ class AchievementMenu(player: Player) : Listener {
 
     // Creates and opens a main-menu GUI, which contains the six categories of achievements.
     fun openMainMenu(): GUI {
-        return gui("${ChatColor.GOLD}${ChatColor.BOLD}Achievements", 1) {
+        return gui("${ChatColor.DARK_RED}${ChatColor.BOLD}Achievements", 1) {
             val categories = listOf("Kills", "Losses", "Wins", "Deaths", "Objectives", "Misc")
             for ((index, category) in categories.withIndex()) {
                 slot(index) {
@@ -45,7 +45,7 @@ class AchievementMenu(player: Player) : Listener {
 
     // Creates and opens a category GUI, which contains all achievements of the specified category.
     private fun openCategory(categoryName: String, page: Int = 1): GUI {
-        return gui("${ChatColor.AQUA}${ChatColor.BOLD}$categoryName", 6) {
+        return gui("${ChatColor.DARK_AQUA}${ChatColor.BOLD}$categoryName", 6) {
             val achievements = getAchievementsForCategory(categoryName)
             val categories = getCategoriesFromAchievements(achievements)
 
@@ -96,7 +96,7 @@ class AchievementMenu(player: Player) : Listener {
 
     // Creates and opens an achievement details GUI, which contains all achievements of a specified category.
     private fun openAchievementDetails(category: AchievementCategory, achievements: List<Achievement>, page: Int = 1): GUI {
-        return gui("${ChatColor.GREEN}${ChatColor.BOLD}${category.displayName}", 6) {
+        return gui("${ChatColor.DARK_GREEN}${ChatColor.BOLD}${category.displayName}", 6) {
             val matchingAchievements = filterAchievementsWithCategory(category, achievements)
 
             val (nonEdgeStart, nonEdgeEnd) = calculateNonEdgeIndices(matchingAchievements.size, page)

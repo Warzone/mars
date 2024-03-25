@@ -65,9 +65,8 @@ class MiscCommands {
     }
 
     @Command(
-        aliases = ["achievements"],
-        desc = "Open the achievements menu",
-        perms = ["mars.achievements"]
+        aliases = ["ach", "achievement", "achievements"],
+        desc = "Open the achievements menu"
     )
     fun onAchievementMenuRequest(
         @Sender sender: Player,
