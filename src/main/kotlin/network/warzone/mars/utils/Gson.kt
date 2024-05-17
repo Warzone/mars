@@ -6,7 +6,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import com.tinder.scarlet.Message
 import com.tinder.scarlet.MessageAdapter
-import network.warzone.api.database.models.AgentParams
+import network.warzone.api.database.models.Agent
 import network.warzone.mars.api.socket.models.PlayerUpdateData
 import network.warzone.mars.match.tracker.PlayerBlocks
 import network.warzone.mars.player.achievements.models.AchievementCategory
@@ -26,16 +26,12 @@ val GSON_CFG : GsonBuilder.() -> Unit = {
         JsonPrimitive(date.time)
     })
     registerTypeAdapter(
-        AgentParams::class.java,
-        ClosedPolymorphismDeserializer.createFromSealedClass(AgentParams::class)
+        Agent::class.java,
+        ClosedPolymorphismDeserializer.createFromSealedClass(Agent::class)
     )
     registerTypeAdapter(
         PlayerUpdateData::class.java,
         ClosedPolymorphismDeserializer.createFromSealedClass(PlayerUpdateData::class)
-    )
-    registerTypeAdapter(
-        AchievementCategory::class.java,
-        ClosedPolymorphismDeserializer.createFromSealedClass(AchievementCategory::class)
     )
     registerTypeAdapter(
         PlayerBlocks::class.java,

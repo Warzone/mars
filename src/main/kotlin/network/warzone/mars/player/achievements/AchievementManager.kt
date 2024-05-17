@@ -1,7 +1,7 @@
 package network.warzone.mars.player.achievements
 
 import network.warzone.api.database.models.Achievement
-import network.warzone.api.database.models.AgentParams
+import network.warzone.api.database.models.Agent
 import network.warzone.mars.Mars
 import network.warzone.mars.player.achievements.models.AchievementCategory
 import network.warzone.mars.player.achievements.variants.*
@@ -49,65 +49,65 @@ object AchievementManager : Listener {
     // to the newly created agent.
     private fun createAgentForAchievement(achievement: Achievement) : AchievementAgent {
         val emitter = AchievementEmitter(achievement)
-        val agent = when (val agentParams = achievement.agent.params) {
-            is AgentParams.KillStreakAgentParams -> {
+        val agent = when (val agentParams = achievement.agent) {
+            is Agent.KillStreakAgentParams -> {
                 KillstreakAchievement(agentParams.targetStreak, emitter)
             }
-            is AgentParams.TotalKillsAgentParams -> {
+            is Agent.TotalKillsAgentParams -> {
                 TotalKillsAchievement(agentParams.targetKills, emitter)
             }
-            is AgentParams.FireDeathAgentParams -> {
+            is Agent.FireDeathAgentParams -> {
                 FireDeathAchievement(emitter)
             }
-            is AgentParams.CaptureNoSprintAgentParams -> {
+            is Agent.CaptureNoSprintAgentParams -> {
                 CaptureNoSprintAchievement(emitter)
             }
-            is AgentParams.ChatMessageAgentParams -> {
+            is Agent.ChatMessageAgentParams -> {
                 ChatMessageAchievement(agentParams.message, emitter)
             }
-            is AgentParams.LevelUpAgentParams -> {
+            is Agent.LevelUpAgentParams -> {
                 LevelUpAchievement(agentParams.level, emitter)
             }
-            is AgentParams.WoolCaptureAgentParams -> {
+            is Agent.WoolCaptureAgentParams -> {
                 WoolCaptureAchievement(agentParams.captures, emitter)
             }
-            is AgentParams.FirstBloodAgentParams -> {
+            is Agent.FirstBloodAgentParams -> {
                 FirstBloodAchievement(agentParams.target, emitter)
             }
-            is AgentParams.BowDistanceAgentParams -> {
+            is Agent.BowDistanceAgentParams -> {
                 BowDistanceAchievement(agentParams.distance, emitter)
             }
-            is AgentParams.FlagCaptureAgentParams -> {
+            is Agent.FlagCaptureAgentParams -> {
                 FlagCaptureAchievement(agentParams.captures, emitter)
             }
-            is AgentParams.FlagDefendAgentParams -> {
+            is Agent.FlagDefendAgentParams -> {
                 FlagDefendAchievement(agentParams.defends, emitter)
             }
-            is AgentParams.WoolDefendAgentParams -> {
+            is Agent.WoolDefendAgentParams -> {
                 WoolDefendAchievement(agentParams.defends, emitter)
             }
-            is AgentParams.MonumentDamageAgentParams -> {
+            is Agent.MonumentDamageAgentParams -> {
                 MonumentDamageAchievement(agentParams.breaks, emitter)
             }
-            is AgentParams.KillConsecutiveAgentParams -> {
+            is Agent.KillConsecutiveAgentParams -> {
                 KillConsecutiveAchievement(agentParams, emitter)
             }
-            is AgentParams.PlayTimeAgentParams -> {
+            is Agent.PlayTimeAgentParams -> {
                 PlayTimeAchievement(agentParams.hours, emitter)
             }
-            is AgentParams.RecordAgentParams<*> -> {
-                RecordAchievement(agentParams as AgentParams.RecordAgentParams<Number>, emitter)
+            is Agent.RecordAgentParams<*> -> {
+                RecordAchievement(agentParams as Agent.RecordAgentParams<Number>, emitter)
             }
-            is AgentParams.ControlPointCaptureAgentParams -> {
+            is Agent.ControlPointCaptureAgentParams -> {
                 ControlPointCaptureAchievement(agentParams.captures, emitter)
             }
-            is AgentParams.TotalWinsAgentParams -> {
+            is Agent.TotalWinsAgentParams -> {
                 TotalWinsAchievement(agentParams.wins, emitter)
             }
-            is AgentParams.TotalDeathsAgentParams -> {
+            is Agent.TotalDeathsAgentParams -> {
                 TotalDeathsAchievement(agentParams.deaths, emitter)
             }
-            is AgentParams.TotalLossesAgentParams -> {
+            is Agent.TotalLossesAgentParams -> {
                 TotalLossesAchievement(agentParams.losses, emitter)
             }
             // ...

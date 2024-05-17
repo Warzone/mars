@@ -1,6 +1,6 @@
 package network.warzone.mars.player.achievements.variants
 
-import network.warzone.api.database.models.AgentParams
+import network.warzone.api.database.models.Agent
 import network.warzone.api.database.models.RecordType
 import network.warzone.mars.api.socket.models.PlayerUpdateEvent
 import network.warzone.mars.player.achievements.AchievementAgent
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 // nor do I know whether or not it works atm. There are probably some issues with the
 // unit of time in each recordType too.
 class RecordAchievement(
-    val params: AgentParams.RecordAgentParams<Number>,
+    val params: Agent.RecordAgentParams<Number>,
     override val emitter: AchievementEmitter) : AchievementAgent
 {
     @EventHandler

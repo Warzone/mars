@@ -45,98 +45,91 @@ enum class RecordType {
 }
 
 @Serializable
-sealed class AgentParams {
+sealed class Agent {
     @Serializable
     @SerialName("TotalKillsAgentParams")
-    data class TotalKillsAgentParams(val targetKills: Int) : AgentParams()
+    data class TotalKillsAgentParams(val targetKills: Int) : Agent()
 
     @Serializable
     @SerialName("KillStreakAgentParams")
-    data class KillStreakAgentParams(val targetStreak: Int) : AgentParams()
+    data class KillStreakAgentParams(val targetStreak: Int) : Agent()
 
     @Serializable
     @SerialName("FireDeathAgentParams")
-    object FireDeathAgentParams : AgentParams()
+    object FireDeathAgentParams : Agent()
 
     @Serializable
     @SerialName("CaptureNoSprintAgentParams")
-    object CaptureNoSprintAgentParams : AgentParams()
+    object CaptureNoSprintAgentParams : Agent()
 
     @Serializable
     @SerialName("CompositeAgentParams")
-    data class CompositeAgentParams(val agents: List<Agent>) : AgentParams()
+    data class CompositeAgentParams(val agents: List<Agent>) : Agent()
 
     @Serializable
     @SerialName("ChatMessageAgentParams")
-    data class ChatMessageAgentParams(val message: String) : AgentParams()
+    data class ChatMessageAgentParams(val message: String) : Agent()
 
     @Serializable
     @SerialName("LevelUpAgentParams")
-    data class LevelUpAgentParams(val level: Int) : AgentParams()
+    data class LevelUpAgentParams(val level: Int) : Agent()
 
     @Serializable
     @SerialName("WoolCaptureAgentParams")
-    data class WoolCaptureAgentParams(val captures: Int) : AgentParams()
+    data class WoolCaptureAgentParams(val captures: Int) : Agent()
 
     @Serializable
     @SerialName("FirstBloodAgentParams")
-    data class FirstBloodAgentParams(val target: Int) : AgentParams()
+    data class FirstBloodAgentParams(val target: Int) : Agent()
 
     @Serializable
     @SerialName("BowDistanceAgentParams")
-    data class BowDistanceAgentParams(val distance: Long) : AgentParams()
+    data class BowDistanceAgentParams(val distance: Long) : Agent()
 
     @Serializable
     @SerialName("FlagCaptureAgentParams")
-    data class FlagCaptureAgentParams(val captures: Int) : AgentParams()
+    data class FlagCaptureAgentParams(val captures: Int) : Agent()
 
     @Serializable
     @SerialName("FlagDefendAgentParams")
-    data class FlagDefendAgentParams(val defends: Int) : AgentParams()
+    data class FlagDefendAgentParams(val defends: Int) : Agent()
 
     @Serializable
     @SerialName("WoolDefendAgentParams")
-    data class WoolDefendAgentParams(val defends: Int) : AgentParams()
+    data class WoolDefendAgentParams(val defends: Int) : Agent()
 
     @Serializable
     @SerialName("MonumentDamageAgentParams")
-    data class MonumentDamageAgentParams(val breaks: Int) : AgentParams()
+    data class MonumentDamageAgentParams(val breaks: Int) : Agent()
 
     @Serializable
     @SerialName("KillConsecutiveAgentParams")
-    data class KillConsecutiveAgentParams(val seconds: Long, val kills: Int, val allWithin: Boolean) : AgentParams()
+    data class KillConsecutiveAgentParams(val seconds: Long, val kills: Int, val allWithin: Boolean) : Agent()
 
     @Serializable
     @SerialName("PlayTimeAgentParams")
-    data class PlayTimeAgentParams(val hours: Long) : AgentParams()
+    data class PlayTimeAgentParams(val hours: Long) : Agent()
 
     @Serializable
     @SerialName("RecordAgentParams")
-    data class RecordAgentParams<T : Number>(val recordType: RecordType, val threshold: T) : AgentParams()
+    data class RecordAgentParams<T : Number>(val recordType: RecordType, val threshold: T) : Agent()
 
     @Serializable
     @SerialName("ControlPointCaptureAgentParams")
-    data class ControlPointCaptureAgentParams(val captures: Int) : AgentParams()
+    data class ControlPointCaptureAgentParams(val captures: Int) : Agent()
 
     @Serializable
     @SerialName("TotalWinsAgentParams")
-    data class TotalWinsAgentParams(val wins: Int) : AgentParams()
+    data class TotalWinsAgentParams(val wins: Int) : Agent()
 
     @Serializable
     @SerialName("TotalDeathsAgentParams")
-    data class TotalDeathsAgentParams(val deaths: Int) : AgentParams()
+    data class TotalDeathsAgentParams(val deaths: Int) : Agent()
 
     @Serializable
     @SerialName("TotalLossesAgentParams")
-    data class TotalLossesAgentParams(val losses: Int) : AgentParams()
+    data class TotalLossesAgentParams(val losses: Int) : Agent()
 }
-
-@Serializable
-data class Agent(
-    val type: AgentType,
-    @Serializable
-    val params: AgentParams? = null,
-)
 
 data class Achievement(
     override val _id: UUID,

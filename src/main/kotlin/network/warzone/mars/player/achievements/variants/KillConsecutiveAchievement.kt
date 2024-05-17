@@ -1,6 +1,6 @@
 package network.warzone.mars.player.achievements.variants
 
-import network.warzone.api.database.models.AgentParams
+import network.warzone.api.database.models.Agent
 import network.warzone.mars.api.socket.models.PlayerUpdateData
 import network.warzone.mars.api.socket.models.PlayerUpdateEvent
 import network.warzone.mars.api.socket.models.PlayerUpdateReason
@@ -12,7 +12,7 @@ import tc.oc.pgm.api.match.event.MatchFinishEvent
 import java.util.*
 
 class KillConsecutiveAchievement(
-    val params: AgentParams.KillConsecutiveAgentParams,
+    val params: Agent.KillConsecutiveAgentParams,
     override val emitter: AchievementEmitter
 ) : AchievementAgent {
 
