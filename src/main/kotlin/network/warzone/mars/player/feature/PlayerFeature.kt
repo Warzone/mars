@@ -166,7 +166,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     }
 
     @EventHandler
-    fun onPlayerLogin(event: PlayerLoginEvent) = runBlocking {
+    fun onPlayerLogin(event: PlayerLoginEvent) {
         val player = event.player
 
         val (_, profile, activePuns, activeSession) = queuedJoins[player.uniqueId]
@@ -222,7 +222,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     }
 
     @EventHandler
-    fun onPlayerLogout(event: PlayerQuitEvent) = runBlocking {
+    fun onPlayerLogout(event: PlayerQuitEvent) {
         Mars.async {
             val player = event.player
             val uuid = player.uniqueId

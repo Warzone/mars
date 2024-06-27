@@ -25,6 +25,10 @@ object BroadcastFeature : Feature<Broadcast>() {
         return broadcasts.find { it.name.equals(target, ignoreCase = true) }
     }
 
+    override fun fetchCached(target: String): Broadcast? {
+        return broadcasts.find { it.name.equals(target, ignoreCase = true) }
+    }
+
     override suspend fun init() {
         index = 0
         broadcasts = BroadcastService.getBroadcasts()

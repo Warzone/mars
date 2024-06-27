@@ -1,6 +1,5 @@
 package network.warzone.mars.report
 
-import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.Feature

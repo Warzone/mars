@@ -34,4 +34,8 @@ class PlayerContext(val uuid: UUID, val player: Player, val activeSession: Sessi
         // The player is online so we know they exist.
         return PlayerFeature.getKnown(uuid)
     }
+
+    fun getPlayerProfileCached(): PlayerProfile? {
+        return PlayerFeature.getCached(uuid)
+    }
 }

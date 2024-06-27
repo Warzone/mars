@@ -4,7 +4,6 @@ import app.ashcon.intake.argument.ArgumentParseException
 import app.ashcon.intake.argument.CommandArgs
 import app.ashcon.intake.argument.Namespace
 import app.ashcon.intake.bukkit.parametric.provider.BukkitProvider
-import kotlinx.coroutines.runBlocking
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.feature.exceptions.PlayerNotOnlineException
 import network.warzone.mars.player.models.PlayerProfile
@@ -20,13 +19,13 @@ class PlayerProfileProvider : BukkitProvider<PlayerProfile> {
         sender: CommandSender?,
         args: CommandArgs,
         annotations: MutableList<out Annotation>?
-    ): PlayerProfile = runBlocking {
+    ): PlayerProfile {
         val name = args.next()
 
         val profile = PlayerFeature.getCached(name) // Only online players
         profile ?: throw ArgumentParseException(PlayerNotOnlineException(name).asTextComponent().content())
 
-        return@runBlocking profile
+        return profile
     }
 
     override fun getSuggestions(

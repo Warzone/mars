@@ -54,14 +54,20 @@ class TagsCommand {
                     // todo: send request on GUI close so player can't spam API reqs by clicking
                     onclick = {
                         if (isActive) {
-                            PlayerFeature.setActiveTag(context.uuid.toString(), null)
-                            profile.activeTagId = null
+                            Mars.asyncAsFuture {
+                                PlayerFeature.setActiveTag(context.uuid.toString(), null)
+                            }.thenRun {
+                                profile.activeTagId = null
+                            }
                         } else if (profile.tagIds.contains(tag._id)) {
-                            PlayerFeature.setActiveTag(
-                                context.uuid.toString(),
-                                tag
-                            )
-                            profile.activeTagId = tag._id
+                            Mars.asyncAsFuture {
+                                PlayerFeature.setActiveTag(
+                                    context.uuid.toString(),
+                                    tag
+                                )
+                            }.thenRun {
+                                profile.activeTagId = tag._id
+                            }
                         }
 
                         refresh()

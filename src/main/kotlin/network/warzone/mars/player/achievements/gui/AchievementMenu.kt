@@ -154,7 +154,7 @@ class AchievementMenu(player: Player) : Listener {
     }
 
     // Navigate the player up the menu hierarchy.
-    private fun createBackArrow(action: suspend InventoryClickEvent.(Player) -> Unit): GUI.Slot.() -> Unit {
+    private fun createBackArrow(action: InventoryClickEvent.(Player) -> Unit): GUI.Slot.() -> Unit {
         return {
             item = item(Material.ARROW) {
                 name = "${ChatColor.GRAY}Back"
@@ -164,7 +164,7 @@ class AchievementMenu(player: Player) : Listener {
     }
 
     // Navigate the player to the next page of a paginated GUI.
-    private fun createNextPageArrow(currentPage: Int, action: suspend InventoryClickEvent.(Player) -> Unit): GUI.Slot.() -> Unit {
+    private fun createNextPageArrow(currentPage: Int, action: InventoryClickEvent.(Player) -> Unit): GUI.Slot.() -> Unit {
         return {
             item = item(Material.ARROW) {
                 name = "${ChatColor.GRAY}Next Page"
@@ -175,7 +175,7 @@ class AchievementMenu(player: Player) : Listener {
     }
 
     // Navigate the player to the previous page of a paginated GUI.
-    private fun createPreviousPageArrow(currentPage: Int, action: suspend InventoryClickEvent.(Player) -> Unit): GUI.Slot.() -> Unit {
+    private fun createPreviousPageArrow(currentPage: Int, action: InventoryClickEvent.(Player) -> Unit): GUI.Slot.() -> Unit {
         return {
             item = item(Material.ARROW) {
                 name = "${ChatColor.GRAY}Previous Page"

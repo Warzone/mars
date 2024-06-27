@@ -1,6 +1,5 @@
 package network.warzone.mars.match.tracker
 
-import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
@@ -100,12 +99,12 @@ class PlayerTracker : Listener {
 
     // todo: set XP bar progress & level (and ensure compatibility with vanilla exp)
     @EventHandler
-    fun onPlayerXPGain(event: PlayerXPGainEvent) = runBlocking {
+    fun onPlayerXPGain(event: PlayerXPGainEvent) {
         val (id, gain, reason, notify, multiplier) = event.data
 
-        val context = PlayerManager.getPlayer(id) ?: return@runBlocking
+        val context = PlayerManager.getPlayer(id) ?: return
         val player = context.player
-        val profile = context.getPlayerProfile()
+        val profile = context.getPlayerProfileCached() ?: return
 
         val currentLevel = profile.stats.level
 
@@ -126,7 +125,7 @@ class PlayerTracker : Listener {
     }
 
     @EventHandler
-    fun onPlayerLevelUp(event: PlayerLevelUpEvent) = runBlocking {
+    fun onPlayerLevelUp(event: PlayerLevelUpEvent) {
         val (player, level) = event.data
 
         player.playSound(player.location, Sound.LEVEL_UP, 1000f, 1f)

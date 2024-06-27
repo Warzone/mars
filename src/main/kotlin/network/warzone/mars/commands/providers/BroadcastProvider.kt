@@ -4,7 +4,6 @@ import app.ashcon.intake.argument.ArgumentParseException
 import app.ashcon.intake.argument.CommandArgs
 import app.ashcon.intake.argument.Namespace
 import app.ashcon.intake.bukkit.parametric.provider.BukkitProvider
-import kotlinx.coroutines.runBlocking
 import network.warzone.mars.broadcast.Broadcast
 import network.warzone.mars.broadcast.BroadcastFeature
 import network.warzone.mars.broadcast.exceptions.BroadcastMissingException
@@ -15,13 +14,13 @@ class BroadcastProvider : BukkitProvider<Broadcast> {
         return "broadcast"
     }
 
-    override fun get(sender: CommandSender?, args: CommandArgs, annotations: MutableList<out Annotation>?): Broadcast = runBlocking {
+    override fun get(sender: CommandSender?, args: CommandArgs, annotations: MutableList<out Annotation>?): Broadcast {
         val broadcastName = args.next()
 
-        val broadcast: Broadcast? = BroadcastFeature.fetch(broadcastName)
+        val broadcast: Broadcast? = BroadcastFeature.fetchCached(broadcastName)
         broadcast ?: throw ArgumentParseException(BroadcastMissingException(broadcastName).asTextComponent().content())
 
-        return@runBlocking broadcast
+        return broadcast
     }
 
     override fun getSuggestions(

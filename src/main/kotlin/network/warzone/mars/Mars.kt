@@ -33,6 +33,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import tc.oc.pgm.api.PGM
 import tc.oc.pgm.tablist.MatchTabManager
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 class Mars : JavaPlugin() {
     companion object {
@@ -42,6 +43,17 @@ class Mars : JavaPlugin() {
             Bukkit.getScheduler().runTaskAsynchronously(get()) {
                 runBlocking { block.invoke() }
             }
+        }
+
+        fun asyncAsFuture(block: suspend() -> Unit) : CompletableFuture<Void?> {
+            val future = CompletableFuture<Void?>()
+            Bukkit.getScheduler().runTaskAsynchronously(get()) {
+                runBlocking {
+                    block.invoke()
+                    future.complete(null)
+                }
+            }
+            return future
         }
 
         fun sync(block: () -> Unit) = Bukkit.getScheduler().runTask(get(), block) // Run next tick

@@ -9,6 +9,11 @@ abstract class Feature<T : Resource> {
     abstract suspend fun fetch(target: String): T?
 
     /**
+     * Query cache exclusively
+     */
+    open fun fetchCached(target: String): T? { return null }
+
+    /**
      * Get resource from cache first, and API if not in cache.
      * Defaults to API fetch if feature has no cache.
      */

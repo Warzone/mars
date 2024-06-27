@@ -1,6 +1,5 @@
 package network.warzone.mars.player.level
 
-import kotlinx.coroutines.runBlocking
 import network.warzone.mars.Mars
 import network.warzone.mars.match.tracker.PlayerXPGainEvent
 import network.warzone.mars.player.PlayerManager
@@ -67,9 +66,9 @@ class LevelDisplayListener : Listener {
     }
 
     // Mars stat system level
-    private fun showStatsLevel(player: Player) = runBlocking {
+    private fun showStatsLevel(player: Player) {
         val context = PlayerManager.getPlayer(player.uniqueId)
-        val profile = context?.getPlayerProfile()
+        val profile = context?.getPlayerProfileCached()
         val stats = profile?.stats
         player.level = stats?.level ?: 1
         player.exp = (stats?.xp?.rem(5000F))?.div(5000F) ?: 0F
