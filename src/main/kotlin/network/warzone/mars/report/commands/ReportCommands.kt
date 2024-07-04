@@ -61,22 +61,22 @@ class ReportCommands {
     fun report(@Sender sender: Player, target: Player, @Text reason: String) {
         val matchPlayer = sender.matchPlayer
         val match = matchPlayer.match
-        if (!sender.hasPermission(Permissions.STAFF)) {
+        val needsCooldown = !sender.hasPermission(Permissions.STAFF)
+        if (needsCooldown) {
             // Check for cooldown
             val lastReport: Instant? = LAST_REPORT_SENT.getIfPresent(sender.uniqueId)
-            lastReport ?: LAST_REPORT_SENT.put(sender.uniqueId, Instant.now())
-
-            val timeSinceReport: Duration = Duration.between(lastReport, Instant.now())
-            val secondsRemaining: Long = REPORT_COOLDOWN_SECONDS - timeSinceReport.getSeconds()
-            if (secondsRemaining > 0) {
-                val secondsComponent: TextComponent = text(secondsRemaining.toString())
-                val secondsLeftComponent: TextComponent = text()
+            if (lastReport != null) {
+                val timeSinceReport: Duration = Duration.between(lastReport, Instant.now())
+                val secondsRemaining: Long = REPORT_COOLDOWN_SECONDS - timeSinceReport.getSeconds()
+                if (secondsRemaining > 0) {
+                    val secondsComponent: TextComponent = text(secondsRemaining.toString())
+                    val secondsLeftComponent: TextComponent = text()
                         .append(secondsComponent)
                         .append(text(if (secondsRemaining != 1L) "misc.seconds" else "misc.second")).build()
-                matchPlayer.sendWarning(text("Please wait ").append(secondsLeftComponent).append(text(" before running that command again")))
-                return
+                    matchPlayer.sendWarning(text("Please wait ").append(secondsLeftComponent).append(text(" before running that command again")))
+                    return
+                }
             }
-
         }
         val accused: MatchPlayer? = match.getPlayer(target)
 
@@ -115,6 +115,9 @@ class ReportCommands {
                 reason = reason
             )
         )
+        if (needsCooldown) {
+            LAST_REPORT_SENT.put(sender.uniqueId, Instant.now())
+        }
         ChatDispatcher.broadcastAdminChatMessage(component, match, Optional.of(REPORT_NOTIFY_SOUND))
     }
 

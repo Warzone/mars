@@ -21,10 +21,12 @@ object ReportFeature : Feature<Report>(), Listener {
 
 
     @EventHandler
-    fun onReportCreate(event: PlayerReportEvent) = runBlocking {
+    fun onReportCreate(event: PlayerReportEvent) {
         val onlineStaff = Bukkit.getOnlinePlayers().filter { it.hasPermission("pgm.staff") }
             .map { SimplePlayer(it.uniqueId, it.name) }.toSet()
-        ReportService.create(event.player.simple, event.sender.simple, event.reason, onlineStaff)
+        Mars.async {
+            ReportService.create(event.player.simple, event.sender.simple, event.reason, onlineStaff)
+        }
     }
 
     override fun getCommands(): List<Any> = listOf(ReportCommands())
