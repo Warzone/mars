@@ -14,6 +14,7 @@ import tc.oc.pgm.teams.Team
 import tc.oc.pgm.util.named.NameDecorationProvider
 import tc.oc.pgm.util.named.NameStyle
 import tc.oc.pgm.util.player.PlayerComponent
+import tc.oc.pgm.util.player.PlayerRenderer
 import tc.oc.pgm.util.tablist.PlayerTabEntry
 import tc.oc.pgm.util.tablist.TabView
 
@@ -54,7 +55,7 @@ class LeveledPlayerTabEntry(player: Player) : PlayerTabEntry(player) {
         if (!isOffline && style.contains(NameStyle.Flag.DEATH) && isDead()) {
             name.color(NamedTextColor.DARK_GRAY)
         } else if (style.contains(NameStyle.Flag.COLOR)) {
-            name.color(if (isOffline) PlayerComponent.OFFLINE_COLOR else provider.getColor(uuid))
+            name.color(if (isOffline) PlayerRenderer.OFFLINE_COLOR else provider.getColor(uuid))
         }
         if (!isOffline && style.contains(NameStyle.Flag.SELF) && player === viewer) {
             name.decoration(TextDecoration.BOLD, true)

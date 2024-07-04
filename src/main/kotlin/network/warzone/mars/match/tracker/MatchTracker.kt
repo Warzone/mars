@@ -136,7 +136,12 @@ class MatchTracker : Listener {
         return match.getModule(GoalMatchModule::class.java)
             ?.getGoals(Core::class.java)
             ?.values()
-            ?.map { CorePartial(it.id, it.name, it.owner.nameLegacy, it.material.itemType) }?.distinctBy { it.id }
+            ?.mapNotNull {
+                val definition = it.definition
+                val materialMatcher = definition.material
+                if (materialMatcher.materials.isEmpty()) return@mapNotNull null
+                CorePartial(it.id, it.name, it.owner.nameLegacy, materialMatcher.materials.iterator().next())
+            }?.distinctBy { it.id }
             ?: listOf()
     }
 
