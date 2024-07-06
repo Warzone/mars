@@ -25,6 +25,7 @@ import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.achievements.AchievementManager
 import network.warzone.mars.player.decoration.PrefixDecorationProvider
 import network.warzone.mars.player.feature.PlayerService
+import network.warzone.mars.player.models.PlayerStats
 import network.warzone.mars.player.tablist.overrideTabManager
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
@@ -71,6 +72,8 @@ class Mars : JavaPlugin() {
         val apiConfigurationSection = config.getConfigurationSection("api")
         ApiClient.loadHttp(apiConfigurationSection)
         ApiClient.loadSocket(serverId, apiConfigurationSection)
+
+        PlayerStats.useExponentialExp(config.getBoolean("server.exponential-exp", false))
 
         MatchManager.init()
 

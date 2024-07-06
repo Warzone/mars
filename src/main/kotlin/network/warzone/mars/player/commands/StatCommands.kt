@@ -13,6 +13,8 @@ import network.warzone.mars.match.tracker.KillstreakTracker
 import network.warzone.mars.player.feature.LevelColorService
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
+import network.warzone.mars.player.models.PlayerStats
+import network.warzone.mars.utils.getLevelAsComponent
 import network.warzone.mars.utils.matchPlayer
 import network.warzone.mars.utils.strategy.multiLine
 import org.bukkit.Bukkit
@@ -20,6 +22,7 @@ import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.player.MatchPlayer
 import javax.annotation.Nullable
+import kotlin.math.roundToInt
 
 
 class StatCommands {
@@ -80,7 +83,7 @@ class StatCommands {
                         LevelColorService.chatColorFromLevel(stats.level)
                     )
                 }
-                .appendMultiLine { createLabelledStat("XP", stats.xp, StatType.NEUTRAL) }
+                .appendMultiLine { createLabelledStat("XP", formatXPProgress(stats.xp), StatType.NEUTRAL) }
                 .appendMultiLine { empty() }
                 .appendMultiLine { createLabelledStat("Kills", stats.kills, StatType.POSITIVE) }
                 .appendMultiLine { createLabelledStat("First Bloods", stats.firstBloods, StatType.POSITIVE) }
@@ -101,6 +104,13 @@ class StatCommands {
         POSITIVE(NamedTextColor.GREEN),
         NEGATIVE(NamedTextColor.RED),
         NEUTRAL(NamedTextColor.AQUA)
+    }
+
+    private fun formatXPProgress(xp: Int) : String {
+        val level = PlayerStats.EXP_FORMULA.getLevelFromExp(xp.toDouble())
+        val nextLevel = level + 1
+        val nextLevelExpRequirement = PlayerStats.EXP_FORMULA.getExpRequiredForLevel(nextLevel)
+        return "${xp}/${nextLevelExpRequirement.roundToInt()}"
     }
 
     private fun createLabelledStat(label: String, value: Any, type: StatType): Component {

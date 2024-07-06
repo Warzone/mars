@@ -14,6 +14,7 @@ import tc.oc.pgm.api.map.Gamemode
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.floor
+import kotlin.math.pow
 
 
 data class PlayerProfile(
@@ -93,8 +94,49 @@ data class PlayerStats(
     val killstreaks: MutableMap<Int, Int> = mutableMapOf(5 to 0, 10 to 0, 25 to 0, 50 to 0, 100 to 0),
     val achievements: MutableMap<String, AchievementStatistic> = mutableMapOf()
 ) {
+
+    companion object {
+        interface ExpFormula {
+            fun getLevelFromExp(exp: Double) : Int
+            fun getExpRequiredForLevel(level: Int) : Double
+        }
+
+        class PowerExpFormula(
+            private val linearFactor: Double,
+            private val growthFactor: Double
+        ) : ExpFormula {
+            override fun getLevelFromExp(exp: Double): Int =
+                floor(linearFactor * exp.pow(growthFactor)).toInt() + 1
+
+            override fun getExpRequiredForLevel(level: Int) : Double {
+                if (level <= 1) return 0.0
+                return (((level - 1).toDouble())/(linearFactor)).pow(1.0/growthFactor)
+            }
+        }
+
+        class LinearExpFormula(
+            private val step: Int
+        ) : ExpFormula {
+            override fun getLevelFromExp(exp: Double): Int =
+                floor(((exp + step) / step).toDouble()).toInt()
+
+            override fun getExpRequiredForLevel(level: Int) : Double {
+                if (level <= 1) return 0.0
+                return ((level * step) - step).toDouble()
+            }
+        }
+
+        private val LINEAR_FORMULA = LinearExpFormula(5000)
+        private val EXPONENTIAL_FORMULA = PowerExpFormula(0.0056, 0.715)
+        var EXP_FORMULA : ExpFormula = LINEAR_FORMULA
+            private set
+
+        fun useExponentialExp(use: Boolean) {
+            EXP_FORMULA = if (use) EXPONENTIAL_FORMULA else LINEAR_FORMULA
+        }
+    }
     val level: Int
-        get() = floor(((xp + 5000) / 5000).toDouble()).toInt()
+        get() = EXP_FORMULA.getLevelFromExp(xp.toDouble())
 
     val winPercentage: String
         get() {
