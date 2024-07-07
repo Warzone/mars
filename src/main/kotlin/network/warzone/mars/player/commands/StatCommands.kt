@@ -109,8 +109,9 @@ class StatCommands {
     private fun formatXPProgress(xp: Int) : String {
         val level = PlayerStats.EXP_FORMULA.getLevelFromExp(xp.toDouble())
         val nextLevel = level + 1
+        val currentLevelExpRequirement = PlayerStats.EXP_FORMULA.getExpRequiredForLevel(level)
         val nextLevelExpRequirement = PlayerStats.EXP_FORMULA.getExpRequiredForLevel(nextLevel)
-        return "${xp}/${nextLevelExpRequirement.roundToInt()}"
+        return "${(xp - currentLevelExpRequirement).toInt()}/${nextLevelExpRequirement - currentLevelExpRequirement}"
     }
 
     private fun createLabelledStat(label: String, value: Any, type: StatType): Component {
