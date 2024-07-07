@@ -86,7 +86,7 @@ class ReportCommands {
             )
             return
         }
-        val event = PlayerReportEvent(matchPlayer, accused, reason)
+        val event = PlayerReportEvent(accused, matchPlayer, reason)
         match.callEvent(event)
         if (event.isCancelled()) {
             return
