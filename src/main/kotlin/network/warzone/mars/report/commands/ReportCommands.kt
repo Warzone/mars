@@ -11,8 +11,7 @@ import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.sound.Sound.sound
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.space
-import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.HoverEvent.showText
 import net.kyori.adventure.text.format.NamedTextColor
@@ -69,10 +68,8 @@ class ReportCommands {
                 val timeSinceReport: Duration = Duration.between(lastReport, Instant.now())
                 val secondsRemaining: Long = REPORT_COOLDOWN_SECONDS - timeSinceReport.getSeconds()
                 if (secondsRemaining > 0) {
-                    val secondsComponent: TextComponent = text(secondsRemaining.toString())
                     val secondsLeftComponent: TextComponent = text()
-                        .append(secondsComponent)
-                        .append(text(if (secondsRemaining != 1L) "misc.seconds" else "misc.second")).build()
+                        .append(translatable(if (secondsRemaining != 1L) "misc.seconds" else "misc.second"), text(secondsRemaining)).build()
                     matchPlayer.sendWarning(text("Please wait ").append(secondsLeftComponent).append(text(" before running that command again")))
                     return
                 }
