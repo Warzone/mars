@@ -35,13 +35,18 @@ class AchievementEmitter(private val achievement: Achievement) {
             println("Achievement " + achievement.name + " earned by " + player.name)
         }
 
-        // Emit achievement completion to the database.
-        ApiClient.emit(
-            OutboundEvent.PlayerAchievement, PlayerAchievementData(
-                SimplePlayer(profile._id, profile.name),
-                achievement._id,
-                Date().time
-            )
+        val data = PlayerAchievementData(
+            SimplePlayer(profile._id, profile.name),
+            achievement._id,
+            Date().time
         )
+
+        if (achievement.firstCompletion.toString() == "00000000-0000-0000-0000-000000000000") {
+            achievement.firstCompletion = profile._id
+            Bukkit.broadcastMessage("\n${ChatColor.GOLD}${player.name} ${ChatColor.GRAY}is the first to complete the achievement ${ChatColor.AQUA}\"${achievement.name}\" ${ChatColor.GRAY}!\n")
+        }
+
+        // Emit achievement completion to the database.
+        ApiClient.emit(OutboundEvent.PlayerAchievement, data)
     }
 }

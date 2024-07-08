@@ -138,6 +138,7 @@ data class Achievement(
     @Serializable
     val category: AchievementCategory? = null,
     val agent: Agent,
+    var firstCompletion: UUID? = null
 ) : NamedResource {
 
     // Structural equality of _id's
