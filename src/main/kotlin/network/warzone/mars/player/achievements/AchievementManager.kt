@@ -119,7 +119,7 @@ object AchievementManager : Listener {
 
     // Activates/deactivates achievements based on certain conditions.
     // Also used to initialize achievements when the server starts.
-    fun fetchNewAchievements() {
+    private fun fetchNewAchievements() {
         Mars.async {
             // Fetch the current achievements from the API database
             val currentAchievements = AchievementFeature.list()
