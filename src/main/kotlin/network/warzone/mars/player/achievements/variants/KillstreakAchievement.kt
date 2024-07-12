@@ -19,7 +19,7 @@ class KillstreakAchievement(
                 targetStreak, 0
             ) >= 1
         ) {
-            emitter.emit(killerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

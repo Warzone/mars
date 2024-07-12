@@ -18,7 +18,7 @@ class FirstBloodAchievement(
         if (!killData.firstBlood) return
         val killerProfile = event.update.updated
         if (killerProfile.stats.firstBloods >= target) {
-            emitter.emit(killerProfile)
+            emitter.emit(killerProfile.name)
         }
     }
 }

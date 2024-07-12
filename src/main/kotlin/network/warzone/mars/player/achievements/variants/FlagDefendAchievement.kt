@@ -15,7 +15,7 @@ class FlagDefendAchievement(
         if (event.update.reason != PlayerUpdateReason.FLAG_DEFEND) return
         val playerProfile = event.update.updated
         if (playerProfile.stats.objectives.flagDefends >= defends) {
-            emitter.emit(playerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

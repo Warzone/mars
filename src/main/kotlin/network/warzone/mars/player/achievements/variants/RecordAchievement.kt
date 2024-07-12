@@ -26,43 +26,43 @@ class RecordAchievement(
                 val session = records.longestSession
                 val elapsedTime = session?.let { differenceInMinutes(it.createdAt, it.endedAt) }
                 if ((elapsedTime ?: 0L) >= params.threshold.toLong()) {
-                    emitter.emit(playerProfile)
+                    emitter.emit(event.update.updated.name)
                 }
             }
             RecordType.LONGEST_PROJECTILE_KILL -> {
                 val longestKill = records.longestProjectileKill?.distance ?: 0
                 if (longestKill >= params.threshold.toInt()) {
-                    emitter.emit(playerProfile)
+                    emitter.emit(event.update.updated.name)
                 }
             }
             RecordType.FASTEST_WOOL_CAPTURE -> {
                 val woolCaptureTime = records.fastestWoolCapture?.value ?: Long.MAX_VALUE
                 if (woolCaptureTime <= params.threshold.toLong()) {
-                    emitter.emit(playerProfile)
+                    emitter.emit(event.update.updated.name)
                 }
             }
             RecordType.FASTEST_FLAG_CAPTURE -> {
                 val flagCaptureTime = records.fastestFlagCapture?.value ?: Long.MAX_VALUE
                 if (flagCaptureTime <= params.threshold.toLong()) {
-                    emitter.emit(playerProfile)
+                    emitter.emit(event.update.updated.name)
                 }
             }
             RecordType.FASTEST_FIRST_BLOOD -> {
                 val firstBloodTime = records.fastestFirstBlood?.time ?: Long.MAX_VALUE
                 if (firstBloodTime <= params.threshold.toLong()) {
-                    emitter.emit(playerProfile)
+                    emitter.emit(event.update.updated.name)
                 }
             }
             RecordType.KILLS_IN_MATCH -> {
                 val kills = records.killsInMatch?.value ?: 0
                 if (kills >= params.threshold.toInt()) {
-                    emitter.emit(playerProfile)
+                    emitter.emit(event.update.updated.name)
                 }
             }
             RecordType.DEATHS_IN_MATCH -> {
                 val deaths = records.deathsInMatch?.value ?: 0
                 if (deaths >= params.threshold.toInt()) {
-                    emitter.emit(playerProfile)
+                    emitter.emit(event.update.updated.name)
                 }
             }
         }

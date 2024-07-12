@@ -15,7 +15,7 @@ class MonumentDamageAchievement(
         if (event.update.reason != PlayerUpdateReason.DESTROYABLE_DAMAGE) return
         val playerProfile = event.update.updated
         if (playerProfile.stats.objectives.destroyableBlockDestroys >= breaks) {
-            emitter.emit(playerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

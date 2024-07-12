@@ -15,7 +15,7 @@ class TotalLossesAchievement(
         if (event.update.reason != PlayerUpdateReason.MATCH_END) return
         val playerProfile = event.update.updated
         if (playerProfile.stats.losses >= losses) {
-            emitter.emit(playerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }
