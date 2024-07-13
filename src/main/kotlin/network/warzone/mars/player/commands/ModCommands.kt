@@ -82,7 +82,7 @@ class ModCommands {
                             )
                             .append(space())
                             .append(username)
-                    ).appendMultiLineComponent(empty())
+                    )
                 }
 
                 message.deliver()
