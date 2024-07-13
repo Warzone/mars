@@ -18,7 +18,7 @@ class BowDistanceAchievement(
         if (killData.data.key != "death.projectile.player.distance") return
         val killerProfile = event.update.updated
         if (killData.data.distance!! >= target) {
-            emitter.emit(killerProfile)
+            emitter.emit(killerProfile.name)
         }
     }
 }

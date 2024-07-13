@@ -15,7 +15,7 @@ class TotalWinsAchievement(
         if (event.update.reason != PlayerUpdateReason.MATCH_END) return
         val playerProfile = event.update.updated
         if (playerProfile.stats.wins >= wins) {
-            emitter.emit(playerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

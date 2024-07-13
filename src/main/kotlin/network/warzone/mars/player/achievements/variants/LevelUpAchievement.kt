@@ -13,7 +13,7 @@ class LevelUpAchievement(
     @EventHandler
     fun onProfileUpdate(event: PlayerLevelUpEvent) {
         if (event.data.level >= level) {
-            emitter.emit(event.data.player)
+            emitter.emit(event.data.player.name)
         }
     }
 }

@@ -47,7 +47,7 @@ class KillConsecutiveAchievement(
             val timeDifference = recentKillsTimestamps.last() - recentKillsTimestamps.first()
             // All kills must be within y seconds
             if (timeDifference <= params.seconds * 1000) {
-                emitter.emit(profile)
+                emitter.emit(profile.name)
             }
         } else {
             // Check each consecutive pair to ensure all kills are within the timeframe
@@ -56,7 +56,7 @@ class KillConsecutiveAchievement(
                     return
                 }
             }
-            emitter.emit(profile)
+            emitter.emit(profile.name)
         }
     }
 

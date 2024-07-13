@@ -15,7 +15,7 @@ class WoolCaptureAchievement(
         if (event.update.reason != PlayerUpdateReason.WOOL_PLACE) return
         val playerProfile = event.update.updated
         if (playerProfile.stats.objectives.woolCaptures >= captures) {
-            emitter.emit(playerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

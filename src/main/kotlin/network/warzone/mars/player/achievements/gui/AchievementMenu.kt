@@ -103,21 +103,21 @@ class AchievementMenu(player: Player) : Listener {
 
             for ((index, achievement) in matchingAchievements.subList(nonEdgeStart, nonEdgeEnd).withIndex()) {
                 slot(getSlotFromNonEdgeIndex(index)) {
-                    item = item(Material.PAPER) {
+                    // Check if the player has the achievement
+                    val hasAchievement = profile.stats.achievements.containsKey(achievement._id.toString())
+                    val colorData: Short = if (hasAchievement) 5 else 14 // 5 for green, 14 for red
+
+                    item = item(Material.STAINED_GLASS_PANE, colorData) {
                         name = "${ChatColor.LIGHT_PURPLE}${achievement.name}"
                         lore = wrap("${ChatColor.GRAY}${achievement.description}", 40)
 
-                        // Check if the player has the achievement
-                        if (profile.stats.achievements.containsKey(achievement._id.toString())) {
-                            enchant(Enchantment.DURABILITY)
-                            flags(ItemFlag.HIDE_ENCHANTS)
-
+                        if (hasAchievement) {
                             val completionDate = profile.stats.achievements[achievement._id.toString()]?.completionTime?.let {
                                 formatDate(it)
                             }
 
                             lore = wrap("${ChatColor.GRAY}${achievement.description}" +
-                                "\n\n${ChatColor.AQUA}Completed: $completionDate", 40)
+                                    "\n\n${ChatColor.AQUA}Completed: $completionDate", 40)
                         }
                     }
                 }

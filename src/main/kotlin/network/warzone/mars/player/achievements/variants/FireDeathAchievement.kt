@@ -18,7 +18,7 @@ class FireDeathAchievement(
         val victimProfile = event.update.updated
         if (deathData.data.cause == DeathCause.FIRE ||
             deathData.data.cause == DeathCause.LAVA) {
-            emitter.emit(victimProfile)
+            emitter.emit(victimProfile.name)
         }
     }
 }

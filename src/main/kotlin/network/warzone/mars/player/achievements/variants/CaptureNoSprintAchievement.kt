@@ -23,7 +23,7 @@ class CaptureNoSprintAchievement(override val emitter: AchievementEmitter) : Ach
         event.match.participants.forEach { matchPlayer ->
             if (matchPlayer.player?.id !in playersWhoSprinted) {
                 val player = matchPlayer ?: return@forEach
-                emitter.emit(player.bukkit)
+                emitter.emit(player.bukkit.name)
             }
         }
         playersWhoSprinted.clear()

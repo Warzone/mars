@@ -15,7 +15,7 @@ class ControlPointCaptureAchievement(
         if (event.update.reason != PlayerUpdateReason.CONTROL_POINT_CAPTURE) return
         val profile = event.update.updated
         if (profile.stats.objectives.controlPointCaptures >= captures) {
-            emitter.emit(profile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

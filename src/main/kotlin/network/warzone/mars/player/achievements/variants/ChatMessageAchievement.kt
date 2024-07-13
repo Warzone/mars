@@ -17,6 +17,6 @@ class ChatMessageAchievement(
         if (event.update.reason != PlayerUpdateReason.CHAT) return
         val msg = ((event.update.data as PlayerUpdateData.ChatUpdateData).data.message)
         if (msg != message) return
-        emitter.emit(event.update.updated)
+        emitter.emit(event.update.updated.name)
     }
 }

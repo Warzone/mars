@@ -8,13 +8,15 @@ import org.bukkit.inventory.meta.ItemMeta
 
 fun item(
     type: Material = Material.STAINED_GLASS,
+    data: Short = 0,
     builder: Item.() -> Unit = {}
-) = Item(type).apply(builder)
+) = Item(type, data).apply(builder)
 
 class Item(
-    val type: Material
+    val type: Material,
+    data: Short = 0
 ) {
-    var stack = ItemStack(type, 1)
+    var stack = ItemStack(type, 1, data)
     val meta: ItemMeta get() = stack.itemMeta
 
     fun stack(builder: ItemStack.() -> Unit) = stack

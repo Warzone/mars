@@ -15,7 +15,7 @@ class TotalDeathsAchievement(
         if (event.update.reason != PlayerUpdateReason.DEATH) return
         val playerProfile = event.update.updated
         if (playerProfile.stats.deaths >= deaths) {
-            emitter.emit(playerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

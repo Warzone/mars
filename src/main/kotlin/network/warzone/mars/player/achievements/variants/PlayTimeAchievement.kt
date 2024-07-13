@@ -19,7 +19,7 @@ class PlayTimeAchievement(
         val targetMillis = hours * 60 * 60 * 1000 // Convert hours to milliseconds
 
         if (playerProfile.stats.gamePlaytime >= targetMillis) {
-            emitter.emit(playerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

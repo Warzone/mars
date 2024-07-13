@@ -15,7 +15,7 @@ class FlagCaptureAchievement(
         if (event.update.reason != PlayerUpdateReason.FLAG_PLACE) return
         val playerProfile = event.update.updated
         if (playerProfile.stats.objectives.flagCaptures >= captures) {
-            emitter.emit(playerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

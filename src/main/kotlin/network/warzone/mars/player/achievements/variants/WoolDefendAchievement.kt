@@ -22,7 +22,7 @@ class WoolDefendAchievement(
         if (event.update.reason != PlayerUpdateReason.WOOL_DEFEND) return
         val playerProfile = event.update.updated
         if (playerProfile.stats.objectives.woolDefends >= defends) {
-            emitter.emit(playerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }

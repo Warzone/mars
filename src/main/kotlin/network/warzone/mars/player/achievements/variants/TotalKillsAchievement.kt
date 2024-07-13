@@ -15,7 +15,7 @@ class TotalKillsAchievement(
         if (event.update.reason != PlayerUpdateReason.KILL) return
         val killerProfile = event.update.updated
         if (killerProfile.stats.kills >= targetKills) {
-            emitter.emit(killerProfile)
+            emitter.emit(event.update.updated.name)
         }
     }
 }
