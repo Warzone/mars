@@ -111,7 +111,7 @@ class StatCommands {
         val nextLevel = level + 1
         val currentLevelExpRequirement = PlayerStats.EXP_FORMULA.getExpRequiredForLevel(level)
         val nextLevelExpRequirement = PlayerStats.EXP_FORMULA.getExpRequiredForLevel(nextLevel)
-        return "${(xp - currentLevelExpRequirement).toInt()}/${nextLevelExpRequirement - currentLevelExpRequirement}"
+        return "${(xp - currentLevelExpRequirement).toInt()}/${(nextLevelExpRequirement - currentLevelExpRequirement).roundToInt()}"
     }
 
     private fun createLabelledStat(label: String, value: Any, type: StatType): Component {
