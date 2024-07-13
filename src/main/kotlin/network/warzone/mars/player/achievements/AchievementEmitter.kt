@@ -24,7 +24,7 @@ import java.util.*
 class AchievementEmitter(private val achievement: Achievement) {
     // Add an achievement to the specified profile.
     fun emit(playerName: String) {
-        val profile: PlayerProfile = PlayerFeature.getCached(playerName)!!
+        val profile: PlayerProfile = PlayerFeature.getCached(playerName) ?: return
         if (profile.stats.achievements.containsKey(achievement._id.toString())) return // Player already has achievement.
 
         // Print achievement earn to player and console.
