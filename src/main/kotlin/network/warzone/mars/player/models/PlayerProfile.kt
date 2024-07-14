@@ -157,7 +157,7 @@ data class PlayerStats(
 
 data class PlayerRecords(
 //    var highestKillstreak: Int = 0, -- this can be calculated from profile
-    var longestSession: Session? = null,
+    var longestSession: SessionRecord? = null,
 //    var longestProjectileHit: ProjectileRecord? = null,
     var longestProjectileKill: ProjectileRecord? = null,
     var fastestWoolCapture: LongRecord? = null,
@@ -166,6 +166,8 @@ data class PlayerRecords(
     var killsInMatch: IntRecord? = null,
     var deathsInMatch: IntRecord? = null,
 )
+
+data class SessionRecord(val sessionId: String, val length: Long)
 
 data class ProjectileRecord(val matchId: String, val distance: Int)
 

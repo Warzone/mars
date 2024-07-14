@@ -24,7 +24,7 @@ class RecordAchievement(
         when (params.recordType) {
             RecordType.LONGEST_SESSION -> {
                 val session = records.longestSession
-                val elapsedTime = session?.let { differenceInMinutes(it.createdAt, it.endedAt) }
+                val elapsedTime = session?.let { differenceInMinutes(it.length) }
                 if ((elapsedTime ?: 0L) >= params.threshold.toLong()) {
                     emitter.emit(event.update.updated.name)
                 }
@@ -69,11 +69,6 @@ class RecordAchievement(
     }
 }
 
-private fun differenceInMinutes(start: Date, end: Date?): Long {
-    if (end == null) return 0L
-
-    val differenceInMillis = end.time - start.time
-    return TimeUnit.MILLISECONDS.toMinutes(differenceInMillis)
+private fun differenceInMinutes(millis: Long): Long {
+    return TimeUnit.MILLISECONDS.toMinutes(millis)
 }
-
-
