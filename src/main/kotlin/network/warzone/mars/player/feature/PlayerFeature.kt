@@ -7,6 +7,7 @@ import network.warzone.mars.admin.AdminService
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.feature.NamedCachedFeature
+import network.warzone.mars.leaderboard.LeaderboardCommands
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.commands.ChatCommands
 import network.warzone.mars.player.commands.MiscCommands
@@ -250,7 +251,7 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     }
 
     override fun getCommands(): List<Any> {
-        return listOf(ModCommands(), MiscCommands(), StatCommands(), PerkCommands(), AdminCommands())
+        return listOf(ModCommands(), MiscCommands(), StatCommands(), PerkCommands(), AdminCommands(), LeaderboardCommands())
     }
 
     override fun getSubcommands(): Map<List<String>, Any> {

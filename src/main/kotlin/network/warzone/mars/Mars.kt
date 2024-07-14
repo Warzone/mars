@@ -56,6 +56,17 @@ class Mars : JavaPlugin() {
             return future
         }
 
+        fun <T> asyncAsFutureWithResult(block: suspend() -> T) : CompletableFuture<T> {
+            val future = CompletableFuture<T>()
+            Bukkit.getScheduler().runTaskAsynchronously(get()) {
+                runBlocking {
+                    val data = block.invoke()
+                    future.complete(data)
+                }
+            }
+            return future
+        }
+
         fun sync(block: () -> Unit) = Bukkit.getScheduler().runTask(get(), block) // Run next tick
 
         fun get() = instance
