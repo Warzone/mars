@@ -15,9 +15,9 @@ data class LeaderboardEntry(
 )
 
 enum class LeaderboardScoreType {
-    KILLS, DEATHS, XP
+    KILLS, DEATHS, XP, WINS, LOSSES
 }
 
 enum class LeaderboardPeriod {
-    ALL_TIME, DAILY
+    ALL_TIME, DAILY, WEEKLY, MONTHLY, YEARLY
 }

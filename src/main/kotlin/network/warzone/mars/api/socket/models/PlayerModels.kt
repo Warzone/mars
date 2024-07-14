@@ -61,7 +61,7 @@ sealed class PlayerUpdateData {
     @SerialName("MatchEndUpdateData")
     data class MatchEndUpdateData(val data: MatchEndData) : PlayerUpdateData()
     @SerialName("DestroyableDamageUpdateData")
-    data class DestroyableDamageUpdateData(val data: DestroyableDamageData, val blockCount: Int) : PlayerUpdateData()
+    data class DestroyableDamageUpdateData(val blockCount: Int) : PlayerUpdateData()
     @SerialName("DestroyableDestroyUpdateData")
     data class DestroyableDestroyUpdateData(val percentage: Float, val blockCount: Int) : PlayerUpdateData()
     @SerialName("CoreLeakUpdateData")

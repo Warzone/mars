@@ -6,6 +6,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.player.commands.ModCommands
+import network.warzone.mars.player.feature.PlayerFeature
+import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.PlayerStats
 import network.warzone.mars.utils.enumify
 import network.warzone.mars.utils.getUsername
@@ -35,13 +37,21 @@ class LeaderboardCommands {
         }
         Mars.asyncAsFutureWithResult {
             LeaderboardClient.fetchLeaderboardEntries(scoreTypeAndPeriod.first, scoreTypeAndPeriod.second)
+        }.thenCompose {
+            Mars.asyncAsFutureWithResult {
+                it.map { entry ->
+                    val player = PlayerFeature.fetch(entry.name)
+                    player to entry
+                }
+            }
         }.thenApply { lbEntries ->
             val message = audience.multiLine()
             lbEntries.mapIndexed { idx, entry ->
-                val username = getUsername(UUID.fromString(entry.id), entry.name, match, offlineNameProvider = ModCommands.offlineNameProvider)
+                val (entryPlayer, lbEntry) = entry
+                val username = getUsername(UUID.fromString(lbEntry.id), lbEntry.name, match, offlineNameProvider = ModCommands.offlineNameProvider)
                 Component.text("${idx + 1}. ", NamedTextColor.GOLD)
                     .append(username).append(Component.text(": ", NamedTextColor.GRAY))
-                    .append(formatScore(scoreTypeAndPeriod.first, entry.score))
+                    .append(formatScore(scoreTypeAndPeriod.first, scoreTypeAndPeriod.second, lbEntry.score, entryPlayer))
             }.forEach {
                 message.appendMultiLineComponent(it)
             }
@@ -55,16 +65,34 @@ class LeaderboardCommands {
         }
     }
 
-    private fun formatScore(scoreType: LeaderboardScoreType, score: Int) : Component =
+    private fun formatScore(scoreType: LeaderboardScoreType, period: LeaderboardPeriod, score: Int, player: PlayerProfile?) : Component =
         when (scoreType) {
             LeaderboardScoreType.XP -> {
-                Component.text(score, NamedTextColor.YELLOW).append(
-                    Component.text(" (Level: ${PlayerStats.EXP_FORMULA.getLevelFromExp(score.toDouble())})",
-                        NamedTextColor.GRAY)
-                )
+                Component.text(score, NamedTextColor.YELLOW)
+                    .append(Component.space())
+                    .append(
+                        if (period == LeaderboardPeriod.ALL_TIME)
+                            Component.text(
+                                " (Level: ${PlayerStats.EXP_FORMULA.getLevelFromExp(score.toDouble())})",
+                            NamedTextColor.GRAY
+                            )
+                        else getLevelsGainedFormatted(score, player)
+                    )
             }
             else -> Component.text(score, NamedTextColor.YELLOW)
         }
+
+    private fun getLevelsGainedFormatted(differential: Int, player: PlayerProfile?) : Component {
+        if (player == null) return Component.empty()
+        val playerXp = player.stats.xp
+        val prevLevel = PlayerStats.EXP_FORMULA.getLevelFromExp((playerXp - differential).toDouble())
+        val currentLevel = PlayerStats.EXP_FORMULA.getLevelFromExp(playerXp.toDouble())
+        val gained = currentLevel - prevLevel
+        if (gained == 0) {
+            return Component.text("(No levels gained)", NamedTextColor.GRAY)
+        }
+        return Component.text("(Gained ${gained} level${if (gained == 1) "" else "s"})", NamedTextColor.LIGHT_PURPLE)
+    }
 
     private fun validateScoreTypeAndPeriod(scoreType: String?, period: String?) : Pair<LeaderboardScoreType, LeaderboardPeriod>? {
         if (scoreType == null) return null
