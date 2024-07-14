@@ -99,6 +99,8 @@ data class PlayerStats(
         interface ExpFormula {
             fun getLevelFromExp(exp: Double) : Int
             fun getExpRequiredForLevel(level: Int) : Double
+            fun getExactLevel(exp: Double) : Float
+            fun getLevelProgress(exp: Double): Float
         }
 
         class PowerExpFormula(
@@ -112,6 +114,12 @@ data class PlayerStats(
                 if (level <= 1) return 0.0
                 return (((level - 1).toDouble())/(linearFactor)).pow(1.0/growthFactor)
             }
+
+            override fun getExactLevel(exp: Double): Float =
+                (linearFactor * exp.pow(growthFactor)).toFloat() % 1f
+
+            override fun getLevelProgress(exp: Double): Float =
+                getExactLevel(exp) % 1f
         }
 
         class LinearExpFormula(
@@ -124,6 +132,12 @@ data class PlayerStats(
                 if (level <= 1) return 0.0
                 return ((level * step) - step).toDouble()
             }
+
+            override fun getExactLevel(exp: Double): Float =
+                (exp / step).toFloat()
+
+            override fun getLevelProgress(exp: Double): Float =
+                ((exp % step) / step).toFloat()
         }
 
         private val LINEAR_FORMULA = LinearExpFormula(5000)

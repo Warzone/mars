@@ -1,8 +1,9 @@
 package network.warzone.mars.player.level
 
 import network.warzone.mars.Mars
-import network.warzone.mars.match.tracker.PlayerXPGainEvent
+import network.warzone.mars.api.socket.models.PlayerUpdateEvent
 import network.warzone.mars.player.PlayerManager
+import network.warzone.mars.player.models.PlayerStats
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -70,8 +71,9 @@ class LevelDisplayListener : Listener {
         val context = PlayerManager.getPlayer(player.uniqueId)
         val profile = context?.getPlayerProfileCached()
         val stats = profile?.stats
+        val xp = stats?.xp?.toDouble() ?: 0.0
         player.level = stats?.level ?: 1
-        player.exp = (stats?.xp?.rem(5000F))?.div(5000F) ?: 0F
+        player.exp = PlayerStats.EXP_FORMULA.getLevelProgress(xp)
     }
 
     // Vanilla experience level
@@ -134,8 +136,8 @@ class LevelDisplayListener : Listener {
     }
 
     @EventHandler
-    fun onXP(event: PlayerXPGainEvent) {
-        val player: Player? = Bukkit.getPlayer(event.data.playerId)
+    fun onUpdate(event: PlayerUpdateEvent) {
+        val player: Player? = Bukkit.getPlayer(event.update.updated._id)
         if (player == null || showUntil.contains(player)) return
         showStatsLevel(player)
     }
