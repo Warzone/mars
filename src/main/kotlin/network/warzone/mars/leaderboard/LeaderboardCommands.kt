@@ -16,6 +16,7 @@ import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import tc.oc.pgm.api.PGM
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import javax.annotation.Nullable
 
 class LeaderboardCommands {
@@ -37,31 +38,36 @@ class LeaderboardCommands {
         }
         Mars.asyncAsFutureWithResult {
             LeaderboardClient.fetchLeaderboardEntries(scoreTypeAndPeriod.first, scoreTypeAndPeriod.second)
-        }.thenCompose {
-            Mars.asyncAsFutureWithResult {
-                it.map { entry ->
+        }.thenApply { lbRawEntries ->
+            val playerFutures = lbRawEntries.mapIndexed { idx, entry ->
+                val standing = idx + 1
+                Mars.asyncAsFutureWithResult {
                     val player = PlayerFeature.fetch(entry.name)
-                    player to entry
+                    LeaderboardEntryData(player, entry, standing)
                 }
             }
-        }.thenApply { lbEntries ->
-            val message = audience.multiLine()
-            lbEntries.mapIndexed { idx, entry ->
-                val (entryPlayer, lbEntry) = entry
-                val username = getUsername(UUID.fromString(lbEntry.id), lbEntry.name, match, offlineNameProvider = ModCommands.offlineNameProvider)
-                Component.text("${idx + 1}. ", NamedTextColor.GOLD)
-                    .append(username).append(Component.text(": ", NamedTextColor.GRAY))
-                    .append(formatScore(scoreTypeAndPeriod.first, scoreTypeAndPeriod.second, lbEntry.score, entryPlayer))
-            }.forEach {
-                message.appendMultiLineComponent(it)
+            CompletableFuture.allOf(*playerFutures.toTypedArray()).thenApply {
+                val lbEntries = playerFutures
+                    .map { f -> f.join() }
+                    .sortedBy { data -> data.standing  }
+                    val message = audience.multiLine()
+                    lbEntries.mapIndexed { idx, entry ->
+                        val (entryPlayer, lbEntry) = entry
+                        val username = getUsername(UUID.fromString(lbEntry.id), lbEntry.name, match, offlineNameProvider = ModCommands.offlineNameProvider)
+                        Component.text("${entry.standing}. ", NamedTextColor.GOLD)
+                            .append(username).append(Component.text(": ", NamedTextColor.GRAY))
+                            .append(formatScore(scoreTypeAndPeriod.first, scoreTypeAndPeriod.second, lbEntry.score, entryPlayer))
+                    }.forEach {
+                        message.appendMultiLineComponent(it)
+                    }
+                    audience.sendMessage(
+                        Component.text(
+                            "${scoreTypeAndPeriod.first.name} leaderboard (${scoreTypeAndPeriod.second.name})",
+                            NamedTextColor.GREEN
+                        )
+                    )
+                    message.deliver()
             }
-            audience.sendMessage(
-                Component.text(
-                    "${scoreTypeAndPeriod.first.name} leaderboard (${scoreTypeAndPeriod.second.name})",
-                    NamedTextColor.GREEN
-                )
-            )
-            message.deliver()
         }
     }
 
@@ -110,4 +116,10 @@ class LeaderboardCommands {
         val enumified = name.enumify()
         return enumValues<T>().firstOrNull { it.name == enumified }
     }
+
+    private data class LeaderboardEntryData(
+        val player: PlayerProfile?,
+        val entry: LeaderboardEntry,
+        val standing: Int
+    )
 }
