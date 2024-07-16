@@ -337,6 +337,10 @@ fun getPlayerLevelAsComponent(profile: PlayerProfile): Component {
     return getLevelAsComponent(profile.stats.level)
 }
 
+fun getPlayerLevelAsComponent(playerLevel: Int): Component {
+    return getLevelAsComponent(playerLevel)
+}
+
 /**
  * Compares two dates (current time if comparison date is set to null) and uses the difference in seconds to return a
  * formatted time span using the [formatTimeSpan] method. Will be prefixed by "in" if the comparison date is future in

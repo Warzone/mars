@@ -10,6 +10,7 @@ import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.player.models.PlayerStats
 import network.warzone.mars.utils.enumify
+import network.warzone.mars.utils.getPlayerLevelAsComponent
 import network.warzone.mars.utils.getUsername
 import network.warzone.mars.utils.strategy.multiLine
 import org.bukkit.ChatColor
@@ -78,10 +79,9 @@ class LeaderboardCommands {
                     .append(Component.space())
                     .append(
                         if (period == LeaderboardPeriod.ALL_TIME)
-                            Component.text(
-                                " (Level: ${PlayerStats.EXP_FORMULA.getLevelFromExp(score.toDouble())})",
-                            NamedTextColor.GRAY
-                            )
+                            Component.text(" (Level ", NamedTextColor.GRAY)
+                                .append(getPlayerLevelAsComponent(PlayerStats.EXP_FORMULA.getLevelFromExp(score.toDouble())))
+                                .append(Component.text(")", NamedTextColor.GRAY))
                         else getLevelsGainedFormatted(score, player)
                     )
             }
