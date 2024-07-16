@@ -1,5 +1,7 @@
 package network.warzone.mars.player.achievements
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.TextComponent
@@ -12,6 +14,7 @@ import network.warzone.mars.api.socket.models.PlayerAchievementData
 import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
+import network.warzone.mars.utils.AUDIENCE_PROVIDER
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Sound
@@ -47,8 +50,18 @@ class AchievementEmitter(private val achievement: Achievement) {
 
         if (achievement.firstCompletion == null) {
             achievement.firstCompletion = profile._id
-            Bukkit.broadcastMessage("\n${ChatColor.GOLD}${player.name} ${ChatColor.GRAY}is the first to complete the achievement ${ChatColor.AQUA}\"${achievement.name}\" ${ChatColor.GRAY}!")
-            Bukkit.broadcastMessage("")
+            val broadcast = Component.newline()
+                .append(Component.text(player.name, NamedTextColor.GOLD))
+                .append(Component.text(" is the first to complete the achievement ", NamedTextColor.GRAY))
+                .append(
+                    Component.text("\"${achievement.name}\"", NamedTextColor.AQUA)
+                        .hoverEvent(
+                            Component.text(achievement.description).color(NamedTextColor.GOLD)
+                        )
+                )
+                .append(Component.text("!", NamedTextColor.GRAY))
+                .append(Component.newline())
+            AUDIENCE_PROVIDER.all().sendMessage(broadcast)
         }
 
         profile.stats.achievements[achievement._id.toString()] = AchievementStatistic(completionTime)
