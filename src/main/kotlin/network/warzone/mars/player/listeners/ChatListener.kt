@@ -2,6 +2,7 @@ package network.warzone.mars.player.listeners
 
 import github.scarsz.discordsrv.DiscordSRV
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.space
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
@@ -13,7 +14,9 @@ import network.warzone.mars.api.socket.models.PlayerChatEvent
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.LevelColorService
+import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.punishment.models.PunishmentKind
+import network.warzone.mars.rank.RankFeature
 import network.warzone.mars.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor.*
@@ -181,9 +184,9 @@ class ChatListener : Listener {
 
         messageBuilder.append { getPlayerLevelAsComponent(profile) }.append(space())
 
-        if (prefix != null) messageBuilder.append { text("$prefix ") }
+        if (prefix != null) messageBuilder.append { getRanksHoverComponent(text("$prefix "), profile) }
 
-        messageBuilder.append { text(username, TextColor.color(teamColor.red, teamColor.green, teamColor.blue)) }
+        messageBuilder.append { getRanksHoverComponent(text(username, TextColor.color(teamColor.red, teamColor.green, teamColor.blue)), profile) }
 
         if (tag != null) messageBuilder.append { text(" $GRAY[${tag.display.color()}$GRAY]") }
 
@@ -230,5 +233,17 @@ class ChatListener : Listener {
                 false
             )
         }
+    }
+
+    private fun getRanksHoverComponent(component: Component, profile: PlayerProfile) : Component {
+        val cachedRanks = profile.rankIds.mapNotNull { RankFeature.getCached(it) }
+        if (cachedRanks.isEmpty()) return component
+        val hoverComponent = text()
+        hoverComponent.append(Component.text("Ranks:", NamedTextColor.GRAY))
+        cachedRanks.forEach { cachedRank ->
+            val name = cachedRank.prefix?.color() ?: cachedRank.displayName?.color() ?: cachedRank.name
+            hoverComponent.appendNewline().append(text(name))
+        }
+        return component.hoverEvent(hoverComponent.build())
     }
 }
