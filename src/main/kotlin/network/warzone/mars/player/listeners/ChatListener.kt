@@ -123,7 +123,7 @@ class ChatListener : Listener {
     }
 
     @EventHandler
-    fun onPlayerChat(event: AsyncPlayerChatEvent) = runBlocking {
+    fun onPlayerChat(event: AsyncPlayerChatEvent) {
         val player = event.player
         val context = PlayerManager.getPlayer(player.uniqueId)!!
 
@@ -140,7 +140,7 @@ class ChatListener : Listener {
                 ?: throw RuntimeException("No appeal link set in config")
             if (activeMute.action.isPermanent()) player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name}${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
             else player.sendMessage("${GRAY}You are muted for ${RED}${activeMute.reason.name} ${GRAY}until ${WHITE}${activeMute.expiresAt} (${activeMute.expiresAt.getRelativeTime()})${GRAY}. $RED${activeMute.reason.message} ${GRAY}You may appeal at ${AQUA}$appealLink")
-            return@runBlocking
+            return
         }
         val chatChannel =
             if (Integration.isVanished(context.player) && context.player.hasPermission(Permissions.ADMINCHAT)) SettingValue.CHAT_ADMIN
@@ -150,13 +150,14 @@ class ChatListener : Listener {
         if (chatChannel == SettingValue.CHAT_GLOBAL && !isChatEnabled && !player.hasPermission("mars.chat.mute.bypass")) {
             player.sendMessage("${RED}Global chat is currently disabled.")
             event.isCancelled = true
-            return@runBlocking
+            return
         }
-
-        when (chatChannel) {
-            SettingValue.CHAT_ADMIN -> sendAdminChat(match, context.getPrefix() ?: "", player.name, event.message, null)
-            SettingValue.CHAT_TEAM -> sendTeamChat(context.matchPlayer.party, context, event.message)
-            else -> sendGlobalChat(match, context, event.message)
+        runBlocking {
+            when (chatChannel) {
+                SettingValue.CHAT_ADMIN -> sendAdminChat(match, context.getPrefix() ?: "", player.name, event.message, null)
+                SettingValue.CHAT_TEAM -> sendTeamChat(context.matchPlayer.party, context, event.message)
+                else -> sendGlobalChat(match, context, event.message)
+            }
         }
 
         val matchPlayer = PGM.get().matchManager.getPlayer(player)!!
