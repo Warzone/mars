@@ -22,7 +22,7 @@ class InventoryListener : Listener {
      */
     @EventHandler
     fun onObserverInventoryChange(event: InventoryCreativeEvent) {
-        val player = event.actor
+        val player = event.view.player as Player
         if (isInObserverMode(player)) event.isCancelled = true
     }
 
@@ -42,8 +42,8 @@ class InventoryListener : Listener {
         val inventory = player.inventory ?: return
 
         // Remove extra staff items from observer inventory
-        inventory?.setItem(1, null)
-        inventory?.setItem(4, null)
-        inventory?.setItem(6, null)
+        inventory.setItem(1, null)
+        inventory.setItem(4, null)
+        inventory.setItem(6, null)
     }
 }
