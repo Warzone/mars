@@ -1,5 +1,7 @@
 package network.warzone.mars.match.tracker
 
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
@@ -12,10 +14,10 @@ import network.warzone.mars.match.deaths.LegacyTextDeathMessageBuilder
 import network.warzone.mars.match.models.DeathCause
 import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
+import network.warzone.mars.utils.AUDIENCE_PROVIDER
 import network.warzone.mars.utils.KEvent
 import network.warzone.mars.utils.simple
 import org.bukkit.ChatColor.*
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -30,6 +32,12 @@ import tc.oc.pgm.util.named.NameStyle
 import java.util.*
 
 class PlayerTracker : Listener {
+
+    companion object {
+        val ORB_SOUND = Sound.sound(Key.key("random.orb"), Sound.Source.MASTER, 0.05f, 1f)
+        val LEVEL_UP_SOUND = Sound.sound(Key.key("entity.player.levelup"), Sound.Source.MASTER, 1000f, 1f)
+    }
+
     private var pendingFirstBlood = true
 
     @EventHandler
@@ -111,7 +119,7 @@ class PlayerTracker : Listener {
         // Add XP
         profile.stats.xp += gain
         if (notify) {
-            player.playSound(player.location, Sound.ORB_PICKUP, 1000f, 1f)
+            AUDIENCE_PROVIDER.player(player).playSound(ORB_SOUND)
             var message = "$LIGHT_PURPLE+$gain XP ($reason)"
             if (multiplier != null && multiplier != 1f) message += " (${multiplier}x multiplier)"
             player.sendMessage(message)
@@ -128,10 +136,10 @@ class PlayerTracker : Listener {
     fun onPlayerLevelUp(event: PlayerLevelUpEvent) {
         val (player, level) = event.data
 
-        player.playSound(player.location, Sound.LEVEL_UP, 1000f, 1f)
         player.sendMessage("$AQUA$STRIKETHROUGH----------------------------------------")
         player.sendMessage("$GREEN$BOLD Level up!$GREEN You are now level $RED${level}")
         player.sendMessage("$AQUA$STRIKETHROUGH----------------------------------------")
+        AUDIENCE_PROVIDER.player(player).playSound(LEVEL_UP_SOUND)
     }
 }
 

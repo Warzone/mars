@@ -1,8 +1,11 @@
 package network.warzone.mars.utils.menu
 
+import net.kyori.adventure.key.Key.key
+import net.kyori.adventure.sound.Sound
+import net.kyori.adventure.sound.Sound.sound
 import network.warzone.mars.Mars
+import network.warzone.mars.utils.AUDIENCE_PROVIDER
 import org.bukkit.Bukkit
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -32,6 +35,11 @@ class GUI(
     val rows: Int,
     val render: GUI.() -> Unit
 ) : Listener {
+
+    companion object {
+        val ORB_PICKUP: Sound = sound(key("random.orb"), Sound.Source.MASTER, 0.05f, 1f)
+    }
+
     init {
         Mars.registerEvents(this)
     }
@@ -73,7 +81,7 @@ class GUI(
     inner class Slot {
         var item: Item? = null
         var onclick: (InventoryClickEvent.(Player) -> Unit)? = null
-        var sound: (InventoryClickEvent.(Player) -> Unit)? = { it.playSound(it.location, Sound.ORB_PICKUP, .05f, 1f) }
+        var sound: (InventoryClickEvent.(Player) -> Unit)? = { AUDIENCE_PROVIDER.player(it).playSound(ORB_PICKUP) }
     }
 
     fun slot(

@@ -2,6 +2,9 @@ package network.warzone.mars.player.listeners
 
 import github.scarsz.discordsrv.DiscordSRV
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.key.Key.key
+import net.kyori.adventure.sound.Sound
+import net.kyori.adventure.sound.Sound.sound
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.space
 import net.kyori.adventure.text.Component.text
@@ -20,7 +23,6 @@ import network.warzone.mars.rank.RankFeature
 import network.warzone.mars.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor.*
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -76,12 +78,13 @@ class ChatListener : Listener {
         val message = translateAlternateColorCodes('&', rawMessage)
         if (soundName != null) {
             try {
-                val sound = Sound.valueOf(soundName)
-                playerIds.mapNotNull { Bukkit.getPlayer(it) }.forEach {
-                    val location = it.location
-                    it.playSound(location, sound, 1000f, 1f)
-                    it.sendMessage(message)
-                }
+                val sound = sound(key(soundName), Sound.Source.MASTER, 1000f, 1f)
+                playerIds.mapNotNull { Bukkit.getPlayer(it) }
+                    .map(AUDIENCE_PROVIDER::player)
+                    .forEach {
+                        it.playSound(sound)
+                        it.sendMessage(text(message))
+                    }
             } catch (e: Exception) {
                 Bukkit.getLogger()
                     .warning("Exception occurred receiving MESSAGE socket event - Sound: $soundName, Message: $rawMessage\n${e.printStackTrace()}")

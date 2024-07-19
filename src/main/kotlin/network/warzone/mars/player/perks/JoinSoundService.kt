@@ -3,15 +3,17 @@ package network.warzone.mars.player.perks
 import com.github.kittinunf.result.getOrNull
 import com.github.kittinunf.result.onFailure
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.sound.Sound
 import network.warzone.mars.Mars
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
+import network.warzone.mars.utils.AUDIENCE_PROVIDER
 import network.warzone.mars.utils.ItemUtils
 import network.warzone.mars.utils.color
-import network.warzone.mars.utils.enumify
 import network.warzone.mars.utils.menu.GUI
 import network.warzone.mars.utils.menu.gui
 import network.warzone.mars.utils.menu.item
@@ -19,20 +21,20 @@ import network.warzone.mars.utils.parseHttpException
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 object JoinSoundService {
+
+    private val ORB_SOUND = Sound.sound(Key.key("random.orb"), Sound.Source.MASTER, 0.05f, 1f)
+    private val NO_SOUND = Sound.sound(Key.key("entity.villager.no"), Sound.Source.MASTER, 0.25f, 1f)
+
     private var joinSounds: List<JoinSound>? = null
-    private val soundNames: Set<String> = Sound.values().map { it.name }.toSet()
 
     init {
         runBlocking {
             joinSounds = ApiClient.get<List<JoinSoundData>>("/mc/perks/join_sounds").mapNotNull { sound ->
-                val formattedSoundName = sound.sound.enumify()
-                val bukkitSound = (if (formattedSoundName in soundNames) Sound.valueOf(formattedSoundName) else null)
-                    ?: return@mapNotNull null
+                val bukkitSound = Sound.sound(Key.key(sound.sound), Sound.Source.MASTER, sound.volume, sound.pitch)
                 val material = ItemUtils.getMaterialByName(sound.guiIcon) ?: Material.SIGN
                 val item = ItemStack(material)
                 return@mapNotNull JoinSound(sound.id, sound.name, sound.description, bukkitSound, sound.permission, item,
@@ -66,10 +68,11 @@ object JoinSoundService {
 
     fun playSound(sound: JoinSound) = playSound(sound) { true }
 
-    fun playSound(sound: JoinSound, filter: (Player) -> Boolean) {
+    private fun playSound(sound: JoinSound, filter: (Player) -> Boolean) {
         Bukkit.getOnlinePlayers()
             .filter(filter)
-            .forEach { it.playSound(it.location, sound.bukkitSound, sound.volume, sound.pitch) }
+            .map(AUDIENCE_PROVIDER::player)
+            .forEach { it.playSound(sound.bukkitSound) }
     }
 
     fun getJoinSoundGUI(playerContext: PlayerContext) : GUI = runBlocking {
@@ -135,11 +138,13 @@ object JoinSoundService {
                         if (this.isRightClick) {
                             this@JoinSoundService.playSound(joinSound) { it == actor }
                         } else {
-                            if (hasPermission) {
-                                actor.playSound(actor.location, Sound.ORB_PICKUP, .05f, 1f) // default
+                            val audience = AUDIENCE_PROVIDER.player(actor)
+                            val sound = if (hasPermission) {
+                                ORB_SOUND // default
                             } else {
-                                actor.playSound(actor.location, Sound.VILLAGER_NO, .25f, 1f)
+                                NO_SOUND
                             }
+                            audience.playSound(sound)
                         }
                     }
                 }

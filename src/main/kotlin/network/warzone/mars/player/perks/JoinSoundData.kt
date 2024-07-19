@@ -1,6 +1,6 @@
 package network.warzone.mars.player.perks
 
-import org.bukkit.Sound
+import net.kyori.adventure.sound.Sound
 import org.bukkit.inventory.ItemStack
 
 data class JoinSoundData(
