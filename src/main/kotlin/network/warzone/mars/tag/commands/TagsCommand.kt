@@ -58,6 +58,7 @@ class TagsCommand {
                                 PlayerFeature.setActiveTag(context.uuid.toString(), null)
                             }.thenRun {
                                 profile.activeTagId = null
+                                refresh()
                             }
                         } else if (profile.tagIds.contains(tag._id)) {
                             Mars.asyncAsFuture {
@@ -67,10 +68,10 @@ class TagsCommand {
                                 )
                             }.thenRun {
                                 profile.activeTagId = tag._id
+                                refresh()
                             }
                         }
 
-                        refresh()
                     }
                 }
             }
