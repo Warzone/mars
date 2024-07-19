@@ -82,4 +82,4 @@ data class PlayerUpdate(
     val reason: PlayerUpdateReason
 )
 
-data class PlayerUpdateEvent(val update: PlayerUpdate) : KEvent()
+data class PlayerUpdateEvent(val update: PlayerUpdate) : KEvent(async = true)

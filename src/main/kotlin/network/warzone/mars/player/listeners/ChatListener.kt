@@ -44,8 +44,9 @@ class ChatListener : Listener {
     class MatchPlayerChatEvent(
         val matchPlayer: MatchPlayer,
         val channel: ChatChannel,
-        val message: String
-    ) : KEvent()
+        val message: String,
+        async: Boolean = true
+    ) : KEvent(async)
 
     companion object {
         val CHANNEL_VALUE_MAP = mapOf(
@@ -164,7 +165,8 @@ class ChatListener : Listener {
                 SettingValue.CHAT_TEAM -> ChatChannel.TEAM
                 else -> ChatChannel.GLOBAL
             },
-            event.message
+            event.message,
+            async = event.isAsynchronous
         ).callEvent()
 
         event.isCancelled = true

@@ -25,7 +25,7 @@ fun gui(
     render: GUI.() -> Unit
 ) = GUI(title, rows, render).apply(render)
 
-fun Player.open(gui: GUI) = openInventory(gui.inventory)
+fun Player.open(gui: GUI) = Mars.sync{ openInventory(gui.inventory) }
 
 class GUI(
     val title: String,
