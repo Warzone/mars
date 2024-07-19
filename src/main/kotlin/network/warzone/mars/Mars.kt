@@ -77,8 +77,6 @@ class Mars : JavaPlugin() {
 
     lateinit var serverId: String
 
-    lateinit var matchTabManager: MatchTabManager
-
     override fun onEnable() = runBlocking {
         instance = this@Mars
 
@@ -112,7 +110,6 @@ class Mars : JavaPlugin() {
             PlayerService.logout(it.uniqueId, it.name, activeSession._id, sessionLength)
         }
 
-        this@Mars.matchTabManager.disable()
         AchievementManager.unload()
     }
 
