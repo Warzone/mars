@@ -16,10 +16,12 @@ import network.warzone.mars.player.PlayerManager
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.utils.*
 import network.warzone.mars.utils.strategy.multiLine
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import tc.oc.pgm.api.PGM
+import tc.oc.pgm.api.Permissions
 import java.time.Duration
 import javax.annotation.Nullable
 
@@ -150,5 +152,10 @@ class ModCommands {
                 else -> sender.sendMessage("${ChatColor.RED}Available operations: add <content>, del <id>")
             }
         }
+    }
+
+    @Command(aliases = ["sc", "s"], desc = "Send a message in staff chat", usage = "<message>", perms = [Permissions.ADMINCHAT] )
+    fun onStaffChat(@Sender sender: CommandSender, message: String) {
+        Bukkit.dispatchCommand(sender, "a $message")
     }
 }
