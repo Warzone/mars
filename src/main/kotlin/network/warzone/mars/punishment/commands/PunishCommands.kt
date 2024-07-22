@@ -67,15 +67,15 @@ class PunishCommands {
         @Switch('c') skipConfirmation: Boolean = false
     ) {
         Mars.async {
-            val target = PlayerFeature.lookup(name, false).player
-            val types = PunishmentFeature.punishmentTypes.filter { it.requiredPermission == null || player.hasPermission(it.requiredPermission) }
-            val arguments = PunishmentArguments(
-                isSilent,
-                note,
-                offenceNumber,
-                skipConfirmation
-            )
             try {
+                val target = PlayerFeature.lookup(name, false).player
+                val types = PunishmentFeature.punishmentTypes.filter { it.requiredPermission == null || player.hasPermission(it.requiredPermission) }
+                val arguments = PunishmentArguments(
+                    isSilent,
+                    note,
+                    offenceNumber,
+                    skipConfirmation
+                )
                 val history = PlayerFeature.getPunishmentHistory(target._id.toString())
 
                 if (reason != null) {
