@@ -146,5 +146,5 @@ class PlayerTracker : Listener {
 data class PlayerLevelUpEvent(val data: PlayerLevelUpData) : KEvent()
 data class PlayerLevelUpData(val player: Player, val level: Int)
 
-data class PlayerXPGainEvent(val data: PlayerXPGainData) : KEvent()
+data class PlayerXPGainEvent(val data: PlayerXPGainData) : KEvent(async = true)
 data class PlayerXPGainData(val playerId: UUID, val gain: Int, val reason: String, val notify: Boolean, val multiplier: Float?)
