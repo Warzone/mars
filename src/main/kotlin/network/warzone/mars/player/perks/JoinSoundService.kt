@@ -125,8 +125,8 @@ object JoinSoundService {
                                     player.sendMessage(
                                         "Selected join sound ${ChatColor.GREEN}${joinSound.name.color()}"
                                     )
-                                    player.closeInventory()
                                 }
+                                player.closeInventory()
                             } else {
                                 player.sendMessage(
                                     "${ChatColor.RED}You don't have permission to use ${ChatColor.GREEN}${joinSound.name.color()}"
@@ -162,8 +162,8 @@ object JoinSoundService {
                         player.sendMessage(
                             "${ChatColor.YELLOW}Cleared join sound."
                         )
-                        player.closeInventory()
                     }
+                    player.closeInventory()
                 }
             }
         }
