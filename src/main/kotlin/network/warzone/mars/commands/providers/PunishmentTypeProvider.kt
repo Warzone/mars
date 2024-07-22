@@ -27,7 +27,7 @@ class PunishmentTypeProvider : BukkitProvider<String> {
         val query = prefix.toLowerCase()
 
         return PunishmentFeature.punishmentTypes
-            .filter { sender.hasPermission(it.requiredPermission) }
+            .filter { it.requiredPermission == null || sender.hasPermission(it.requiredPermission) }
             .map { it.short }
             .filter { it.startsWith(query, ignoreCase = true) }
     }

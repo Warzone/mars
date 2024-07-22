@@ -2,11 +2,11 @@ package network.warzone.mars.match.deaths
 
 import network.warzone.mars.utils.createLogger
 import org.bukkit.Location
-import org.bukkit.entity.EntityType
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.api.tracker.info.PhysicalInfo
 import tc.oc.pgm.api.tracker.info.PotionInfo
 import tc.oc.pgm.tracker.info.*
+import tc.oc.pgm.util.bukkit.EntityTypes
 import tc.oc.pgm.util.material.Materials
 
 class LegacyTextDeathMessageBuilder(event: MatchPlayerDeathEvent)
@@ -24,9 +24,9 @@ class LegacyTextDeathMessageBuilder(event: MatchPlayerDeathEvent)
 
     override fun entity(entityInfo: EntityInfo): Boolean {
         when (entityInfo.entityType) {
-            EntityType.UNKNOWN,
-            EntityType.COMPLEX_PART,
-            EntityType.ENDER_CRYSTAL -> return false
+            EntityTypes.UNKNOWN,
+            EntityTypes.COMPLEX_PART,
+            EntityTypes.ENDER_CRYSTAL -> return false
         }
 
         if (test("entity")) weaponString = entityInfo.identifier

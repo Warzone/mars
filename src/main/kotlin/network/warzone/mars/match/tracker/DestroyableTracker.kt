@@ -17,6 +17,7 @@ import tc.oc.pgm.api.player.ParticipantState
 import tc.oc.pgm.destroyable.Destroyable
 import tc.oc.pgm.destroyable.DestroyableHealthChange
 import tc.oc.pgm.destroyable.DestroyableHealthChangeEvent
+import tc.oc.pgm.util.material.MaterialData
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -56,8 +57,8 @@ class DestroyableTracker : Listener {
         val destroyableBatch = batchList.find { it.destroyable == event.destroyable }
         if (destroyableBatch == null) {
             batchList.add(DestroyableDamageBatch(event.destroyable, change, 1))
-            val task = Bukkit.getScheduler().runTaskLaterAsynchronously(Mars.get(), {
-                val batch = batchList.find { it.destroyable == event.destroyable } ?: return@runTaskLaterAsynchronously
+            val task = Bukkit.getScheduler().runTaskLaterAsynchronously(Mars.get(), Runnable {
+                val batch = batchList.find { it.destroyable == event.destroyable } ?: return@Runnable
 
                 resolveBatch(player, batch)
 
@@ -80,7 +81,7 @@ class DestroyableTracker : Listener {
                 OutboundEvent.DestroyableDestroy,
                 DestroyableDestroyData(
                     event.destroyable.id,
-                    change.oldState.material.name,
+                    MaterialData.block(change.oldState.block).itemType.name,
                     event.destroyable
                         .contributions
                         .map { Contribution(it.playerState.id, it.percentage.toFloat(), it.blocks) }
@@ -94,7 +95,7 @@ class DestroyableTracker : Listener {
             OutboundEvent.DestroyableDamage,
             DestroyableDamageData(
                 batch.destroyable.id,
-                batch.change.oldState.material.name,
+                MaterialData.block(batch.change.oldState.block).itemType.name,
                 player.id,
                 batch.count
             )

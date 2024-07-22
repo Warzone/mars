@@ -42,6 +42,22 @@ class AchievementEmitter(private val achievement: Achievement) {
                 .hoverEvent(hoverText)
             audience.sendMessage(achievementComponent)
             audience.playSound(LEVEL_UP_SOUND)
+
+            if (achievement.firstCompletion == null) {
+                achievement.firstCompletion = profile._id
+                val broadcast = Component.newline()
+                    .append(text(player.name, NamedTextColor.GOLD))
+                    .append(text(" is the first to complete the achievement ", NamedTextColor.GRAY))
+                    .append(
+                        text("\"${achievement.name}\"", NamedTextColor.AQUA)
+                            .hoverEvent(
+                                text(achievement.description).color(NamedTextColor.GOLD)
+                            )
+                    )
+                    .append(text("!", NamedTextColor.GRAY))
+                    .append(Component.newline())
+                AUDIENCE_PROVIDER.all().sendMessage(broadcast)
+            }
         }
 
         val completionTime = Date().time
@@ -51,22 +67,6 @@ class AchievementEmitter(private val achievement: Achievement) {
             achievement._id,
             completionTime
         )
-
-        if (achievement.firstCompletion == null) {
-            achievement.firstCompletion = profile._id
-            val broadcast = Component.newline()
-                .append(text(player.name, NamedTextColor.GOLD))
-                .append(text(" is the first to complete the achievement ", NamedTextColor.GRAY))
-                .append(
-                    text("\"${achievement.name}\"", NamedTextColor.AQUA)
-                        .hoverEvent(
-                            text(achievement.description).color(NamedTextColor.GOLD)
-                        )
-                )
-                .append(text("!", NamedTextColor.GRAY))
-                .append(Component.newline())
-            AUDIENCE_PROVIDER.all().sendMessage(broadcast)
-        }
 
         profile.stats.achievements[achievement._id.toString()] = AchievementStatistic(completionTime)
 

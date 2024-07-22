@@ -11,6 +11,7 @@ import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent
 import tc.oc.pgm.api.tracker.info.*
 import tc.oc.pgm.tracker.Trackers
 import tc.oc.pgm.tracker.info.*
+import tc.oc.pgm.util.bukkit.EntityTypes
 import tc.oc.pgm.util.material.Materials
 import tc.oc.pgm.util.named.NameStyle
 import tc.oc.pgm.util.text.TextTranslations
@@ -190,9 +191,9 @@ open class PGMDeathMessageBuilder(event: MatchPlayerDeathEvent, logger: Logger) 
     open fun entity(entityInfo: EntityInfo): Boolean {
         // Skip for entities that are weird and have no translations
         when (entityInfo.entityType) {
-            EntityType.UNKNOWN,
-            EntityType.COMPLEX_PART,
-            EntityType.ENDER_CRYSTAL -> return false
+            EntityTypes.UNKNOWN,
+            EntityTypes.COMPLEX_PART,
+            EntityTypes.ENDER_CRYSTAL -> return false
         }
 
         if (option("entity")) {

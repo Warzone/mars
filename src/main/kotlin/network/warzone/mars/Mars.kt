@@ -31,7 +31,6 @@ import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import tc.oc.pgm.api.PGM
-import tc.oc.pgm.tablist.MatchTabManager
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
@@ -40,30 +39,30 @@ class Mars : JavaPlugin() {
         lateinit var instance: Mars
 
         fun async(block: suspend() -> Unit) {
-            Bukkit.getScheduler().runTaskAsynchronously(get()) {
+            Bukkit.getScheduler().runTaskAsynchronously(get(), Runnable {
                 runBlocking { block.invoke() }
-            }
+            })
         }
 
         fun asyncAsFuture(block: suspend() -> Unit) : CompletableFuture<Void?> {
             val future = CompletableFuture<Void?>()
-            Bukkit.getScheduler().runTaskAsynchronously(get()) {
+            Bukkit.getScheduler().runTaskAsynchronously(get(), Runnable {
                 runBlocking {
                     block.invoke()
                     future.complete(null)
                 }
-            }
+            })
             return future
         }
 
         fun <T> asyncAsFutureWithResult(block: suspend() -> T) : CompletableFuture<T> {
             val future = CompletableFuture<T>()
-            Bukkit.getScheduler().runTaskAsynchronously(get()) {
+            Bukkit.getScheduler().runTaskAsynchronously(get(), Runnable {
                 runBlocking {
                     val data = block.invoke()
                     future.complete(data)
                 }
-            }
+            })
             return future
         }
 
@@ -82,7 +81,7 @@ class Mars : JavaPlugin() {
 
         this@Mars.saveDefaultConfig()
 
-        serverId = config.getString("server.id")
+        serverId = config.getString("server.id") ?: throw RuntimeException("Server ID not set in config")
 
         val commandGraph = BasicBukkitCommandGraph(CommandModule)
 
@@ -90,7 +89,7 @@ class Mars : JavaPlugin() {
         FeatureManager.registerCommands(commandGraph)
         AchievementManager.load()
 
-        val apiConfigurationSection = config.getConfigurationSection("api")
+        val apiConfigurationSection = config.getConfigurationSection("api") ?: throw RuntimeException("API configuration not found in config")
         ApiClient.loadHttp(apiConfigurationSection)
         ApiClient.loadSocket(serverId, apiConfigurationSection)
 

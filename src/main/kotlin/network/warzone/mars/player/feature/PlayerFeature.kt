@@ -245,9 +245,9 @@ object PlayerFeature : NamedCachedFeature<PlayerProfile>(), Listener {
     fun onDisconnectPlayer(event: DisconnectPlayerEvent) {
         val context = PlayerManager.getPlayer(event.data.playerId) ?: return
         val reason = event.data.reason?.color() ?: "Disconnected"
-        Bukkit.getScheduler().runTask(Mars.get()) {
+        Bukkit.getScheduler().runTask(Mars.get(), Runnable {
             context.player.kickPlayer("${ChatColor.RED}$reason")
-        }
+        })
     }
 
     override fun getCommands(): List<Any> {

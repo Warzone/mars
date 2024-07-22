@@ -231,14 +231,14 @@ class ChatListener : Listener {
 
     private fun sendToDiscord(player: Player, message: String) {
         if (!DISCORDSRV_ENABLED) return
-        Bukkit.getScheduler().runTaskAsynchronously(Mars.get()) {
+        Bukkit.getScheduler().runTaskAsynchronously(Mars.get(), Runnable {
             DiscordSRV.getPlugin().processChatMessage(
                 player,
                 message,
                 DiscordSRV.getPlugin().getOptionalChannel("global"),
                 false
             )
-        }
+        })
     }
 
     private fun getRanksHoverComponent(component: Component, profile: PlayerProfile) : Component {

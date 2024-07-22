@@ -10,11 +10,10 @@ import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.menu.*
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemFlag
+import tc.oc.pgm.util.material.Materials
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -107,7 +106,7 @@ class AchievementMenu(player: Player) : Listener {
                     val hasAchievement = profile.stats.achievements.containsKey(achievement._id.toString())
                     val colorData: Short = if (hasAchievement) 5 else 14 // 5 for green, 14 for red
 
-                    item = item(Material.STAINED_GLASS_PANE, colorData) {
+                    item = item(Materials.STAINED_GLASS_PANE, colorData) {
                         name = "${ChatColor.LIGHT_PURPLE}${achievement.name}"
                         lore = wrap("${ChatColor.GRAY}${achievement.description}", 40)
 

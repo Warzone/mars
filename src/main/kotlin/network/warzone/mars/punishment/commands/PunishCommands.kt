@@ -35,7 +35,8 @@ import org.bukkit.DyeColor
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
+import tc.oc.pgm.util.inventory.ItemBuilder
+import tc.oc.pgm.util.material.Materials
 import java.time.Duration
 import java.util.*
 import javax.annotation.Nullable
@@ -67,7 +68,7 @@ class PunishCommands {
     ) {
         Mars.async {
             val target = PlayerFeature.lookup(name, false).player
-            val types = PunishmentFeature.punishmentTypes.filter { player.hasPermission(it.requiredPermission) }
+            val types = PunishmentFeature.punishmentTypes.filter { it.requiredPermission == null || player.hasPermission(it.requiredPermission) }
             val arguments = PunishmentArguments(
                 isSilent,
                 note,
@@ -271,10 +272,11 @@ class PunishCommands {
                     }
 
                     onclick = {
+                        val actor = this.view.player as Player
                         if (this.isRightClick) {
                             val anvil =
                                 AnvilGUI.Builder().text("Enter note here").plugin(Mars.get())
-                            anvil.onComplete { player, note ->
+                            anvil.onComplete { _, note ->
                                 arguments.note = note
                                 return@onComplete AnvilGUI.Response.openInventory(
                                     createPunishConfirmGUI(
@@ -287,7 +289,7 @@ class PunishCommands {
                                     ).inventory
                                 )
                             }
-                            anvil.open(this.actor)
+                            anvil.open(actor)
                         } else if (this.isLeftClick) {
                             actor.open(
                                 createPunishConfirmGUI(
@@ -305,8 +307,8 @@ class PunishCommands {
             }
 
             slot(0) {
-                item = item(Material.SKULL_ITEM) {
-                    stack = getHead(target.name)
+                item = item(Materials.PLAYER_HEAD) {
+                    stack = getHead(target.name, target._id)
                     name = targetDisplay
                     lore = createPlayerLore(target, history)
                 }
@@ -335,9 +337,8 @@ class PunishCommands {
                 val dye = if (action == selectedAction) DyeColor.LIME else DyeColor.WHITE
                 val length = action.formatLength()
                 slot(index) {
-                    item = item(Material.STAINED_GLASS_PANE) {
-                        stack = ItemStack(Material.STAINED_GLASS_PANE, 1, dye.data.toShort())
-
+                    item = item(Materials.STAINED_GLASS_PANE) {
+                        stack = ItemBuilder().material(Materials.STAINED_GLASS_PANE).color(dye).build()
                         val fmtNoun = "${action.kind.color}${action.kind.noun}"
                         val fmtVerb = "${ChatColor.GRAY}${action.kind.verb}"
                         val fmtReason = "${ChatColor.RED}${type.name}"
@@ -370,8 +371,8 @@ class PunishCommands {
             }
 
             slot(18) {
-                item = item(Material.SKULL_ITEM) {
-                    stack = getHead(target.name)
+                item = item(Materials.PLAYER_HEAD) {
+                    stack = getHead(target.name, target._id)
                     name = targetDisplay
                     lore = createPlayerLore(target, history)
                 }
@@ -405,7 +406,7 @@ class PunishCommands {
                                 ).inventory
                             )
                         }
-                        anvil.open(this.actor)
+                        anvil.open(this.view.player as Player)
                     }
                 }
             }
@@ -419,7 +420,7 @@ class PunishCommands {
                     )
                     onclick = {
                         arguments.silent = !arguments.silent
-                        it.player.openInventory(
+                        it.player?.openInventory(
                             createPunishConfirmGUI(
                                 context,
                                 target,
@@ -464,7 +465,7 @@ class PunishCommands {
                         arguments.silent,
                         arguments.note
                     )
-                    actor.closeInventory()
+                    view.player.closeInventory()
                 }
             }
         }

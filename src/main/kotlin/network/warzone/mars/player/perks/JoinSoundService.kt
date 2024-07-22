@@ -23,6 +23,7 @@ import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import tc.oc.pgm.util.material.Materials
 
 object JoinSoundService {
 
@@ -35,7 +36,7 @@ object JoinSoundService {
         runBlocking {
             joinSounds = ApiClient.get<List<JoinSoundData>>("/mc/perks/join_sounds").mapNotNull { sound ->
                 val bukkitSound = Sound.sound(Key.key(sound.sound), Sound.Source.MASTER, sound.volume, sound.pitch)
-                val material = ItemUtils.getMaterialByName(sound.guiIcon) ?: Material.SIGN
+                val material = ItemUtils.getMaterialByName(sound.guiIcon) ?: Materials.SIGN
                 val item = ItemStack(material)
                 return@mapNotNull JoinSound(sound.id, sound.name, sound.description, bukkitSound, sound.permission, item,
                     sound.guiSlot, sound.volume, sound.pitch)

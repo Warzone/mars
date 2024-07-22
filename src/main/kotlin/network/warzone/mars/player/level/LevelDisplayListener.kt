@@ -14,10 +14,10 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerExpChangeEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.scheduler.BukkitTask
 import tc.oc.pgm.api.match.event.MatchUnloadEvent
 import tc.oc.pgm.spawns.events.PlayerSpawnEvent
+import tc.oc.pgm.util.bukkit.MetadataUtils
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.floor
@@ -36,7 +36,7 @@ class LevelDisplayListener : Listener {
     private var task: BukkitTask? = null
 
     init {
-        this.task = Bukkit.getScheduler().runTaskTimer(Mars.get(), {
+        this.task = Bukkit.getScheduler().runTaskTimer(Mars.get(), Runnable {
             val date = Date().time
             showUntil.forEach {
                 if (it.value <= date) { // Return to stats level
@@ -59,11 +59,11 @@ class LevelDisplayListener : Listener {
     }
 
     private fun getVanillaExpFromMetadata(player: Player): Float {
-        return player.getMetadata(METADATA_KEY, Mars.get())?.asFloat() ?: 0.0F
+        return MetadataUtils.getMetadataValue(player, METADATA_KEY, Mars.get()) ?: 0.0F
     }
 
     private fun setVanillaExpInMetadata(player: Player, level: Float) {
-        player.setMetadata(METADATA_KEY, FixedMetadataValue(Mars.get(), level))
+        player.setMetadata(METADATA_KEY, MetadataUtils.createMetadataValue(Mars.get(), level))
     }
 
     // Mars stat system level
@@ -98,24 +98,26 @@ class LevelDisplayListener : Listener {
     @EventHandler
     fun openInventory(event: InventoryOpenEvent) {
         if (EXP_INVENTORIES.contains(event.inventory.type)) {
-            if (showUntil.contains(event.actor)) {
+            val player = event.view.player as Player
+            if (showUntil.contains(event.view.player)) {
                 // Store real XP in case it has changed
-                setVanillaExpInMetadata(event.actor, getExactLevel(event.actor))
+                setVanillaExpInMetadata(player, getExactLevel(player))
             }
             // Mark as showing real XP indefinitely (until inventory is closed)
-            showVanillaLevel(event.actor, Long.MAX_VALUE)
+            showVanillaLevel(player, Long.MAX_VALUE)
         }
     }
 
     @EventHandler
     fun closeInventory(event: InventoryCloseEvent) {
         if (EXP_INVENTORIES.contains(event.inventory.type)) {
-            if (showUntil.contains(event.actor)) {
+            val player = event.view.player as Player
+            if (showUntil.contains(player)) {
                 // Store current real XP in case experience has been used (enchantment table or anvil)
-                setVanillaExpInMetadata(event.actor, getExactLevel(event.actor))
+                setVanillaExpInMetadata(player, getExactLevel(player))
             }
             // Mark as showing real XP for 5 seconds
-            showVanillaLevel(event.actor, 5L)
+            showVanillaLevel(player, 5L)
         }
     }
 

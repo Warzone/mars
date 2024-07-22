@@ -5,9 +5,15 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
+import tc.oc.pgm.util.bukkit.BukkitUtils
+import tc.oc.pgm.util.material.Materials
+
+/** Not registered in [Materials] helper interface */
+val STAINED_GLASS: Material
+    = BukkitUtils.parse(Material::valueOf, "STAINED_GLASS", "LEGACY_STAINED_GLASS")
 
 fun item(
-    type: Material = Material.STAINED_GLASS,
+    type: Material = STAINED_GLASS,
     data: Short = 0,
     builder: Item.() -> Unit = {}
 ) = Item(type, data).apply(builder)
@@ -29,7 +35,7 @@ class Item(
     var name
         get() = meta.displayName
         set(value) {
-            meta { displayName = value }
+            meta { setDisplayName(value) }
         }
 
     var lore
