@@ -122,7 +122,7 @@ class ChatListener : Listener {
         sendAdminChat(PGM.get().matchManager.getMatch(), prefix, player.name, message, serverId)
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     fun onPlayerChat(event: AsyncPlayerChatEvent) {
         val player = event.player
         val context = PlayerManager.getPlayer(player.uniqueId)!!
