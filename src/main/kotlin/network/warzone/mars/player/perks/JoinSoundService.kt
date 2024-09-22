@@ -3,7 +3,6 @@ package network.warzone.mars.player.perks
 import com.github.kittinunf.result.getOrNull
 import com.github.kittinunf.result.onFailure
 import kotlinx.coroutines.runBlocking
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
 import network.warzone.mars.Mars
 import network.warzone.mars.api.ApiClient
@@ -11,13 +10,10 @@ import network.warzone.mars.api.http.ApiExceptionType
 import network.warzone.mars.player.PlayerContext
 import network.warzone.mars.player.feature.exceptions.PlayerMissingException
 import network.warzone.mars.player.models.PlayerProfile
-import network.warzone.mars.utils.AUDIENCE_PROVIDER
-import network.warzone.mars.utils.ItemUtils
-import network.warzone.mars.utils.color
+import network.warzone.mars.utils.*
 import network.warzone.mars.utils.menu.GUI
 import network.warzone.mars.utils.menu.gui
 import network.warzone.mars.utils.menu.item
-import network.warzone.mars.utils.parseHttpException
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -27,15 +23,16 @@ import tc.oc.pgm.util.material.Materials
 
 object JoinSoundService {
 
-    private val ORB_SOUND = Sound.sound(Key.key("random.orb"), Sound.Source.MASTER, 0.05f, 1f)
-    private val NO_SOUND = Sound.sound(Key.key("entity.villager.no"), Sound.Source.MASTER, 0.25f, 1f)
+    private val ORB_SOUND = Sound.sound(Sounds.RANDOM_ORB, Sound.Source.MASTER, 0.05f, 1f)
+    private val NO_SOUND = Sound.sound(Sounds.MOB_VILLAGER_NO, Sound.Source.MASTER, 0.25f, 1f)
 
     private var joinSounds: List<JoinSound>? = null
 
     init {
         runBlocking {
             joinSounds = ApiClient.get<List<JoinSoundData>>("/mc/perks/join_sounds").mapNotNull { sound ->
-                val bukkitSound = Sound.sound(Key.key(sound.sound), Sound.Source.MASTER, sound.volume, sound.pitch)
+                val key = Sounds.resolve(sound.sound)
+                val bukkitSound = Sound.sound(key, Sound.Source.MASTER, sound.volume, sound.pitch)
                 val material = ItemUtils.getMaterialByName(sound.guiIcon) ?: Materials.SIGN
                 val item = ItemStack(material)
                 return@mapNotNull JoinSound(sound.id, sound.name, sound.description, bukkitSound, sound.permission, item,

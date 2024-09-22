@@ -2,7 +2,6 @@ package network.warzone.mars.player.listeners
 
 import github.scarsz.discordsrv.DiscordSRV
 import kotlinx.coroutines.runBlocking
-import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.sound.Sound.sound
 import net.kyori.adventure.text.Component
@@ -78,7 +77,8 @@ class ChatListener : Listener {
         val message = translateAlternateColorCodes('&', rawMessage)
         if (soundName != null) {
             try {
-                val sound = sound(key(soundName), Sound.Source.MASTER, 1000f, 1f)
+                val key = Sounds.resolve(soundName)
+                val sound = sound(key, Sound.Source.MASTER, 1000f, 1f)
                 playerIds.mapNotNull { Bukkit.getPlayer(it) }
                     .map(AUDIENCE_PROVIDER::player)
                     .forEach {

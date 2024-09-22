@@ -1,10 +1,10 @@
 package network.warzone.mars.utils.menu
 
-import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.sound.Sound.sound
 import network.warzone.mars.Mars
 import network.warzone.mars.utils.AUDIENCE_PROVIDER
+import network.warzone.mars.utils.Sounds
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -37,7 +37,7 @@ class GUI(
 ) : Listener {
 
     companion object {
-        val ORB_PICKUP: Sound = sound(key("random.orb"), Sound.Source.MASTER, 0.05f, 1f)
+        val ORB_PICKUP: Sound = sound(Sounds.RANDOM_ORB, Sound.Source.MASTER, 0.05f, 1f)
     }
 
     init {

@@ -1,6 +1,5 @@
 package network.warzone.mars.player.achievements
 
-import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.sound.Sound.sound
 import net.kyori.adventure.text.Component
@@ -15,6 +14,7 @@ import network.warzone.mars.api.socket.models.SimplePlayer
 import network.warzone.mars.player.feature.PlayerFeature
 import network.warzone.mars.player.models.PlayerProfile
 import network.warzone.mars.utils.AUDIENCE_PROVIDER
+import network.warzone.mars.utils.Sounds
 import org.bukkit.Bukkit
 import java.util.*
 
@@ -23,7 +23,7 @@ import java.util.*
 class AchievementEmitter(private val achievement: Achievement) {
 
     companion object {
-        val LEVEL_UP_SOUND = sound(key("entity.player.levelup"), Sound.Source.MASTER, 1f, 1f)
+        val LEVEL_UP_SOUND = sound(Sounds.RANDOM_LEVELUP, Sound.Source.MASTER, 1f, 1f)
     }
 
     // Add an achievement to the specified profile.

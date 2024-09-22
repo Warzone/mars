@@ -7,7 +7,6 @@ import app.ashcon.intake.parametric.annotation.Switch
 import app.ashcon.intake.parametric.annotation.Text
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.sound.Sound.sound
 import net.kyori.adventure.text.Component
@@ -18,6 +17,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import network.warzone.mars.report.PlayerReportEvent
 import network.warzone.mars.report.Report
+import network.warzone.mars.utils.Sounds
 import network.warzone.mars.utils.matchPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -44,7 +44,7 @@ import java.util.stream.Collectors
 class ReportCommands {
 
     companion object {
-        private val REPORT_NOTIFY_SOUND: Sound = sound(key("random.pop"), Sound.Source.MASTER, 1f, 1.2f)
+        private val REPORT_NOTIFY_SOUND: Sound = sound(Sounds.RANDOM_POP, Sound.Source.MASTER, 1f, 1.2f)
 
         private const val REPORT_COOLDOWN_SECONDS: Long = 15
         private const val REPORT_EXPIRE_HOURS:  Long = 1
