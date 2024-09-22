@@ -70,7 +70,7 @@ dependencies {
         exclude(group = "org.spigotmc", module = "spigot-api")
     }
 
-    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
+    implementation("net.wesjd:anvilgui:1.10.2-SNAPSHOT")
 
 //    compileOnly("me.lucko:adventure-platform-bukkit:4.0.0") {
 //        exclude(group = "org.spigotmc", module = "spigot-api")
