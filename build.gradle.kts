@@ -95,7 +95,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.21")
     implementation(kotlin("stdlib-jdk8"))
 
-    implementation("com.github.kittinunf.result:result-jvm:5.1.0")
+    implementation("com.github.kittinunf.result:result-jvm:5.6.0")
 }
 
 tasks.withType<ShadowJar> {
