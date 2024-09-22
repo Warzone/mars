@@ -6,19 +6,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 17
+    - uses: actions/checkout@v4
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: temurin
         cache: gradle
+    - name: Set up Gradle
+      uses: gradle/actions/setup-gradle@v3
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
-      with:
-        arguments: shadowJar
+      run: ./gradlew shadowJar
     - name: Upload artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: Mars
         path: build/libs/Mars-1.0-SNAPSHOT-all.jar
