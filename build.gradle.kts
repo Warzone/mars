@@ -52,7 +52,7 @@ dependencies {
 
     implementation("net.time4j:time4j-base:5.8")
     implementation("net.time4j:time4j-sqlxml:5.8")
-    implementation("net.time4j:time4j-tzdata:5.0-2020a")
+    implementation("net.time4j:time4j-tzdata:5.0-2024a")
 
     compileOnly("app.ashcon:sportpaper:1.8.8-R0.1-SNAPSHOT")
     implementation("com.github.Electroid.Intake:intake-bukkit:v1.2.1")
