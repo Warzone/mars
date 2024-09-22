@@ -18,7 +18,7 @@ jobs:
       with:
         arguments: shadowJar
     - name: Upload artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: Mars
         path: build/libs/Mars-1.0-SNAPSHOT-all.jar
