@@ -68,7 +68,7 @@ class ChatListener : Listener {
             Mars.get().logger.warning("DiscordSRV could not be found, disabling DiscordSRV integration")
         }
         LevelColorService
-        HandlerList.unregisterAll(ChatDispatcher.get())
+        HandlerList.unregisterAll(PGM.get().chatManager)
     }
 
     @EventHandler
