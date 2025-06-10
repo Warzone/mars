@@ -155,7 +155,6 @@ class ChatListener : Listener {
 
         val isChatUwu = Mars.get().config.getBoolean("chat.uwu")
         if (isChatUwu && chatChannel != SettingValue.CHAT_ADMIN) {
-
             val text = event.message
             val replaced = uwuify(text)
             Mars.async {
@@ -286,7 +285,6 @@ class ChatListener : Listener {
             .replace(Regex("N([aeiou])"), "Ny$1")
             .replace(Regex("N([AEIOU])"), "Ny$1")
             .replace(Regex("ove"), "uv")
-
     }
 
     fun uwuifyPunctuation(message: String): String {
