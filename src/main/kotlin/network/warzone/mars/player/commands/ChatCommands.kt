@@ -22,4 +22,13 @@ class ChatCommands {
         Bukkit.getOnlinePlayers().forEach { player -> repeat(500) { player.sendMessage("\n") } }
         Bukkit.broadcastMessage("${ChatColor.DARK_AQUA}${sender.name} cleared the chat.")
     }
+
+    @Command(aliases = ["uwu"], desc = "Uwu-fies the chat!", perms = ["mars.chat.uwu"])
+    fun onChatUwu(@Sender sender: CommandSender) {
+        val isEnabled = Mars.get().config.getBoolean("chat.uwu")
+        if (!isEnabled) Bukkit.broadcastMessage("${ChatColor.DARK_AQUA}${sender.name} has uwu-fied the chat.")
+        else Bukkit.broadcastMessage("${ChatColor.DARK_AQUA}${sender.name} returned the chat to normal.")
+        Mars.get().config.set("chat.uwu", !isEnabled)
+        Mars.get().saveConfig()
+    }
 }

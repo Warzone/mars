@@ -37,8 +37,8 @@ import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
-import tc.oc.pgm.listeners.ChatDispatcher
 import tc.oc.pgm.util.bukkit.OnlinePlayerMapAdapter
+import kotlin.random.Random
 
 
 class ChatListener : Listener {
@@ -152,6 +152,24 @@ class ChatListener : Listener {
             event.isCancelled = true
             return
         }
+
+        val isChatUwu = Mars.get().config.getBoolean("chat.uwu")
+        if (isChatUwu && chatChannel != SettingValue.CHAT_ADMIN) {
+
+            val text = event.message
+            val replaced = uwuify(text)
+            Mars.async {
+                if (chatChannel == SettingValue.CHAT_GLOBAL) {
+                    sendGlobalChat(match, context, replaced)
+                } else {
+                    sendTeamChat(context.matchPlayer.party, context, replaced)
+                }
+            }
+            event.isCancelled = true;
+            return;
+        }
+
+
         runBlocking {
             when (chatChannel) {
                 SettingValue.CHAT_ADMIN -> sendAdminChat(match, context.getPrefix() ?: "", player.name, event.message, null)
@@ -174,8 +192,11 @@ class ChatListener : Listener {
         ).callEvent()
 
         event.isCancelled = true
-        if (queuedChannels.containsKey(event.player))
+        if (queuedChannels.containsKey(event.player)) {
             matchPlayer.settings.setValue(SettingKey.CHAT, queuedChannels.remove(event.player))
+        }
+
+
     }
 
     private suspend fun sendGlobalChat(match: Match, context: PlayerContext, message: String) {
@@ -251,5 +272,55 @@ class ChatListener : Listener {
             hoverComponent.appendNewline().append(text(name))
         }
         return component.hoverEvent(hoverComponent.build())
+    }
+
+    val exclamations = arrayOf("!?", "?!!", "?!?1", "!!11", "?!?!")
+    val faces = arrayOf("(・`ω´・)", ";;w;;", "OwO", "UwU", ">w<", "^w^", "ÚwÚ", "^-^", ":3")
+    val actions = arrayOf("*blushes*", "*whispers to self*", "*cries*", "*screams*", "*sweats*", "*twerks*", "*runs away*", "*screeches*", "*walks away*", "*looks at you*", "*starts twerking*", "*huggles tightly*", "*boops your nose*")
+
+    fun uwuifyWords(message: String): String {
+        return message
+            .replace(Regex("[rl]"), "w")
+            .replace(Regex("[RL]"), "W")
+            .replace(Regex("n([aeiou])"), "ny$1")
+            .replace(Regex("N([aeiou])"), "Ny$1")
+            .replace(Regex("N([AEIOU])"), "Ny$1")
+            .replace(Regex("ove"), "uv")
+
+    }
+
+    fun uwuifyPunctuation(message: String): String {
+        return message.split(" ").map { word ->
+            word.replace(Regex("[?!]+$"), exclamations.random())
+        }.joinToString(" ")
+
+    }
+
+    fun uwuifySpaces(message: String): String {
+        return message.split(" ").map{ word ->
+            val firstCharacter = word.first()
+            val rand = Random.nextDouble()
+            when {
+                rand < 0.1 -> {
+                     "$word ${faces.random()}"
+                }
+                rand < 0.2 -> {
+                    "$word ${actions.random()}"
+                }
+                rand < 0.3 -> {
+                    ("$firstCharacter-").repeat(Random.nextInt(0, 3)) + word
+                }
+                else -> {
+                    word
+                }
+            }
+        }.joinToString(" ")
+    }
+
+    fun uwuify(message: String): String {
+        return message
+            .let(::uwuifyWords)
+            .let(::uwuifySpaces)
+            .let(::uwuifyPunctuation)
     }
 }
