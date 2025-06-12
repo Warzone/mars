@@ -27,6 +27,7 @@ import network.warzone.mars.player.decoration.PrefixDecorationProvider
 import network.warzone.mars.player.feature.PlayerService
 import network.warzone.mars.player.models.PlayerStats
 import network.warzone.mars.player.tablist.overrideTabManager
+import network.warzone.mars.sit.SitController
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -36,6 +37,8 @@ import java.util.concurrent.CompletableFuture
 
 class Mars : JavaPlugin() {
     companion object {
+
+        var sitController = SitController();
         lateinit var instance: Mars
 
         fun async(block: suspend() -> Unit) {
@@ -115,6 +118,10 @@ class Mars : JavaPlugin() {
     private fun overrideDefaultProviders() {
         PGM.get().nameDecorationRegistry.setProvider(PrefixDecorationProvider())
         this.overrideTabManager()
+    }
+
+    fun getSitController (): SitController {
+        return sitController;
     }
 
 }

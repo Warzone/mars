@@ -11,6 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.player.achievements.gui.AchievementMenu
+import network.warzone.mars.sit.SitController
 import network.warzone.mars.utils.matchPlayer
 import network.warzone.mars.utils.menu.open
 import org.bukkit.Bukkit
@@ -20,7 +21,9 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import javax.annotation.Nullable
 
+
 class MiscCommands {
+
     @Command(aliases = ["appeal"], desc = "Get a direct link to the appeal site")
     fun onAppealLink(@Sender sender: Player) {
         val appealLink = Mars.get().config.getString("server.links.appeal") ?: "No appeal link available"
@@ -63,6 +66,24 @@ class MiscCommands {
         if (player == sender) sender.sendMessage("${ChatColor.GRAY}Your ping is ${ChatColor.AQUA}${ping}ms")
         else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
     }
+
+    val sitController = Mars.sitController
+
+    @Command(aliases = ["sit"], desc = "Sit down to get comfortable!", perms = ["mars.sit"])
+    fun onPlayerSit(@Sender sender: Player) {
+        if (!sitController.isSitting(sender)) {
+            sitController.sit(sender )
+            println("sit")
+            println(sitController.sitting)
+        } else {
+            sitController.unSit(sender)
+            println("unsit")
+            println(sitController.sitting)
+        }
+
+    }
+
+
 
     @Command(
         aliases = ["ach", "achievement", "achievements"],

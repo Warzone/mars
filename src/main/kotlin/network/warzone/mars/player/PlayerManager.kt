@@ -8,11 +8,14 @@ import network.warzone.mars.player.listeners.InventoryListener
 import network.warzone.mars.player.models.Session
 import network.warzone.mars.player.settings.SettingsListener
 import network.warzone.mars.punishment.models.Punishment
+import network.warzone.mars.sit.listeners.DismountListener
+import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import java.util.*
 
 object PlayerManager {
     private val players: MutableMap<UUID, PlayerContext> = HashMap()
+
 
     init {
         Mars.registerEvents(ChatListener())
@@ -20,6 +23,7 @@ object PlayerManager {
         Mars.registerEvents(LevelDisplayListener())
         Mars.registerEvents(CombatListener())
         Mars.registerEvents(SettingsListener())
+        Mars.registerEvents(DismountListener())
     }
 
     fun createPlayer(player: Player, session: Session, activePunishments: List<Punishment>): PlayerContext {
