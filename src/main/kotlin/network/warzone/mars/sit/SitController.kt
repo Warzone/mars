@@ -1,5 +1,8 @@
 package network.warzone.mars.sit
 
+import app.ashcon.intake.CommandException
+import network.warzone.mars.Mars
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
@@ -7,15 +10,20 @@ import org.bukkit.entity.Player
 import java.util.UUID
 
 class SitController {
-    val sitting: HashSet<UUID?> = HashSet()
+    val sitting: HashMap<UUID?, ArmorStand?> = HashMap()
 
     fun sit(player: Player) {
         if (isSitting(player)) {
             return;
         }
 
-        sitting.add(player.uniqueId)
-        createChair(player.location).passenger = player;
+        if(!validSeatLocation(player)) {
+            throw CommandException("Invalid sitting location")
+        }
+
+        val chair = createChair(player.location, player)
+        sitting.put(player.uniqueId, chair)
+
     }
 
     fun isSitting(player: Player): Boolean {
@@ -32,18 +40,23 @@ class SitController {
         if (!isSitting(player)) {
             return;
         }
-        seat.remove()
         sitting.remove(player.uniqueId)
+        seat.remove()
+    }
 
+    fun validSeatLocation(player: Player): Boolean {
+        return !(player.isFlying || player.isSleeping || !player.isValid)
 
     }
 
 
-    private fun createChair(loc: Location): ArmorStand {
+    private fun createChair(loc: Location, player: Player): ArmorStand {
         val world = loc.world
-        val chair = world.spawnEntity(loc.subtract(0.0, 0.6, 0.0), EntityType.ARMOR_STAND) as ArmorStand
+        val chair = world.spawnEntity(loc.subtract(0.0, 0.0, 0.0), EntityType.ARMOR_STAND) as ArmorStand
         chair.setGravity(false)
-        chair.isMarker = true;
+        chair.isMarker = true
+        chair.isSmall = true
+        chair.passenger = player
         return chair
     }
 }

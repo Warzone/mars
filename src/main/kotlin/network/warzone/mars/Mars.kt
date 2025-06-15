@@ -120,8 +120,4 @@ class Mars : JavaPlugin() {
         this.overrideTabManager()
     }
 
-    fun getSitController (): SitController {
-        return sitController;
-    }
-
 }

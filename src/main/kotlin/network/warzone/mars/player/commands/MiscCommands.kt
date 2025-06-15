@@ -73,11 +73,9 @@ class MiscCommands {
     fun onPlayerSit(@Sender sender: Player) {
         if (!sitController.isSitting(sender)) {
             sitController.sit(sender )
-            println("sit")
             println(sitController.sitting)
         } else {
             sitController.unSit(sender)
-            println("unsit")
             println(sitController.sitting)
         }
 

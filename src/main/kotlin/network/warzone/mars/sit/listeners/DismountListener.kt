@@ -6,8 +6,11 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.spigotmc.event.entity.EntityDismountEvent
+import org.spigotmc.event.entity.EntityMountEvent
 
 class DismountListener : Listener {
 
@@ -19,11 +22,12 @@ class DismountListener : Listener {
             return
         } else {
             println("Player dismounted so removed from sit list")
-            println(sitController.sitting)
             val player = event.entity as Player;
             val seat = event.dismounted as ArmorStand
-            seat.remove()
+//            seat.remove()
             sitController.unSit(player, seat);
+            println(sitController.sitting)
+
         }
     }
 
@@ -33,5 +37,12 @@ class DismountListener : Listener {
             sitController.unSit(event.player)
             println("Player quit removed from sit list")
         }
+    }
+
+    @EventHandler
+    fun onPlayerDamaged(event: EntityDamageByEntityEvent) {
+        if (event.entity !is Player) return
+        val player = event.entity as Player
+        sitController.unSit(player);
     }
 }
