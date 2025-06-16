@@ -1,8 +1,6 @@
 package network.warzone.mars.sit
 
 import app.ashcon.intake.CommandException
-import network.warzone.mars.Mars
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
@@ -48,7 +46,6 @@ class SitController {
         return !(player.isFlying || player.isSleeping || !player.isValid)
 
     }
-
 
     private fun createChair(loc: Location, player: Player): ArmorStand {
         val world = loc.world

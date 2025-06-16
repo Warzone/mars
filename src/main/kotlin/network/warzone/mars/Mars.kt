@@ -27,6 +27,7 @@ import network.warzone.mars.player.decoration.PrefixDecorationProvider
 import network.warzone.mars.player.feature.PlayerService
 import network.warzone.mars.player.models.PlayerStats
 import network.warzone.mars.player.tablist.overrideTabManager
+import network.warzone.mars.sit.ChairRotationTask
 import network.warzone.mars.sit.SitController
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
@@ -101,6 +102,8 @@ class Mars : JavaPlugin() {
         MatchManager.init()
 
         BukkitIntake(this@Mars, commandGraph).register()
+
+        ChairRotationTask().start()
 
         overrideDefaultProviders()
     }
