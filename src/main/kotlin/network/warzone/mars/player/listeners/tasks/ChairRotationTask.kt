@@ -1,4 +1,4 @@
-package network.warzone.mars.sit
+package network.warzone.mars.player.listeners.tasks
 
 import network.warzone.mars.Mars
 import org.bukkit.Bukkit
@@ -27,6 +27,6 @@ class ChairRotationTask : BukkitRunnable() {
     }
 
     fun start() {
-        this.runTaskTimer(Mars.get(), 0L, 1L)
+        this.runTaskTimer(Mars.Companion.get(), 0L, 1L)
     }
 }

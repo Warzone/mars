@@ -27,8 +27,8 @@ import network.warzone.mars.player.decoration.PrefixDecorationProvider
 import network.warzone.mars.player.feature.PlayerService
 import network.warzone.mars.player.models.PlayerStats
 import network.warzone.mars.player.tablist.overrideTabManager
-import network.warzone.mars.sit.ChairRotationTask
-import network.warzone.mars.sit.SitController
+import network.warzone.mars.player.listeners.tasks.ChairRotationTask
+import network.warzone.mars.player.controllers.SitController
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -105,6 +105,7 @@ class Mars : JavaPlugin() {
 
         ChairRotationTask().start()
 
+
         overrideDefaultProviders()
     }
 
@@ -116,6 +117,7 @@ class Mars : JavaPlugin() {
         }
 
         AchievementManager.unload()
+        sitController.clearAllSeats()
     }
 
     private fun overrideDefaultProviders() {

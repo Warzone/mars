@@ -1,6 +1,8 @@
-package network.warzone.mars.sit
+package network.warzone.mars.player.controllers
 
 import app.ashcon.intake.CommandException
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
@@ -16,12 +18,11 @@ class SitController {
         }
 
         if(!validSeatLocation(player)) {
-            throw CommandException("Invalid sitting location")
+            throw CommandException("You were unable to sit!")
         }
-
         val chair = createChair(player.location, player)
         sitting.put(player.uniqueId, chair)
-
+        player.sendActionBar("${ChatColor.GREEN}You are now sitting!")
     }
 
     fun isSitting(player: Player): Boolean {
@@ -38,13 +39,21 @@ class SitController {
         if (!isSitting(player)) {
             return;
         }
+        player.sendActionBar("${ChatColor.DARK_RED}You are no longer sitting!")
         sitting.remove(player.uniqueId)
         seat.remove()
     }
 
     fun validSeatLocation(player: Player): Boolean {
-        return !(player.isFlying || player.isSleeping || !player.isValid)
+        return !(player.isFlying || player.isSleeping || !player.isValid || player.isSneaking || !player.isOnGround)
+    }
 
+    fun clearAllSeats() {
+        for ((uuid) in sitting) {
+            val player = Bukkit.getPlayer(uuid) ?: continue
+            unSit(player)
+
+        }
     }
 
     private fun createChair(loc: Location, player: Player): ArmorStand {

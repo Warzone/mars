@@ -8,7 +8,7 @@ import network.warzone.mars.player.listeners.InventoryListener
 import network.warzone.mars.player.models.Session
 import network.warzone.mars.player.settings.SettingsListener
 import network.warzone.mars.punishment.models.Punishment
-import network.warzone.mars.sit.listeners.DismountListener
+import network.warzone.mars.player.listeners.DismountListener
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import java.util.*

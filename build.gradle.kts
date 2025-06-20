@@ -110,6 +110,7 @@ tasks.withType<ShadowJar> {
     filesMatching("**/plugin.yml") {
         expand("version" to project.version)
     }
+    destinationDirectory.set(file("C:\\Users\\jello\\OneDrive\\Documents\\GitHub\\mars-compose\\mars\\build\\libs"))
 }
 
 tasks.withType<KotlinCompile> {
