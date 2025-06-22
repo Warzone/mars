@@ -63,6 +63,7 @@ class SitController {
         chair.isMarker = true
         chair.isSmall = true
         chair.passenger = player
+        chair.isVisible = false
         return chair
     }
 }
