@@ -10,8 +10,10 @@ class ChairRotationTask : BukkitRunnable() {
     val sitController = Mars.sitController
 
     override fun run() {
-        for ((uuid, armorStand) in sitController.sitting) {
+        for ((uuid) in sitController.sitting) {
             val player = Bukkit.getPlayer(uuid) ?: continue
+            val armorStand = sitController.sitting.get(uuid)?.first
+
             if (armorStand == null || !player.isOnline) continue
 
             val entityArmorStand = (armorStand as CraftArmorStand).handle

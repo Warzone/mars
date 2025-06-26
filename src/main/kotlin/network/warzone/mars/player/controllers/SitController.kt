@@ -4,24 +4,29 @@ import app.ashcon.intake.CommandException
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.block.Block
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import java.util.UUID
+import java.util.*
+import kotlin.math.floor
 
 class SitController {
-    val sitting: HashMap<UUID?, ArmorStand?> = HashMap()
+    val sitting: HashMap<UUID?, Pair<ArmorStand?, Block?>> = HashMap()
 
     fun sit(player: Player) {
         if (isSitting(player)) {
             return;
         }
-
-        if(!validSeatLocation(player)) {
+        val block = getBlockBelow(player)
+        if(!validSeatLocation(player, block)) {
             throw CommandException("You were unable to sit!")
         }
         val chair = createChair(player.location, player)
-        sitting.put(player.uniqueId, chair)
+        sitting.put(player.uniqueId, Pair(chair, block))
         player.sendActionBar("${ChatColor.GREEN}You are now sitting!")
     }
 
@@ -44,26 +49,55 @@ class SitController {
         seat.remove()
     }
 
-    fun validSeatLocation(player: Player): Boolean {
-        return !(player.isFlying || player.isSleeping || !player.isValid || player.isSneaking || !player.isOnGround)
+    fun validSeatLocation(player: Player, block: Block?): Boolean {
+        return !(block?.type == Material.AIR || !player.isOnGround);
     }
 
     fun clearAllSeats() {
         for ((uuid) in sitting) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             unSit(player)
-
         }
     }
 
     private fun createChair(loc: Location, player: Player): ArmorStand {
         val world = loc.world
-        val chair = world.spawnEntity(loc.subtract(0.0, 0.0, 0.0), EntityType.ARMOR_STAND) as ArmorStand
+        val chair = world.spawnEntity(loc.add(0.0, 0.05, 0.0), EntityType.ARMOR_STAND) as ArmorStand
         chair.setGravity(false)
         chair.isMarker = true
         chair.isSmall = true
         chair.passenger = player
         chair.isVisible = false
         return chair
+    }
+
+
+    fun getBlockBelow(entity: Entity): Block? {
+        val bb = (entity as CraftEntity).handle.boundingBox
+        val minX = floor(bb.a)
+        val maxX = floor(bb.d)
+        val minZ = floor(bb.c)
+        val maxZ = floor(bb.f)
+        val y = floor(bb.b - 0.01)
+        val world = entity.world
+        for (x in minX.toInt()..maxX.toInt()) {
+            for (z in minZ.toInt()..maxZ.toInt()) {
+                val loc = Location(world, x.toDouble(),y, z.toDouble())
+                val block = world.getBlockAt(loc)
+                if (block.type == Material.AIR) {
+                    val belowBlock = world.getBlockAt(loc.subtract(0.0, 1.0, 0.0))
+                    val type = belowBlock.type
+                    if (type == Material.FENCE ||
+                        type == Material.NETHER_FENCE ||
+                        type == Material.COBBLE_WALL ||
+                        type == Material.STEP ||
+                        type == Material.FENCE_GATE) {
+                        return belowBlock
+                    }
+                }
+                return block
+            }
+        }
+        return null;
     }
 }
