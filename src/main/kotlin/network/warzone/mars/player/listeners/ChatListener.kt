@@ -37,6 +37,7 @@ import tc.oc.pgm.api.party.Party
 import tc.oc.pgm.api.player.MatchPlayer
 import tc.oc.pgm.api.setting.SettingKey
 import tc.oc.pgm.api.setting.SettingValue
+import tc.oc.pgm.listeners.ChatDispatcher
 import tc.oc.pgm.util.bukkit.OnlinePlayerMapAdapter
 
 
@@ -151,7 +152,6 @@ class ChatListener : Listener {
             event.isCancelled = true
             return
         }
-
         runBlocking {
             when (chatChannel) {
                 SettingValue.CHAT_ADMIN -> sendAdminChat(match, context.getPrefix() ?: "", player.name, event.message, null)
@@ -174,11 +174,8 @@ class ChatListener : Listener {
         ).callEvent()
 
         event.isCancelled = true
-        if (queuedChannels.containsKey(event.player)) {
+        if (queuedChannels.containsKey(event.player))
             matchPlayer.settings.setValue(SettingKey.CHAT, queuedChannels.remove(event.player))
-        }
-
-
     }
 
     private suspend fun sendGlobalChat(match: Match, context: PlayerContext, message: String) {

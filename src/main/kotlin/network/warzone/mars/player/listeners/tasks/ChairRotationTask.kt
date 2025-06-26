@@ -13,9 +13,7 @@ class ChairRotationTask : BukkitRunnable() {
         for ((uuid) in sitController.sitting) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             val armorStand = sitController.sitting.get(uuid)?.first
-
-            if (armorStand == null || !player.isOnline) continue
-
+            if (armorStand == null) continue
             val entityArmorStand = (armorStand as CraftArmorStand).handle
             entityArmorStand.yaw = player.location.yaw
             entityArmorStand.setPositionRotation(
