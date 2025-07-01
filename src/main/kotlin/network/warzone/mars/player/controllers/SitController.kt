@@ -50,7 +50,7 @@ class SitController {
     }
 
     fun validSeatLocation(player: Player, block: Block?): Boolean {
-        return !(block?.type == Material.AIR || !player.isOnGround);
+        return !(block?.type == Material.AIR || block == null || !player.isOnGround);
     }
 
     fun clearAllSeats() {
@@ -78,11 +78,11 @@ class SitController {
         val maxX = floor(bb.d)
         val minZ = floor(bb.c)
         val maxZ = floor(bb.f)
-        val y = floor(bb.b - 0.01)
+        val y = floor(bb.b - 0.02)
         val world = entity.world
         for (x in minX.toInt()..maxX.toInt()) {
             for (z in minZ.toInt()..maxZ.toInt()) {
-                val loc = Location(world, x.toDouble(),y, z.toDouble())
+                val loc = Location(world, x.toDouble(), y, z.toDouble())
                 val block = world.getBlockAt(loc)
                 if (block.type == Material.AIR) {
                     val belowBlock = world.getBlockAt(loc.subtract(0.0, 1.0, 0.0))
@@ -94,8 +94,9 @@ class SitController {
                         type == Material.FENCE_GATE) {
                         return belowBlock
                     }
+                } else {
+                    return block
                 }
-                return block
             }
         }
         return null;

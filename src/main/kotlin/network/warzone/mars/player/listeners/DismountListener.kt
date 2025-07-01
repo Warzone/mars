@@ -1,7 +1,11 @@
 package network.warzone.mars.player.listeners
 
 import network.warzone.mars.Mars
+import network.warzone.mars.feature.ResourceType
 import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftArmorStand
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -17,11 +21,11 @@ class DismountListener : Listener {
 
     @EventHandler
     fun onDismount(event: EntityDismountEvent) {
-        if (event.entity !is Player && event.dismounted !is ArmorStand) {
-            return
-        } else {
-            val player = event.entity as Player;
-            sitController.unSit(player);
+        if (event.entity is Player && event.dismounted is ArmorStand && sitController.isSitting(event.entity as Player)) {
+            val player = (event.entity as CraftPlayer).handle
+            val armorStand = (event.dismounted as CraftArmorStand).handle
+            sitController.unSit(event.entity as CraftPlayer)
+            player.setPositionRotation(armorStand.locX, armorStand.locY,armorStand.locZ, player.yaw, player.pitch)
         }
     }
 
