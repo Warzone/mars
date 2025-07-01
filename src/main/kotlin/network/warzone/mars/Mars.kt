@@ -38,8 +38,6 @@ import java.util.concurrent.CompletableFuture
 
 class Mars : JavaPlugin() {
     companion object {
-
-        var sitController = SitController();
         lateinit var instance: Mars
 
         fun async(block: suspend() -> Unit) {
@@ -104,8 +102,6 @@ class Mars : JavaPlugin() {
         BukkitIntake(this@Mars, commandGraph).register()
 
         ChairRotationTask().start()
-
-
         overrideDefaultProviders()
     }
 
@@ -115,9 +111,8 @@ class Mars : JavaPlugin() {
             val sessionLength = Date().time - activeSession.createdAt.time
             PlayerService.logout(it.uniqueId, it.name, activeSession._id, sessionLength)
         }
-
         AchievementManager.unload()
-        sitController.clearAllSeats()
+        SitController().clearAllSeats()
     }
 
     private fun overrideDefaultProviders() {
