@@ -20,9 +20,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import javax.annotation.Nullable
 
-
 class MiscCommands {
-
     @Command(aliases = ["appeal"], desc = "Get a direct link to the appeal site")
     fun onAppealLink(@Sender sender: Player) {
         val appealLink = Mars.get().config.getString("server.links.appeal") ?: "No appeal link available"
