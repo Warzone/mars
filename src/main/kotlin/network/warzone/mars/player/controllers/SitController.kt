@@ -71,21 +71,19 @@ class SitController {
         return chair
     }
 
-
     fun getBlockBelow(entity: Entity): Block? {
         val bb = (entity as CraftEntity).handle.boundingBox
-        val minX = floor(bb.a)
-        val maxX = floor(bb.d)
-        val minZ = floor(bb.c)
-        val maxZ = floor(bb.f)
-        val y = floor(bb.b - 0.02)
+        val minX = floor(bb.a).toInt()
+        val maxX = floor(bb.d).toInt()
+        val minZ = floor(bb.c).toInt()
+        val maxZ = floor(bb.f).toInt()
+        val y = floor(bb.b - 0.02).toInt()
         val world = entity.world
-        for (x in minX.toInt()..maxX.toInt()) {
-            for (z in minZ.toInt()..maxZ.toInt()) {
-                val loc = Location(world, x.toDouble(), y, z.toDouble())
-                val block = world.getBlockAt(loc)
+        for (x in minX..maxX) {
+            for (z in minZ..maxZ) {
+                val block = world.getBlockAt(x, y, z)
                 if (block.type == Material.AIR) {
-                    val belowBlock = world.getBlockAt(loc.subtract(0.0, 1.0, 0.0))
+                    val belowBlock = world.getBlockAt(x,y - 1,z)
                     val type = belowBlock.type
                     if (type == Material.FENCE ||
                         type == Material.NETHER_FENCE ||

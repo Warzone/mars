@@ -11,6 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import network.warzone.mars.Mars
 import network.warzone.mars.commands.providers.PlayerName
 import network.warzone.mars.player.achievements.gui.AchievementMenu
+import network.warzone.mars.player.controllers.SitController
 import network.warzone.mars.utils.matchPlayer
 import network.warzone.mars.utils.menu.open
 import org.bukkit.Bukkit
@@ -64,13 +65,12 @@ class MiscCommands {
         else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
     }
 
-    val sitController = Mars.sitController
     @Command(aliases = ["sit"], desc = "Sit down to get comfortable!", perms = ["mars.sit"])
     fun onPlayerSit(@Sender sender: Player) {
-        if (!sitController.isSitting(sender)) {
-            sitController.sit(sender)
+        if (!SitController().isSitting(sender)) {
+            SitController().sit(sender)
         } else {
-            sitController.unSit(sender)
+            SitController().unSit(sender)
         }
     }
 

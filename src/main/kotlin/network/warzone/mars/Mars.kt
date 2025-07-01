@@ -39,6 +39,7 @@ import java.util.concurrent.CompletableFuture
 class Mars : JavaPlugin() {
     companion object {
         lateinit var instance: Mars
+        var sitController = SitController();
 
         fun async(block: suspend() -> Unit) {
             Bukkit.getScheduler().runTaskAsynchronously(get(), Runnable {
@@ -112,7 +113,8 @@ class Mars : JavaPlugin() {
             PlayerService.logout(it.uniqueId, it.name, activeSession._id, sessionLength)
         }
         AchievementManager.unload()
-        SitController().clearAllSeats()
+        sitController.clearAllSeats()
+        ChairRotationTask().cancel()
     }
 
     private fun overrideDefaultProviders() {

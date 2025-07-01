@@ -2,6 +2,7 @@ package network.warzone.mars.player.listeners
 
 import network.warzone.mars.Mars
 import network.warzone.mars.feature.ResourceType
+import network.warzone.mars.player.controllers.SitController
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftArmorStand
@@ -17,8 +18,8 @@ import org.spigotmc.event.entity.EntityDismountEvent
 
 class DismountListener : Listener {
 
-    val sitController = Mars.Companion.sitController
 
+    val sitController = Mars.sitController
     @EventHandler
     fun onDismount(event: EntityDismountEvent) {
         if (event.entity is Player && event.dismounted is ArmorStand && sitController.isSitting(event.entity as Player)) {
