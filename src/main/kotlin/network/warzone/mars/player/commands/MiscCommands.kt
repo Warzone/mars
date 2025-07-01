@@ -65,12 +65,13 @@ class MiscCommands {
         else sender.sendMessage("${ChatColor.AQUA}$possessive ${ChatColor.GRAY}ping is ${ChatColor.AQUA}${ping}ms")
     }
 
+    val sitController = Mars.sitController
     @Command(aliases = ["sit"], desc = "Sit down to get comfortable!", perms = ["mars.sit"])
     fun onPlayerSit(@Sender sender: Player) {
-        if (!SitController().isSitting(sender)) {
-            SitController().sit(sender)
+        if (!sitController.isSitting(sender)) {
+            sitController.sit(sender)
         } else {
-            SitController().unSit(sender)
+            sitController.unSit(sender)
         }
     }
 
