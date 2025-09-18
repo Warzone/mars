@@ -27,6 +27,8 @@ import network.warzone.mars.player.decoration.PrefixDecorationProvider
 import network.warzone.mars.player.feature.PlayerService
 import network.warzone.mars.player.models.PlayerStats
 import network.warzone.mars.player.tablist.overrideTabManager
+import network.warzone.mars.player.listeners.tasks.ChairRotationTask
+import network.warzone.mars.player.controllers.SitController
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -37,6 +39,7 @@ import java.util.concurrent.CompletableFuture
 class Mars : JavaPlugin() {
     companion object {
         lateinit var instance: Mars
+        var sitController = SitController();
 
         fun async(block: suspend() -> Unit) {
             Bukkit.getScheduler().runTaskAsynchronously(get(), Runnable {
@@ -99,6 +102,7 @@ class Mars : JavaPlugin() {
 
         BukkitIntake(this@Mars, commandGraph).register()
 
+        ChairRotationTask().start()
         overrideDefaultProviders()
     }
 
@@ -108,8 +112,9 @@ class Mars : JavaPlugin() {
             val sessionLength = Date().time - activeSession.createdAt.time
             PlayerService.logout(it.uniqueId, it.name, activeSession._id, sessionLength)
         }
-
         AchievementManager.unload()
+        sitController.clearAllSeats()
+        ChairRotationTask().cancel()
     }
 
     private fun overrideDefaultProviders() {
