@@ -2,7 +2,8 @@ package network.warzone.mars.player.tablist
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.VirtualComponentRenderer
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
@@ -21,16 +22,16 @@ import tc.oc.pgm.util.Players
 import tc.oc.pgm.util.named.NameDecorationProvider
 import tc.oc.pgm.util.named.NameStyle
 import tc.oc.pgm.util.player.PlayerComponent
-import tc.oc.pgm.util.player.PlayerComponent.player
 import tc.oc.pgm.util.player.PlayerRenderer
 import tc.oc.pgm.util.tablist.PlayerTabEntry
-import tc.oc.pgm.util.text.RenderableComponent
 import java.util.*
 
 
 fun Mars.overrideTabManager() {
     AUDIENCE_PROVIDER
-    PlayerTabEntry.setPlayerComponent(::LeveledPlayerComponent)
+    PlayerTabEntry.setPlayerComponent {
+        virtual(CommandSender::class.java, LeveledPlayerComponent(it))
+    }
 }
 
 class LeveledPlayerRenderer {
@@ -94,7 +95,7 @@ class LeveledPlayerRenderer {
 class LeveledPlayerComponent(
     private val player: Player?,
     private val nameStyle: NameStyle,
-) : RenderableComponent {
+) : VirtualComponentRenderer<CommandSender> {
 
     companion object {
         val RENDERER = LeveledPlayerRenderer()
@@ -102,9 +103,9 @@ class LeveledPlayerComponent(
 
     constructor(player: Player?) : this(player, NameStyle.TAB)
 
-    override fun render(viewer: CommandSender): Component {
-        if (player == null) return PlayerComponent.UNKNOWN_PLAYER
-        return RENDERER.render(player, PlayerData(player, NameStyle.TAB), PlayerRelationship(player, viewer))
+    override fun apply(context: CommandSender): ComponentLike {
+        if (player == null) return PlayerComponent.UNKNOWN
+        return RENDERER.render(player, PlayerData(player, NameStyle.TAB), PlayerRelationship(player, context))
     }
 }
 

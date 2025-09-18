@@ -2,8 +2,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.21"
-    kotlin("plugin.serialization") version "1.6.21"
+    kotlin("jvm") version "1.9.0"
+    kotlin("plugin.serialization") version "1.9.0"
 
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("me.qoomon.git-versioning") version "5.1.1"
@@ -66,7 +66,7 @@ dependencies {
 
     compileOnly("net.kyori:adventure-api:4.8.1")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.8.1")
-    implementation("net.kyori:adventure-platform-bukkit:4.3.0") {
+    implementation("net.kyori:adventure-platform-bukkit:4.4.1") { // Match PGM
         exclude(group = "org.spigotmc", module = "spigot-api")
     }
 

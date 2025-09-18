@@ -154,6 +154,7 @@ object ApiClient {
                         val data = GSON.fromJson(json, PlayerUpdate::class.java)
                         PlayerUpdateEvent(data).callEvent()
                     }
+                    else -> {}
                 }
             }
 

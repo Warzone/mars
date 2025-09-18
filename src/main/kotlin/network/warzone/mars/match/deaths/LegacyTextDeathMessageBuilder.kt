@@ -27,6 +27,7 @@ class LegacyTextDeathMessageBuilder(event: MatchPlayerDeathEvent)
             EntityTypes.UNKNOWN,
             EntityTypes.COMPLEX_PART,
             EntityTypes.ENDER_CRYSTAL -> return false
+            else -> {}
         }
 
         if (test("entity")) weaponString = entityInfo.identifier

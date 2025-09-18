@@ -194,6 +194,7 @@ open class PGMDeathMessageBuilder(event: MatchPlayerDeathEvent, logger: Logger) 
             EntityTypes.UNKNOWN,
             EntityTypes.COMPLEX_PART,
             EntityTypes.ENDER_CRYSTAL -> return false
+            else -> {}
         }
 
         if (option("entity")) {
@@ -302,6 +303,7 @@ open class PGMDeathMessageBuilder(event: MatchPlayerDeathEvent, logger: Logger) 
                 EntityType.UNKNOWN,
                 EntityType.ARROW,
                 EntityType.WITHER_SKULL -> info = null // "shot by arrow" is redundant
+                else -> {}
             }
         } else {
             // Projectile name may be different than entity name e.g. custom projectile
