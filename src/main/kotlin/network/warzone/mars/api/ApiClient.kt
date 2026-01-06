@@ -4,28 +4,44 @@ import com.google.gson.annotations.SerializedName
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.features.defaultRequest
+import io.ktor.client.features.json.GsonSerializer
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.utils.io.ByteReadChannel
+import java.util.logging.Level
 import network.warzone.mars.Mars
 import network.warzone.mars.api.events.ApiConnectedEvent
 import network.warzone.mars.api.socket.OutboundEvent
 import network.warzone.mars.api.socket.SocketEventType
 import network.warzone.mars.api.socket.WarzoneService
-import network.warzone.mars.api.socket.models.*
+import network.warzone.mars.api.socket.models.MessageData
+import network.warzone.mars.api.socket.models.MessageEvent
+import network.warzone.mars.api.socket.models.PlayerChatData
+import network.warzone.mars.api.socket.models.PlayerChatEvent
+import network.warzone.mars.api.socket.models.PlayerUpdate
+import network.warzone.mars.api.socket.models.PlayerUpdateEvent
 import network.warzone.mars.match.tracker.ForceMatchEndEvent
 import network.warzone.mars.match.tracker.PlayerXPGainData
 import network.warzone.mars.match.tracker.PlayerXPGainEvent
 import network.warzone.mars.player.feature.DisconnectPlayerData
 import network.warzone.mars.player.feature.DisconnectPlayerEvent
-import network.warzone.mars.utils.*
+import network.warzone.mars.utils.GSON
+import network.warzone.mars.utils.GSON_CFG
+import network.warzone.mars.utils.GsonMessageAdapter
+import network.warzone.mars.utils.MissingConfigPathException
+import network.warzone.mars.utils.createLogger
 import okhttp3.OkHttpClient
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
-import java.util.logging.Level
 
 data class Packet<T>(
     @SerializedName("e") val event: SocketEventType,
@@ -42,6 +58,13 @@ object ApiClient {
 
         defaultRequest {
             contentType(ContentType.Application.Json)
+            header("Authorization", "API-Token $apiToken")
+            header("Mars-Server-ID", Mars.get().serverId)
+        }
+    }
+    val clientBinary: HttpClient = HttpClient(CIO) {
+        defaultRequest {
+            contentType(ContentType.Application.OctetStream)
             header("Authorization", "API-Token $apiToken")
             header("Mars-Server-ID", Mars.get().serverId)
         }
@@ -85,6 +108,13 @@ object ApiClient {
         return client.post(baseUrl + url) {
             this.body = body
         }
+    }
+
+    suspend inline fun <reified T> postBinary(url: String, channel: ByteReadChannel): T {
+        val r : T = clientBinary.post(baseUrl + url) {
+            this.body = channel
+        }
+        return r
     }
 
     suspend inline fun <reified T> put(url: String): T {

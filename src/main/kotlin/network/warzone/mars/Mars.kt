@@ -16,6 +16,10 @@ package network.warzone.mars
 
 import app.ashcon.intake.bukkit.BukkitIntake
 import app.ashcon.intake.bukkit.graph.BasicBukkitCommandGraph
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.commands.CommandModule
@@ -31,6 +35,7 @@ import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import tc.oc.pgm.api.PGM
+import java.lang.Runnable
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
@@ -75,6 +80,7 @@ class Mars : JavaPlugin() {
     }
 
     lateinit var serverId: String
+    lateinit var coroutines: CoroutineScope
 
     override fun onEnable() = runBlocking {
         instance = this@Mars
@@ -82,6 +88,8 @@ class Mars : JavaPlugin() {
         this@Mars.saveDefaultConfig()
 
         serverId = config.getString("server.id") ?: throw RuntimeException("Server ID not set in config")
+
+        coroutines = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
         val commandGraph = BasicBukkitCommandGraph(CommandModule)
 
@@ -110,6 +118,7 @@ class Mars : JavaPlugin() {
         }
 
         AchievementManager.unload()
+        coroutines.cancel()
     }
 
     private fun overrideDefaultProviders() {

@@ -1,15 +1,26 @@
 package network.warzone.mars.map
 
+import io.ktor.utils.io.close
+import io.ktor.utils.io.writeFully
+import io.ktor.utils.io.writer
+import java.io.File
+import java.util.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import network.warzone.mars.Mars
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.feature.NamedCachedFeature
+import network.warzone.mars.map.images.MapImages
+import network.warzone.mars.map.images.MapImages.Companion.CHUNK_SIZE
+import network.warzone.mars.map.images.MapImages.Companion.getMapImage
 import network.warzone.mars.map.models.GameMap
 import network.warzone.mars.map.models.MapContributor
+import network.warzone.mars.utils.BASE_LOGGER
 import org.bukkit.Bukkit
 import tc.oc.pgm.api.PGM
 import tc.oc.pgm.api.map.Contributor
 import tc.oc.pgm.api.map.MapInfo
 import tc.oc.pgm.map.contrib.PlayerContributor
-import java.util.*
 
 object MapFeature : NamedCachedFeature<GameMap>() {
     override suspend fun init() {
@@ -30,6 +41,29 @@ object MapFeature : NamedCachedFeature<GameMap>() {
         return created.onEach { add(it) }
     }
 
+    private fun uploadImages(imageFiles: List<Pair<String, File>>) {
+        Mars.get().coroutines.launch {
+            val readEnd = writer {
+                val conduit = Channel<ByteArray>(capacity = CHUNK_SIZE)
+                val images = MapImages(imageFiles)
+                launch {
+                    images.streamToChannel(this, conduit)
+                }
+                launch {
+                    for (data in conduit) {
+                        channel.writeFully(data)
+                    }
+                    channel.flush()
+                    channel.close()
+                }
+            }.channel
+            ApiClient.postBinary<Unit>(
+                "/mc/maps/images",
+                readEnd
+            )
+        }
+    }
+
     suspend fun list(): List<GameMap> {
         val maps = ApiClient.get<List<GameMap>>("/mc/maps")
 
@@ -48,6 +82,7 @@ object MapFeature : NamedCachedFeature<GameMap>() {
 
         // Initialize an empty array of map load requests.
         val mapLoadRequests = mutableListOf<MapLoadOneRequest>()
+        val mapImages = mutableListOf<Pair<String, File>>()
 
         // Loop over the iterator of maps.
         while (pgmMaps.hasNext()) {
@@ -67,10 +102,13 @@ object MapFeature : NamedCachedFeature<GameMap>() {
             } else { // Create new map
                 mapLoadRequests.add(toMapLoadRequest(map, null))
             }
+            getMapImage(map)?.let { mapImages.add(it) }
         }
 
         // Send all the map load requests to the API.
         create(maps = mapLoadRequests)
+        BASE_LOGGER.info("Found ${mapImages.size} map image(s) to upload")
+        uploadImages(mapImages)
     }
 
     private fun toMapLoadRequest(map: MapInfo, id: UUID?): MapLoadOneRequest {
