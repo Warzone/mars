@@ -74,9 +74,6 @@ object MapFeature : NamedCachedFeature<GameMap>() {
      * Find and load all new maps.
      */
     private suspend fun findNewMaps() {
-        // Get the currently loaded maps.
-        val currentMaps: List<GameMap> = list()
-
         // Get the PGM Map Library.
         val pgmMaps = PGM.get().mapLibrary.maps
 
@@ -89,19 +86,9 @@ object MapFeature : NamedCachedFeature<GameMap>() {
             // Get the map.
             val map = pgmMaps.next()
 
-            // Try and find a currently loaded map by the same name.
-            val existingMap = currentMaps.find { it.name.equals(map.name, ignoreCase = true) }
-
             if (map.gamemodes.isEmpty()) Bukkit.getLogger().warning("Found map '${map.name}' with no registered gamemodes")
 
-            if (existingMap != null) { // Map is already loaded
-                if (existingMap.hasChanged(map)) {
-                    // Create map load request for current map (regardless of version) for update.
-                    mapLoadRequests.add(toMapLoadRequest(map, existingMap._id))
-                }
-            } else { // Create new map
-                mapLoadRequests.add(toMapLoadRequest(map, null))
-            }
+            mapLoadRequests.add(toMapLoadRequest(map, null))
             getMapImage(map)?.let { mapImages.add(it) }
         }
 
