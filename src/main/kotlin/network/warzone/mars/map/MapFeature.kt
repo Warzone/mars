@@ -102,6 +102,7 @@ object MapFeature : NamedCachedFeature<GameMap>() {
         return MapLoadOneRequest(
             _id = id ?: UUID.randomUUID(),
             name = map.name,
+            slug = map.id,
             version = map.version.toString(),
             gamemodes = map.gamemodes.map { it.name },
             authors = map.authors.mapNotNull { resolveContributor(it) },
@@ -127,6 +128,7 @@ object MapFeature : NamedCachedFeature<GameMap>() {
     data class MapLoadOneRequest(
         val _id: UUID,
         val name: String,
+        val slug: String,
         val version: String,
         val gamemodes: List<String>,
         val authors: List<MapContributor>,
