@@ -152,7 +152,7 @@ class MatchTracker : Listener {
                 DestroyablePartial(
                     it.id,
                     it.name,
-                    it.owner.nameLegacy,
+                    it.owner?.nameLegacy,
                     it.blockRegion.blockVectors
                         .map { block -> BlockVectors.blockAt(match.world, block).type }
                         .groupingBy { self -> self }

@@ -7,7 +7,7 @@ import java.util.*
 data class DestroyablePartial(
     val id: String,
     val name: String,
-    val ownerName: String,
+    val ownerName: String?,
     val material: Material,
     val breaksRequired: Int,
     val blockCount: Int

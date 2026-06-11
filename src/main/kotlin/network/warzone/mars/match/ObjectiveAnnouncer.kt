@@ -55,9 +55,10 @@ class ObjectiveAnnouncer : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun onDestroyableDamage(event: DestroyableDamageEvent) {
         if (event.destroyable.isDestroyed || !event.destroyable.hasShowOption(ShowOption.SHOW_MESSAGES)) return
+        val owner = event.destroyable.owner ?: return
 
         var message = Component.join(JoinConfiguration.noSeparators(),
-            event.destroyable.owner.name,
+            owner.name,
             Component.text("'s "),
             event.destroyable.componentName,
             Component.text(" was damaged by "),
