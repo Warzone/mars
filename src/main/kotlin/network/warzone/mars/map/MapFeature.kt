@@ -2,7 +2,9 @@ package network.warzone.mars.map
 
 import java.io.File
 import java.util.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import network.warzone.mars.Mars
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.feature.NamedCachedFeature
@@ -38,7 +40,7 @@ object MapFeature : NamedCachedFeature<GameMap>() {
 
     private fun uploadImages(imageFiles: List<Pair<String, File>>) {
         Mars.get().coroutines.launch {
-            val payload = MapImages(imageFiles).buildPayload()
+            val payload = withContext(Dispatchers.IO) { MapImages(imageFiles).buildPayload() }
             ApiClient.postBinary<Unit>("/mc/maps/images", payload)
         }
     }
