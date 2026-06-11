@@ -1,17 +1,12 @@
 package network.warzone.mars.map
 
-import io.ktor.utils.io.close
-import io.ktor.utils.io.writeFully
-import io.ktor.utils.io.writer
 import java.io.File
 import java.util.*
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import network.warzone.mars.Mars
 import network.warzone.mars.api.ApiClient
 import network.warzone.mars.feature.NamedCachedFeature
 import network.warzone.mars.map.images.MapImages
-import network.warzone.mars.map.images.MapImages.Companion.CHUNK_SIZE
 import network.warzone.mars.map.images.MapImages.Companion.getMapImage
 import network.warzone.mars.map.models.GameMap
 import network.warzone.mars.map.models.MapContributor
@@ -43,24 +38,8 @@ object MapFeature : NamedCachedFeature<GameMap>() {
 
     private fun uploadImages(imageFiles: List<Pair<String, File>>) {
         Mars.get().coroutines.launch {
-            val readEnd = writer {
-                val conduit = Channel<ByteArray>(capacity = CHUNK_SIZE)
-                val images = MapImages(imageFiles)
-                launch {
-                    images.streamToChannel(this, conduit)
-                }
-                launch {
-                    for (data in conduit) {
-                        channel.writeFully(data)
-                    }
-                    channel.flush()
-                    channel.close()
-                }
-            }.channel
-            ApiClient.postBinary<Unit>(
-                "/mc/maps/images",
-                readEnd
-            )
+            val payload = MapImages(imageFiles).buildPayload()
+            ApiClient.postBinary<Unit>("/mc/maps/images", payload)
         }
     }
 

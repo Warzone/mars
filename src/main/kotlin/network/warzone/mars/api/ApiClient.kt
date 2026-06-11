@@ -16,7 +16,6 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import io.ktor.utils.io.ByteReadChannel
 import java.util.logging.Level
 import network.warzone.mars.Mars
 import network.warzone.mars.api.events.ApiConnectedEvent
@@ -110,9 +109,9 @@ object ApiClient {
         }
     }
 
-    suspend inline fun <reified T> postBinary(url: String, channel: ByteReadChannel): T {
+    suspend inline fun <reified T> postBinary(url: String, body: ByteArray): T {
         val r : T = clientBinary.post(baseUrl + url) {
-            this.body = channel
+            this.body = body
         }
         return r
     }
